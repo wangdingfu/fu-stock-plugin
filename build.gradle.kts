@@ -32,8 +32,8 @@ repositories {
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
-    implementation("cn.hutool:hutool-json:5.8.36")
-    implementation("cn.hutool:hutool-http:5.8.36")
+    implementation("cn.hutool:hutool-json:5.8.41")
+    implementation("cn.hutool:hutool-http:5.8.41")
     implementation("org.apache.commons:commons-lang3:3.10")
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
