@@ -67,12 +67,12 @@ public class StockView {
 
     public void stopTask() {
         scheduledTaskManager.stopTask();
-        updateTime(true);
+        updateTime(" [ 已停止刷新 ]");
     }
 
     public void shutdownTask() {
         scheduledTaskManager.shutdownExecutor();
-        updateTime(true);
+        updateTime(" [ 已停止刷新 ]");
     }
 
 
@@ -136,13 +136,24 @@ public class StockView {
         tableModel.setRowCount(0); // 清空现有数据
         stockInfoList.forEach(f -> tableModel.addRow(toTableData(f)));
         // 2. 更新时间标签（格式化当前时间）
-        updateTime(false);
+        updateTime();
     }
 
-    private void updateTime(boolean isStop) {
+    private void updateTime() {
+        updateTime("");
+    }
+
+    private void updateTime(String tag) {
         // 2. 更新时间标签（格式化当前时间）
         String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        showTextLabel.setText("最后更新时间：" + currentTime + (isStop ? " [已停止刷新]" : ""));
+        showTextLabel.setText("最后更新时间：" + currentTime + tag);
+    }
+
+    public void manualUpdate() {
+        List<StockInfo> stockInfos = fetchLatestStockData();
+        tableModel.setRowCount(0); // 清空现有数据
+        stockInfos.forEach(f -> tableModel.addRow(toTableData(f)));
+        updateTime(" [ 手动刷新中... ]");
     }
 
     private Vector<Object> toTableData(StockInfo stockInfo) {

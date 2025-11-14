@@ -90,6 +90,9 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String userInput = Messages.showInputDialog(project, ADD_STOCK_GROUP_MESSAGE, ADD_STOCK_GROUP_TITLE, IconUtil.getAddIcon(), "我的分组", null);
                 if (userInput != null && !userInput.isEmpty()) {
+                    if (stockViewMap.containsKey(userInput)) {
+                        return;
+                    }
                     StockView stockView = new StockView(project, userInput);
                     TabInfo tabInfo = new TabInfo(stockView.getRootPanel());
                     tabInfo.setText(userInput);
@@ -160,7 +163,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                getSelected().ifPresent(StockView::loadStockData);
+                getSelected().ifPresent(StockView::manualUpdate);
             }
         });
     }
