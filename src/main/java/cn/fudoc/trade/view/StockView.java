@@ -67,10 +67,12 @@ public class StockView {
 
     public void stopTask() {
         scheduledTaskManager.stopTask();
+        updateTime(true);
     }
 
     public void shutdownTask() {
         scheduledTaskManager.shutdownExecutor();
+        updateTime(true);
     }
 
 
@@ -83,7 +85,7 @@ public class StockView {
     /**
      * 加载列表中的股票
      */
-    private void loadStockData() {
+    public void loadStockData() {
         log.info("分组【{}】刷新股票数据", group);
         // 实际场景：调用股票接口获取数据
         List<StockInfo> stockInfoList = fetchLatestStockData();
@@ -97,7 +99,7 @@ public class StockView {
     }
 
 
-    private Set<String> getCodeList(){
+    private Set<String> getCodeList() {
         Vector<Vector> dataVector = tableModel.getDataVector();
         Set<String> codeSet = new HashSet<>();
         dataVector.forEach(data -> {
@@ -115,12 +117,9 @@ public class StockView {
      * @param code 股票代码
      */
     public void addStock(String code) {
-        List<StockInfo> stockInfos = fetchStockData(Lists.newArrayList(code));
-        if (CollectionUtils.isEmpty(stockInfos)) {
-            return;
-        }
-        stockInfos.forEach(f -> tableModel.addRow(toTableData(f)));
-
+        Set<String> codeList = getCodeList();
+        codeList.add(code);
+        updateStockData(fetchStockData(codeList));
     }
 
     private List<StockInfo> fetchStockData(Set<String> codeList) {
@@ -137,8 +136,13 @@ public class StockView {
         tableModel.setRowCount(0); // 清空现有数据
         stockInfoList.forEach(f -> tableModel.addRow(toTableData(f)));
         // 2. 更新时间标签（格式化当前时间）
+        updateTime(false);
+    }
+
+    private void updateTime(boolean isStop) {
+        // 2. 更新时间标签（格式化当前时间）
         String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        showTextLabel.setText("最后更新时间：" + currentTime);
+        showTextLabel.setText("最后更新时间：" + currentTime + (isStop ? " [已停止刷新]" : ""));
     }
 
     private Vector<Object> toTableData(StockInfo stockInfo) {

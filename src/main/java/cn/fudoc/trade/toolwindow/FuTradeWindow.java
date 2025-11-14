@@ -85,7 +85,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
     }
 
     private void initActionGroup() {
-        this.actionGroup.add(new AnAction("添加股票分组", "", FuIcons.FU_ADD_STOCK_GROUP) {
+        this.actionGroup.add(new AnAction("添加股票分组", "", AllIcons.Actions.AddDirectory) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String userInput = Messages.showInputDialog(project, ADD_STOCK_GROUP_MESSAGE, ADD_STOCK_GROUP_TITLE, IconUtil.getAddIcon(), "我的分组", null);
@@ -100,7 +100,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                 }
             }
         });
-        this.actionGroup.add(new AnAction(ADD_STOCK_TITLE, "", FuIcons.FU_ADD_STOCK) {
+        this.actionGroup.add(new AnAction(ADD_STOCK_TITLE, "", AllIcons.General.Add) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String userInput = Messages.showInputDialog(project, ADD_STOCK_MESSAGE, ADD_STOCK_TITLE, IconUtil.getAddIcon(), "sz300037", null);
@@ -114,6 +114,12 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         });
         //启动定时刷新股票
         this.actionGroup.add(new DumbAwareAction(STOCK_AUTO_LOAD_TITLE, "", AllIcons.Actions.Execute) {
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                Presentation presentation = e.getPresentation();
+                presentation.setEnabled(!isExecute.get());
+            }
+
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 getSelected().ifPresent(stockView -> {
@@ -141,6 +147,20 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                     stockView.stopTask();
                     isExecute.set(false);
                 });
+            }
+        });
+
+        //手动刷新股票
+        this.actionGroup.addAction(new DumbAwareAction("刷新", "", AllIcons.Actions.ForceRefresh) {
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                getSelected().ifPresent(StockView::loadStockData);
             }
         });
     }
