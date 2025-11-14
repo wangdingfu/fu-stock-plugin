@@ -1,6 +1,7 @@
 package cn.fudoc.trade.strategy;
 
 import java.util.List;
+import java.util.Set;
 
 public interface FetchStockStrategy {
 
@@ -16,5 +17,5 @@ public interface FetchStockStrategy {
      * @param codeList 股票代码集合
      * @return 股票数据集合
      */
-    List<StockInfo> fetch(List<String> codeList);
+    List<StockInfo> fetch(Set<String> codeList);
 }

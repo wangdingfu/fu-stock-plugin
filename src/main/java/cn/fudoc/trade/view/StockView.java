@@ -15,10 +15,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
 
 @Slf4j
 public class StockView {
@@ -95,16 +93,20 @@ public class StockView {
 
 
     private List<StockInfo> fetchLatestStockData() {
-        // 实际应替换为真实API请求（如通过OkHttp、HttpClient）
+        return fetchStockData(getCodeList());
+    }
+
+
+    private Set<String> getCodeList(){
         Vector<Vector> dataVector = tableModel.getDataVector();
-        List<String> codeList = Lists.newArrayList();
+        Set<String> codeSet = new HashSet<>();
         dataVector.forEach(data -> {
             Object o = data.get(0);
             if (Objects.nonNull(o)) {
-                codeList.add(o.toString());
+                codeSet.add(o.toString());
             }
         });
-        return fetchStockData(codeList);
+        return codeSet;
     }
 
     /**
@@ -118,9 +120,10 @@ public class StockView {
             return;
         }
         stockInfos.forEach(f -> tableModel.addRow(toTableData(f)));
+
     }
 
-    private List<StockInfo> fetchStockData(List<String> codeList) {
+    private List<StockInfo> fetchStockData(Set<String> codeList) {
         if (CollectionUtils.isEmpty(codeList)) {
             return Lists.newArrayList();
         }
@@ -137,7 +140,6 @@ public class StockView {
         String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         showTextLabel.setText("最后更新时间：" + currentTime);
     }
-
 
     private Vector<Object> toTableData(StockInfo stockInfo) {
         Vector<Object> vector = new Vector<>();

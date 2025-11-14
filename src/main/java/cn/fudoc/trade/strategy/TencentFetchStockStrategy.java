@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 从腾讯api获取股票数据
@@ -19,7 +20,7 @@ public class TencentFetchStockStrategy implements FetchStockStrategy{
     }
 
     @Override
-    public List<StockInfo> fetch(List<String> codeList) {
+    public List<StockInfo> fetch(Set<String> codeList) {
         String codeStr = String.join(",", codeList);
         String requestUrl = BASE_URL + codeStr;;
         try {

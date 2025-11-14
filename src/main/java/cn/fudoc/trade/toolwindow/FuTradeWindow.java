@@ -51,14 +51,21 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         tabs.addListener(new TabsListener() {
             @Override
             public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
-                StockView stockView = stockViewMap.get(oldSelection.getText());
-                if (Objects.nonNull(stockView)) {
-                    stockView.stopTask();
+                if (Objects.nonNull(oldSelection)) {
+                    StockView stockView = stockViewMap.get(oldSelection.getText());
+                    if (Objects.nonNull(stockView)) {
+                        stockView.stopTask();
+                    }
                 }
-                StockView newStockView = stockViewMap.get(newSelection.getText());
-                if (Objects.nonNull(newStockView)) {
-                    newStockView.startTask();
+                //切换新窗口时 判断当前是否开启自动刷新 开启时才刷新股票数据
+                if (isExecute.get() && Objects.nonNull(newSelection)) {
+                    StockView newStockView = stockViewMap.get(newSelection.getText());
+                    if (Objects.nonNull(newStockView)) {
+                        //添加新窗口时 默认启动刷新
+                        newStockView.startTask();
+                    }
                 }
+
             }
         }, () -> stockViewMap.forEach((key, value) -> value.shutdownTask()));
         setContent(this.rootPanel);
