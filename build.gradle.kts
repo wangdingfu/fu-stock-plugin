@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.kotlin) // Kotlin support
     alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
-    alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
 }
 
@@ -31,6 +30,11 @@ repositories {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.26")
+    annotationProcessor("org.projectlombok:lombok:1.18.26")
+    implementation("cn.hutool:hutool-json:5.8.22")
+    implementation("cn.hutool:hutool-http:5.8.22")
+    implementation("org.apache.commons:commons-lang3:3.10")
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
 

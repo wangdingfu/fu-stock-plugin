@@ -1,15 +1,21 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.wangdingfu.fustockplugin</id>
-    <name>fu-stock-plugin</name>
-    <vendor>wangdingfu</vendor>
+    <name>Fu Trade</name>
+    <vendor email="wangdingfu1024@163.com" url="https://github.com/wangdingfu">WANG DINGFU</vendor>
+
 
     <depends>com.intellij.modules.platform</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.wangdingfu.fustockplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.wangdingfu.fustockplugin.startup.MyProjectActivity" />
+        <toolWindow id="Fu Trade"
+                    icon="FuIcons.FU_TRADE"
+                    anchor="right"
+                    secondary="false"
+                    doNotActivateOnStart="true"
+                    order="last"
+                    factoryClass="cn.fudoc.trade.toolwindow.FuTradeToolWindowFactory"/>
     </extensions>
 </idea-plugin>
