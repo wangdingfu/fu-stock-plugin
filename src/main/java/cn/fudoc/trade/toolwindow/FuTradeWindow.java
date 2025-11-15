@@ -1,6 +1,9 @@
 package cn.fudoc.trade.toolwindow;
 
+import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.state.StockGroupPersistentState;
+import cn.fudoc.trade.util.ToolBarUtils;
+import cn.fudoc.trade.view.StockView;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -13,11 +16,7 @@ import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
 import com.intellij.util.IconUtil;
-import cn.fudoc.trade.common.FuBundle;
-import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.StockView;
-import icons.FuIcons;
-import org.apache.commons.collections.CollectionUtils;
+import lombok.Getter;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +38,9 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
     private static final String ADD_STOCK_MESSAGE = FuBundle.message("add.stock.message");
     private static final String STOCK_AUTO_LOAD_TITLE = FuBundle.message("stock.auto.load.title");
 
+    private Long refreshTime = 0L;
+
+    @Getter
     private final AtomicBoolean isExecute = new AtomicBoolean(false);
 
     private final Map<String, StockView> stockViewMap = new HashMap<>();
@@ -64,6 +66,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                     if (Objects.nonNull(newStockView)) {
                         //添加新窗口时 默认启动刷新
                         newStockView.startTask();
+                        refreshTime = System.currentTimeMillis();
                     }
                 }
 
@@ -89,6 +92,44 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         }
     }
 
+    public void autoSelectedTab() {
+        if (isExecute.get() && System.currentTimeMillis() - refreshTime > 3000) {
+            //代表是启用自动刷新  但实际未自动刷新
+            if (startTask()) {
+                refreshTime = System.currentTimeMillis();
+            } else {
+                tabs.select(tabs.getTabAt(0), true);
+            }
+        }
+    }
+
+    public void stopTask() {
+        TabInfo selectedInfo = tabs.getSelectedInfo();
+        if (Objects.isNull(selectedInfo)) {
+            return;
+        }
+        StockView stockView = stockViewMap.get(selectedInfo.getText());
+        if (Objects.isNull(stockView)) {
+            return;
+        }
+        stockView.stopTask();
+    }
+
+
+    private boolean startTask() {
+        TabInfo selectedInfo = tabs.getSelectedInfo();
+        if (Objects.isNull(selectedInfo)) {
+            return false;
+        }
+        StockView stockView = stockViewMap.get(selectedInfo.getText());
+        if (Objects.isNull(stockView)) {
+            return false;
+        }
+        stockView.startTask();
+        return true;
+    }
+
+
     private JPanel initToolBarUI() {
         JPanel toolBarPanel = new JPanel(new BorderLayout());
         Utils.setSmallerFontForChildren(toolBarPanel);
@@ -103,6 +144,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String userInput = Messages.showInputDialog(project, ADD_STOCK_GROUP_MESSAGE, ADD_STOCK_GROUP_TITLE, IconUtil.getAddIcon(), "我的分组", null);
                 addGroup(userInput);
+                StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+                instance.addGroup(userInput);
             }
         });
         this.actionGroup.add(new AnAction(ADD_STOCK_TITLE, "", AllIcons.General.Add) {
@@ -113,6 +156,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                 if (userInput != null && !userInput.isEmpty()) {
                     getSelected().ifPresent(stockView -> {
                         stockView.addStock(userInput);
+                        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+                        instance.addStock(stockView.getGroup(), userInput);
                     });
                 }
             }
@@ -134,7 +179,10 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 getSelected().ifPresent(stockView -> {
                     stockView.startTask();
+                    refreshTime = System.currentTimeMillis();
                     isExecute.set(true);
+                    StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+                    instance.setAutoRefresh(isExecute.get());
                 });
             }
         });
@@ -156,6 +204,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                 getSelected().ifPresent(stockView -> {
                     stockView.stopTask();
                     isExecute.set(false);
+                    StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+                    instance.setAutoRefresh(isExecute.get());
                 });
             }
         });

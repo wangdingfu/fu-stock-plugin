@@ -11,7 +11,7 @@ import java.util.Set;
  * 从腾讯api获取股票数据
  */
 @Slf4j
-public class TencentFetchStockStrategy implements FetchStockStrategy{
+public class TencentFetchStockStrategy implements FetchStockStrategy {
     private static final String BASE_URL = "http://qt.gtimg.cn/q=";
 
     @Override
@@ -22,11 +22,12 @@ public class TencentFetchStockStrategy implements FetchStockStrategy{
     @Override
     public List<StockInfo> fetch(Set<String> codeList) {
         String codeStr = String.join(",", codeList);
-        String requestUrl = BASE_URL + codeStr;;
+        String requestUrl = BASE_URL + codeStr;
         try {
+            System.out.println("获取股票数据：" + requestUrl);
             return parseStockSegment(HttpUtil.get(requestUrl));
-        }catch (Exception e){
-            log.warn("从腾讯获取股票实时信息异常:{}",e.getMessage());
+        } catch (Exception e) {
+            log.warn("从腾讯获取股票实时信息异常:{}", e.getMessage());
         }
         return new ArrayList<>();
     }
@@ -60,7 +61,7 @@ public class TencentFetchStockStrategy implements FetchStockStrategy{
             bean.setStockCode(code);
             bean.setStockName(values[1]);
             bean.setCurrentPrice(values[3]);
-            bean.setIncreaseRate(values[32]+"%");
+            bean.setIncreaseRate(values[32] + "%");
             bean.setVolume(values[36]);
             stockInfoList.add(bean);
         }

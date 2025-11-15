@@ -37,6 +37,7 @@ public class StockView {
     /**
      * 股票分组名称
      */
+    @Getter
     private final String group;
 
     private final ScheduledTaskManager scheduledTaskManager;
