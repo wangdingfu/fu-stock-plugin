@@ -122,6 +122,13 @@ public class StockView {
         updateStockData(fetchStockData(codeList));
     }
 
+    public void initStock(Set<String> codeList) {
+        if(CollectionUtils.isEmpty(codeList)){
+            return;
+        }
+        updateStockData(fetchStockData(codeList));
+    }
+
     private List<StockInfo> fetchStockData(Set<String> codeList) {
         if (CollectionUtils.isEmpty(codeList)) {
             return Lists.newArrayList();

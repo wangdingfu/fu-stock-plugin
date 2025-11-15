@@ -17,5 +17,10 @@
                     doNotActivateOnStart="true"
                     order="last"
                     factoryClass="cn.fudoc.trade.toolwindow.FuTradeToolWindowFactory"/>
+
+        <applicationService serviceImplementation="cn.fudoc.trade.state.StockGroupPersistentState"/>
+
     </extensions>
+
+
 </idea-plugin>

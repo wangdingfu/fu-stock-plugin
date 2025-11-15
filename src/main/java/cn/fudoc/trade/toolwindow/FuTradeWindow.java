@@ -1,5 +1,6 @@
 package cn.fudoc.trade.toolwindow;
 
+import cn.fudoc.trade.state.StockGroupPersistentState;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -16,14 +17,14 @@ import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockView;
 import icons.FuIcons;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider {
@@ -71,9 +72,21 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         setContent(this.rootPanel);
         this.rootPanel.add(initToolBarUI(), BorderLayout.NORTH);
         this.rootPanel.add(tabs, BorderLayout.CENTER);
-
         //初始化工具栏事件
         initActionGroup();
+
+        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+        isExecute.set(instance.isAutoRefresh());
+        Map<String, Set<String>> stockMap = instance.getStockMap();
+        if (MapUtils.isNotEmpty(stockMap)) {
+            stockMap.forEach((key, value) -> {
+                StockView stockView = addGroup(key);
+                if (Objects.isNull(stockView)) {
+                    return;
+                }
+                stockView.initStock(value);
+            });
+        }
     }
 
     private JPanel initToolBarUI() {
@@ -89,18 +102,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String userInput = Messages.showInputDialog(project, ADD_STOCK_GROUP_MESSAGE, ADD_STOCK_GROUP_TITLE, IconUtil.getAddIcon(), "我的分组", null);
-                if (userInput != null && !userInput.isEmpty()) {
-                    if (stockViewMap.containsKey(userInput)) {
-                        return;
-                    }
-                    StockView stockView = new StockView(project, userInput);
-                    TabInfo tabInfo = new TabInfo(stockView.getRootPanel());
-                    tabInfo.setText(userInput);
-                    tabs.addTab(tabInfo);
-                    // 可选：切换到新添加的标签
-                    tabs.select(tabInfo, true);
-                    stockViewMap.put(userInput, stockView);
-                }
+                addGroup(userInput);
             }
         });
         this.actionGroup.add(new AnAction(ADD_STOCK_TITLE, "", AllIcons.General.Add) {
@@ -117,6 +119,11 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         });
         //启动定时刷新股票
         this.actionGroup.add(new DumbAwareAction(STOCK_AUTO_LOAD_TITLE, "", AllIcons.Actions.Execute) {
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
             @Override
             public void update(@NotNull AnActionEvent e) {
                 Presentation presentation = e.getPresentation();
@@ -166,6 +173,24 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                 getSelected().ifPresent(StockView::manualUpdate);
             }
         });
+    }
+
+
+    private StockView addGroup(String group) {
+        if (StringUtils.isEmpty(group)) {
+            return null;
+        }
+        if (stockViewMap.containsKey(group)) {
+            return stockViewMap.get(group);
+        }
+        StockView stockView = new StockView(project, group);
+        TabInfo tabInfo = new TabInfo(stockView.getRootPanel());
+        tabInfo.setText(group);
+        tabs.addTab(tabInfo);
+        // 可选：切换到新添加的标签
+        tabs.select(tabInfo, true);
+        stockViewMap.put(group, stockView);
+        return stockView;
     }
 
 
