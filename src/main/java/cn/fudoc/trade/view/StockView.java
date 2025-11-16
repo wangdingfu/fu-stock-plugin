@@ -36,6 +36,7 @@ public class StockView {
      */
     private static final String[] columnNames = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交量(万手)"};
     private static final String STOCK_UN_SELECTED_TITLE = FuBundle.message("stock.un_selected.title");
+    private static final String STOCK_UN_SELECTED_REFRESH_TITLE = FuBundle.message("stock.un_selected.refresh.title");
 
     /**
      * 股票分组名称
@@ -109,13 +110,13 @@ public class StockView {
     private void deleteSelectedRow() {
         int[] selectedRows = stockTable.getSelectedRows();
         if (selectedRows == null || selectedRows.length == 0) {
-            Messages.showInfoMessage(STOCK_UN_SELECTED_TITLE, "提示");
+            String message = scheduledTaskManager.isRunning() ? STOCK_UN_SELECTED_REFRESH_TITLE : STOCK_UN_SELECTED_TITLE;
+            Messages.showInfoMessage(message, "提示");
             return;
         }
-        for (int selectedRow : selectedRows) {
-            // 转换为模型索引（处理排序/过滤后的索引偏移）
-            int modelRow = stockTable.convertRowIndexToModel(selectedRow);
-            tableModel.removeRow(modelRow); // 通过模型删除行
+        for (int i = selectedRows.length - 1; i >= 0; i--) {
+            int modelRow = stockTable.convertRowIndexToModel(selectedRows[i]);
+            tableModel.removeRow(modelRow);
         }
     }
 

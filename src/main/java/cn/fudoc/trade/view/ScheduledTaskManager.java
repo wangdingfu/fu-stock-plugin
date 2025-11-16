@@ -38,6 +38,11 @@ public class ScheduledTaskManager {
         }
     }
 
+
+    public boolean isRunning() {
+        return scheduledFuture != null && !scheduledFuture.isCancelled();
+    }
+
     /**
      * 关闭线程池（不再使用时调用，释放资源）
      */
