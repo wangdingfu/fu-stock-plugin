@@ -1,6 +1,7 @@
 package cn.fudoc.trade.toolwindow;
 
 import cn.fudoc.trade.common.FuBundle;
+import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockView;
@@ -179,16 +180,15 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 getSelected().ifPresent(stockView -> {
-                    boolean isStart = stockView.startTask();
-                    if(!isStart){
+                    boolean isStart = stockView.startTask(null, "[ 将于开盘后自动刷新 ]");
+                    if (!isStart) {
                         //没有启动成功 则提示
-                        Messages.showInfoMessage(STOCK_AUTO_LOAD_TIME_TITLE, "提示");
+                        FuNotification.notifyWarning(STOCK_AUTO_LOAD_TIME_TITLE, project);
                     }
                     refreshTime = System.currentTimeMillis();
                     isExecute.set(true);
                     StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
                     instance.setAutoRefresh(isExecute.get());
-                    stockView.updateTime("[ 将于开盘后自动刷新 ]");
                 });
             }
         });

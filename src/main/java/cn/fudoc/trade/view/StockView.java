@@ -1,6 +1,7 @@
 package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.common.FuBundle;
+import cn.fudoc.trade.common.FuNotification;
 import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
@@ -13,6 +14,7 @@ import cn.fudoc.trade.strategy.TencentFetchStockStrategy;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -68,13 +70,16 @@ public class StockView {
         scheduledTaskManager = new ScheduledTaskManager();
     }
 
-
     public boolean startTask() {
+        return startTask(null, null);
+    }
+
+    public boolean startTask(String tag, String notStartTag) {
         if (isCanStart()) {
-            scheduledTaskManager.startTask(this::loadStockData);
+            scheduledTaskManager.startTask(() -> loadStockData(tag));
             return true;
         }
-        loadStockData();
+        loadStockData(notStartTag);
         return false;
     }
 
@@ -92,17 +97,22 @@ public class StockView {
         if (hour == 11 && minute > 30) {
             return false;
         }
+        if (DateUtil.isWeekend(now)) {
+            //周六周日不开盘
+            return false;
+        }
+        //TODO 节假日判断
         return true;
     }
 
     public void stopTask() {
         scheduledTaskManager.stopTask();
-        updateTime(" [ 已停止刷新 ]");
+        updateTime("[ 已停止刷新 ]");
     }
 
     public void shutdownTask() {
         scheduledTaskManager.shutdownExecutor();
-        updateTime(" [ 已停止刷新 ]");
+        updateTime("[ 已停止刷新 ]");
     }
 
 
@@ -134,7 +144,7 @@ public class StockView {
         int[] selectedRows = stockTable.getSelectedRows();
         if (selectedRows == null || selectedRows.length == 0) {
             String message = scheduledTaskManager.isRunning() ? STOCK_UN_SELECTED_REFRESH_TITLE : STOCK_UN_SELECTED_TITLE;
-            Messages.showInfoMessage(message, "提示");
+            FuNotification.notifyWarning(message, project);
             return;
         }
         for (int i = selectedRows.length - 1; i >= 0; i--) {
@@ -146,12 +156,11 @@ public class StockView {
     /**
      * 加载列表中的股票
      */
-    public void loadStockData() {
-        log.info("分组【{}】刷新股票数据", group);
+    public void loadStockData(String tag) {
         // 实际场景：调用股票接口获取数据
         List<StockInfo> stockInfoList = fetchLatestStockData();
         // 在EDT线程中更新UI（Swing线程安全）
-        SwingUtilities.invokeLater(() -> updateStockData(stockInfoList));
+        SwingUtilities.invokeLater(() -> updateStockData(stockInfoList, tag));
     }
 
 
@@ -180,14 +189,14 @@ public class StockView {
     public void addStock(String code) {
         Set<String> codeList = getCodeList();
         codeList.add(code);
-        updateStockData(fetchStockData(codeList));
+        initStock(codeList);
     }
 
     public void initStock(Set<String> codeList) {
         if (CollectionUtils.isEmpty(codeList)) {
             return;
         }
-        updateStockData(fetchStockData(codeList));
+        updateStockData(fetchStockData(codeList), null);
     }
 
     private List<StockInfo> fetchStockData(Set<String> codeList) {
@@ -200,28 +209,22 @@ public class StockView {
 
 
     // 提供方法更新数据（实际可通过接口实时刷新）
-    public void updateStockData(List<StockInfo> stockInfoList) {
+    public void updateStockData(List<StockInfo> stockInfoList, String tag) {
         tableModel.setRowCount(0); // 清空现有数据
         stockInfoList.forEach(f -> tableModel.addRow(toTableData(f)));
         // 2. 更新时间标签（格式化当前时间）
-        updateTime();
+        updateTime(tag);
     }
 
-    private void updateTime() {
-        updateTime("");
-    }
 
-    public void updateTime(String tag) {
+    private void updateTime(String tag) {
         // 2. 更新时间标签（格式化当前时间）
         String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        showTextLabel.setText("最后更新时间：" + currentTime + tag);
+        showTextLabel.setText("最后更新时间：" + currentTime + (StringUtils.isEmpty(tag) ? "" : tag));
     }
 
     public void manualUpdate() {
-        List<StockInfo> stockInfos = fetchLatestStockData();
-        tableModel.setRowCount(0); // 清空现有数据
-        stockInfos.forEach(f -> tableModel.addRow(toTableData(f)));
-        updateTime(" [ 手动刷新中... ]");
+        updateStockData(fetchLatestStockData(), "[ 手动刷新中... ]");
     }
 
     private Vector<Object> toTableData(StockInfo stockInfo) {

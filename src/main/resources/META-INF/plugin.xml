@@ -10,6 +10,10 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+
+        <notificationGroup id="cn.fudoc.trade.notification.group" displayType="BALLOON" bundle="messages.MyBundle" key="cn.fudoc.trade.notification.group"/>
+
+
         <toolWindow id="Fu Trade"
                     icon="FuIcons.FU_TRADE"
                     anchor="right"
