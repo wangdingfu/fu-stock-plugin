@@ -2,6 +2,7 @@ package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.common.FuNotification;
+import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
@@ -147,9 +148,14 @@ public class StockView {
             FuNotification.notifyWarning(message, project);
             return;
         }
+        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
         for (int i = selectedRows.length - 1; i >= 0; i--) {
             int modelRow = stockTable.convertRowIndexToModel(selectedRows[i]);
             tableModel.removeRow(modelRow);
+            //持久化移除
+            Object valueAt = tableModel.getValueAt(modelRow, 0);
+            String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
+            instance.removeStock(group, code);
         }
     }
 
@@ -220,7 +226,7 @@ public class StockView {
     private void updateTime(String tag) {
         // 2. 更新时间标签（格式化当前时间）
         String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        showTextLabel.setText("最后更新时间：" + currentTime + (StringUtils.isEmpty(tag) ? "" : tag));
+        showTextLabel.setText("最后更新时间：" + currentTime + (StringUtils.isEmpty(tag) ? "" : (" " + tag)));
     }
 
     public void manualUpdate() {

@@ -8,6 +8,7 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -34,8 +35,8 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
     private Map<String, Set<String>> stockMap = new HashMap<>();
 
     public Map<String, Set<String>> getStockMap() {
-        if(!stockMap.containsKey("我的自选")){
-            stockMap.put("我的自选",Sets.newHashSet());
+        if (!stockMap.containsKey("我的自选")) {
+            stockMap.put("我的自选", Sets.newHashSet());
         }
         return stockMap;
     }
@@ -48,6 +49,24 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
             return;
         }
         this.stockMap.put(group, new HashSet<>());
+    }
+
+    public void removeGroup(String group) {
+        if (StringUtils.isEmpty(group)) {
+            return;
+        }
+        this.stockMap.remove(group);
+    }
+
+
+    public void removeStock(String group, String code) {
+        if (StringUtils.isBlank(group) || StringUtils.isBlank(code)) {
+            return;
+        }
+        Set<String> codeSet = this.stockMap.get(group);
+        if (CollectionUtils.isNotEmpty(codeSet)) {
+            codeSet.remove(code);
+        }
     }
 
 

@@ -39,6 +39,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
     private static final String ADD_STOCK_MESSAGE = FuBundle.message("add.stock.message");
     private static final String STOCK_AUTO_LOAD_TITLE = FuBundle.message("stock.auto.load.title");
     private static final String STOCK_AUTO_LOAD_TIME_TITLE = FuBundle.message("stock.auto.load.time.tip");
+    private static final String REMOVE_STOCK_GROUP_TITLE = FuBundle.message("remove.stock.group.title");
 
     private Long refreshTime = 0L;
 
@@ -53,6 +54,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         this.rootPanel = new JPanel(new BorderLayout());
         this.actionGroup = new DefaultActionGroup();
         tabs = new JBTabsImpl(project);
+        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+
         tabs.addListener(new TabsListener() {
             @Override
             public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
@@ -71,7 +74,16 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                         refreshTime = System.currentTimeMillis();
                     }
                 }
-
+            }
+            @Override
+            public void tabRemoved(@NotNull TabInfo tabToRemove) {
+                int result = Messages.showYesNoDialog(REMOVE_STOCK_GROUP_TITLE, "确认移除", Messages.getQuestionIcon());
+                if (result == Messages.YES) {
+                    // 移除当前标签
+                    tabs.removeTab(tabToRemove);
+                    //持久化数据更新
+                    instance.removeGroup(tabToRemove.getText());
+                }
             }
         }, () -> stockViewMap.forEach((key, value) -> value.shutdownTask()));
         setContent(this.rootPanel);
@@ -80,7 +92,6 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         //初始化工具栏事件
         initActionGroup();
 
-        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
         isExecute.set(instance.isAutoRefresh());
         Map<String, Set<String>> stockMap = instance.getStockMap();
         if (MapUtils.isNotEmpty(stockMap)) {
