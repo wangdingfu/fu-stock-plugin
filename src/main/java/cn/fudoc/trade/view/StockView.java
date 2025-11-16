@@ -1,6 +1,7 @@
 package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.common.FuBundle;
+import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -34,7 +35,7 @@ public class StockView {
     /**
      * 定义表格列名
      */
-    private static final String[] columnNames = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交量(万手)"};
+    private static final String[] columnNames = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
     private static final String STOCK_UN_SELECTED_TITLE = FuBundle.message("stock.un_selected.title");
     private static final String STOCK_UN_SELECTED_REFRESH_TITLE = FuBundle.message("stock.un_selected.refresh.title");
 
@@ -68,8 +69,30 @@ public class StockView {
     }
 
 
-    public void startTask() {
-        scheduledTaskManager.startTask(this::loadStockData);
+    public boolean startTask() {
+        if (isCanStart()) {
+            scheduledTaskManager.startTask(this::loadStockData);
+            return true;
+        }
+        loadStockData();
+        return false;
+    }
+
+    private boolean isCanStart() {
+        //判断当前时间是否开盘时间  不是则不提交任务 自动刷新时间段定位9:15 ~ 11:30 13:00~15:00
+        Date now = new Date();
+        int hour = DateUtil.hour(now, true);
+        if (hour < 9 || hour > 15 || hour == 12) {
+            return false;
+        }
+        int minute = DateUtil.minute(now);
+        if (hour == 9 && minute < 15) {
+            return false;
+        }
+        if (hour == 11 && minute > 30) {
+            return false;
+        }
+        return true;
     }
 
     public void stopTask() {
@@ -161,7 +184,7 @@ public class StockView {
     }
 
     public void initStock(Set<String> codeList) {
-        if(CollectionUtils.isEmpty(codeList)){
+        if (CollectionUtils.isEmpty(codeList)) {
             return;
         }
         updateStockData(fetchStockData(codeList));
@@ -188,7 +211,7 @@ public class StockView {
         updateTime("");
     }
 
-    private void updateTime(String tag) {
+    public void updateTime(String tag) {
         // 2. 更新时间标签（格式化当前时间）
         String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         showTextLabel.setText("最后更新时间：" + currentTime + tag);

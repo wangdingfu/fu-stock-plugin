@@ -1,8 +1,11 @@
 package cn.fudoc.trade.strategy;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -62,9 +65,22 @@ public class TencentFetchStockStrategy implements FetchStockStrategy {
             bean.setStockName(values[1]);
             bean.setCurrentPrice(values[3]);
             bean.setIncreaseRate(values[32] + "%");
-            bean.setVolume(values[36]);
+            bean.setVolume(formatVolume(values[37]));
             stockInfoList.add(bean);
         }
         return stockInfoList;
+    }
+
+    private static final BigDecimal Y = new BigDecimal("10000");
+
+    private static String formatVolume(String volume) {
+        if(StringUtils.isEmpty(volume) || !NumberUtil.isNumber(volume)){
+            return "---";
+        }
+        BigDecimal bigDecimal = new BigDecimal(volume);
+        if(bigDecimal.compareTo(Y) < 0){
+            return volume+" 万";
+        }
+        return NumberUtil.div(bigDecimal,Y,2) + " 亿";
     }
 }

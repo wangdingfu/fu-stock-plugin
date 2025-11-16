@@ -24,7 +24,7 @@ public class StockInfo {
      */
     private String increaseRate;
     /**
-     * 成交量(万手)（东方财富返回单位为“手”，需转换为“万手”）
+     * 成交额
      */
     private String volume;
 }

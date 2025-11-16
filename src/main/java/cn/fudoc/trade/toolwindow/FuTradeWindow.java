@@ -37,6 +37,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
     private static final String ADD_STOCK_TITLE = FuBundle.message("add.stock.title");
     private static final String ADD_STOCK_MESSAGE = FuBundle.message("add.stock.message");
     private static final String STOCK_AUTO_LOAD_TITLE = FuBundle.message("stock.auto.load.title");
+    private static final String STOCK_AUTO_LOAD_TIME_TITLE = FuBundle.message("stock.auto.load.time.tip");
 
     private Long refreshTime = 0L;
 
@@ -178,11 +179,16 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 getSelected().ifPresent(stockView -> {
-                    stockView.startTask();
+                    boolean isStart = stockView.startTask();
+                    if(!isStart){
+                        //没有启动成功 则提示
+                        Messages.showInfoMessage(STOCK_AUTO_LOAD_TIME_TITLE, "提示");
+                    }
                     refreshTime = System.currentTimeMillis();
                     isExecute.set(true);
                     StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
                     instance.setAutoRefresh(isExecute.get());
+                    stockView.updateTime("[ 将于开盘后自动刷新 ]");
                 });
             }
         });
