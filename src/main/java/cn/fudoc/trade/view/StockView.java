@@ -1,7 +1,9 @@
 package cn.fudoc.trade.view;
 
+import cn.fudoc.trade.common.FuBundle;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import cn.fudoc.trade.strategy.FetchStockStrategy;
@@ -33,12 +35,15 @@ public class StockView {
      * 定义表格列名
      */
     private static final String[] columnNames = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交量(万手)"};
+    private static final String STOCK_UN_SELECTED_TITLE = FuBundle.message("stock.un_selected.title");
 
     /**
      * 股票分组名称
      */
     @Getter
     private final String group;
+
+    private final JBTable stockTable;
 
     private final ScheduledTaskManager scheduledTaskManager;
 
@@ -57,7 +62,7 @@ public class StockView {
                 return false;
             }
         };
-        initStockTable();
+        stockTable = initStockTable();
         scheduledTaskManager = new ScheduledTaskManager();
     }
 
@@ -77,10 +82,41 @@ public class StockView {
     }
 
 
-    private void initStockTable() {
+    private JBTable initStockTable() {
         JBTable stockTable = new JBTable(tableModel);
+        // 2. 创建右键菜单
+        JPopupMenu popupMenu = createPopupMenu();
+        stockTable.setComponentPopupMenu(popupMenu);
         ToolbarDecorator decorator = ToolbarDecorator.createDecorator(stockTable);
+        stockTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.rootPanel.add(decorator.createPanel(), BorderLayout.CENTER);
+        return stockTable;
+    }
+
+    // 创建右键菜单（包含“删除”选项）
+    private JPopupMenu createPopupMenu() {
+        JPopupMenu menu = new JPopupMenu();
+
+        // 添加“删除”菜单项
+        JMenuItem deleteItem = new JMenuItem("删除");
+        deleteItem.addActionListener(e -> deleteSelectedRow()); // 绑定删除逻辑
+
+        menu.add(deleteItem);
+        return menu;
+    }
+
+    // 删除选中行的核心逻辑
+    private void deleteSelectedRow() {
+        int[] selectedRows = stockTable.getSelectedRows();
+        if (selectedRows == null || selectedRows.length == 0) {
+            Messages.showInfoMessage(STOCK_UN_SELECTED_TITLE, "提示");
+            return;
+        }
+        for (int selectedRow : selectedRows) {
+            // 转换为模型索引（处理排序/过滤后的索引偏移）
+            int modelRow = stockTable.convertRowIndexToModel(selectedRow);
+            tableModel.removeRow(modelRow); // 通过模型删除行
+        }
     }
 
     /**
