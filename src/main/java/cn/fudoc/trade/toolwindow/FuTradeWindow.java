@@ -75,6 +75,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                     }
                 }
             }
+
             @Override
             public void tabRemoved(@NotNull TabInfo tabToRemove) {
                 int result = Messages.showYesNoDialog(REMOVE_STOCK_GROUP_TITLE, "确认移除", Messages.getQuestionIcon());
