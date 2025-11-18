@@ -1,11 +1,14 @@
 package cn.fudoc.trade.common;
 
+import com.intellij.BundleBase;
 import com.intellij.DynamicBundle;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ResourceBundle;
+
 public class FuBundle extends DynamicBundle {
 
-    private static final FuBundle INSTANCE = new FuBundle("messages.MyBundle");
+    private static final ResourceBundle INSTANCE = ResourceBundle.getBundle("messages.MyBundle");
 
 
     public FuBundle(@NotNull String pathToBundle) {
@@ -14,6 +17,6 @@ public class FuBundle extends DynamicBundle {
 
 
     public static String message(String key, Object... params) {
-        return INSTANCE.getMessage(key, params);
+        return BundleBase.message(INSTANCE, key, params);
     }
 }

@@ -13,9 +13,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.tabs.JBTabs;
+import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
-import com.intellij.ui.tabs.impl.JBTabsImpl;
 import com.intellij.util.IconUtil;
 import lombok.Getter;
 import org.apache.commons.collections.MapUtils;
@@ -30,9 +31,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider {
 
     private final Project project;
-    private final JPanel rootPanel;
     private final DefaultActionGroup actionGroup;
-    private final JBTabsImpl tabs;
+    private final JBTabs tabs;
     private static final String ADD_STOCK_GROUP_TITLE = FuBundle.message("add.stock.group.title");
     private static final String ADD_STOCK_GROUP_MESSAGE = FuBundle.message("add.stock.group.message");
     private static final String ADD_STOCK_TITLE = FuBundle.message("add.stock.title");
@@ -51,9 +51,9 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
     public FuTradeWindow(@NotNull Project project, ToolWindow toolWindow) {
         super(Boolean.TRUE, Boolean.TRUE);
         this.project = project;
-        this.rootPanel = new JPanel(new BorderLayout());
+        JPanel rootPanel = new JPanel(new BorderLayout());
         this.actionGroup = new DefaultActionGroup();
-        tabs = new JBTabsImpl(project);
+        tabs = JBTabsFactory.createTabs(project);
         StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
 
         tabs.addListener(new TabsListener() {
@@ -80,16 +80,17 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             public void tabRemoved(@NotNull TabInfo tabToRemove) {
                 int result = Messages.showYesNoDialog(REMOVE_STOCK_GROUP_TITLE, "确认移除", Messages.getQuestionIcon());
                 if (result == Messages.YES) {
-                    // 移除当前标签
-                    tabs.removeTab(tabToRemove);
                     //持久化数据更新
                     instance.removeGroup(tabToRemove.getText());
                 }
             }
         }, () -> stockViewMap.forEach((key, value) -> value.shutdownTask()));
-        setContent(this.rootPanel);
-        this.rootPanel.add(initToolBarUI(), BorderLayout.NORTH);
-        this.rootPanel.add(tabs, BorderLayout.CENTER);
+        setContent(rootPanel);
+        //工具栏
+        rootPanel.add(initToolBarUI(), BorderLayout.NORTH);
+        //股票分组
+        rootPanel.add(tabs.getComponent(), BorderLayout.CENTER);
+        //todo 我的持仓
         //初始化工具栏事件
         initActionGroup();
 
