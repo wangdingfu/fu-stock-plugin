@@ -155,7 +155,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
     }
 
     private void initActionGroup() {
-        this.actionGroup.add(new AnAction("添加股票分组", "", AllIcons.Actions.AddDirectory) {
+        this.actionGroup.add(new AnAction("添加股票分组", "", FuIcons.FU_ADD_GROUP) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String userInput = Messages.showInputDialog(project, ADD_STOCK_GROUP_MESSAGE, ADD_STOCK_GROUP_TITLE, IconUtil.getAddIcon(), "我的分组", null);
