@@ -18,6 +18,7 @@ import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.util.IconUtil;
+import icons.FuIcons;
 import lombok.Getter;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
