@@ -5,9 +5,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.extra.pinyin.PinyinUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 public class StockIndex {
@@ -26,6 +24,9 @@ public class StockIndex {
      */
     private final Map<String, String> nameMap = new HashMap<>(8000);
 
+    public StockIndex(boolean isHK) {
+        this.isHK = isHK;
+    }
 
     public StockIndex(List<StockInfo> stockInfoList, boolean isHK) {
         this.isHK = isHK;
@@ -98,9 +99,7 @@ public class StockIndex {
 
     private boolean isAlpha(String str) {
         for (char c : str.toCharArray()) {
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-                continue;
-            } else {
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) {
                 return false;
             }
         }
