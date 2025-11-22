@@ -7,6 +7,7 @@
 
     <depends>com.intellij.modules.platform</depends>
 
+
     <extensions defaultExtensionNs="com.intellij">
 
         <notificationGroup id="cn.fudoc.trade.notification.group" displayType="BALLOON" bundle="messages.MyBundle" key="cn.fudoc.trade.notification.group"/>
@@ -21,6 +22,7 @@
                     factoryClass="cn.fudoc.trade.toolwindow.FuTradeToolWindowFactory"/>
 
         <applicationService serviceImplementation="cn.fudoc.trade.state.StockGroupPersistentState"/>
+        <applicationService serviceInterface="cn.fudoc.trade.api.TencentApiService" serviceImplementation="cn.fudoc.trade.api.impl.TencentApiServiceImpl"/>
     </extensions>
 
 

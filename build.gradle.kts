@@ -30,11 +30,14 @@ repositories {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+    implementation("javax.inject:javax.inject:1")
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     implementation("cn.hutool:hutool-json:5.8.36")
     implementation("cn.hutool:hutool-http:5.8.36")
-    implementation("org.apache.commons:commons-lang3:3.10")
+    implementation("cn.hutool:hutool-extra:5.8.36")
+    implementation("com.belerweb:pinyin4j:2.5.1")
+    implementation("org.apache.commons:commons-lang3:5.3")
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
 

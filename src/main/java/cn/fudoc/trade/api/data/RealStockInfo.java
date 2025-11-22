@@ -1,11 +1,14 @@
-package cn.fudoc.trade.strategy;
+package cn.fudoc.trade.api.data;
 
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 股票实时交易数据对象
+ */
 @Getter
 @Setter
-public class StockInfo {
+public class RealStockInfo {
 
     /**
      * 股票代码（如600519、000858）

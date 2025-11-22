@@ -1,5 +1,7 @@
-package cn.fudoc.trade.strategy;
+package cn.fudoc.trade.api.impl;
 
+import cn.fudoc.trade.api.TencentApiService;
+import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -10,30 +12,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+
 /**
- * 从腾讯api获取股票数据
+ * 腾讯金融API数据获取实现类
  */
 @Slf4j
-public class TencentFetchStockStrategy implements FetchStockStrategy {
+public class TencentApiServiceImpl implements TencentApiService {
+    private static final BigDecimal Y = new BigDecimal("10000");
     private static final String BASE_URL = "http://qt.gtimg.cn/q=";
 
-    @Override
-    public FetchStockSourceEnum source() {
-        return FetchStockSourceEnum.TENCENT;
-    }
 
     @Override
-    public List<StockInfo> fetch(Set<String> codeList) {
-        String codeStr = String.join(",", codeList);
+    public List<RealStockInfo> stockList(Set<String> codeSet) {
+        String codeStr = String.join(",", codeSet);
         String requestUrl = BASE_URL + codeStr;
         try {
-            System.out.println("获取股票数据：" + requestUrl);
             return parseStockSegment(HttpUtil.get(requestUrl));
         } catch (Exception e) {
             log.warn("从腾讯获取股票实时信息异常:{}", e.getMessage());
         }
         return new ArrayList<>();
     }
+
 
     /**
      * values[3]==>当前价
@@ -53,25 +53,24 @@ public class TencentFetchStockStrategy implements FetchStockStrategy {
      * values[45]==>总市值 单位：亿
      * values[46]==>市净率
      */
-    private static List<StockInfo> parseStockSegment(String result) {
-        List<StockInfo> stockInfoList = new ArrayList<>();
+    private static List<RealStockInfo> parseStockSegment(String result) {
+        List<RealStockInfo> realStockInfoList = new ArrayList<>();
         String[] lines = result.split("\n");
         for (String line : lines) {
             String code = line.substring(line.indexOf("_") + 1, line.indexOf("="));
             String dataStr = line.substring(line.indexOf("=") + 2, line.length() - 2);
             String[] values = dataStr.split("~");
-            StockInfo bean = new StockInfo();
+            RealStockInfo bean = new RealStockInfo();
             bean.setStockCode(code);
             bean.setStockName(values[1]);
             bean.setCurrentPrice(values[3]);
             bean.setIncreaseRate(values[32] + "%");
             bean.setVolume(formatVolume(values[37]));
-            stockInfoList.add(bean);
+            realStockInfoList.add(bean);
         }
-        return stockInfoList;
+        return realStockInfoList;
     }
 
-    private static final BigDecimal Y = new BigDecimal("10000");
 
     private static String formatVolume(String volume) {
         if(StringUtils.isEmpty(volume) || !NumberUtil.isNumber(volume)){

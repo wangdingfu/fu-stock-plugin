@@ -1,22 +1,22 @@
 package cn.fudoc.trade.view;
 
+import cn.fudoc.trade.api.TencentApiService;
+import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Lists;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
-import cn.fudoc.trade.strategy.FetchStockStrategy;
-import cn.fudoc.trade.strategy.StockInfo;
-import cn.fudoc.trade.strategy.TencentFetchStockStrategy;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.inject.Inject;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -51,6 +51,8 @@ public class StockView {
     private final JBTable stockTable;
 
     private final ScheduledTaskManager scheduledTaskManager;
+    @Inject
+    private final TencentApiService tencentApiService;
 
     public StockView(Project project, String group) {
         this.project = project;
@@ -69,6 +71,7 @@ public class StockView {
         };
         stockTable = initStockTable();
         scheduledTaskManager = new ScheduledTaskManager();
+        tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
     }
 
     public boolean startTask() {
@@ -164,13 +167,13 @@ public class StockView {
      */
     public void loadStockData(String tag) {
         // 实际场景：调用股票接口获取数据
-        List<StockInfo> stockInfoList = fetchLatestStockData();
+        List<RealStockInfo> realStockInfoList = fetchLatestStockData();
         // 在EDT线程中更新UI（Swing线程安全）
-        SwingUtilities.invokeLater(() -> updateStockData(stockInfoList, tag));
+        SwingUtilities.invokeLater(() -> updateStockData(realStockInfoList, tag));
     }
 
 
-    private List<StockInfo> fetchLatestStockData() {
+    private List<RealStockInfo> fetchLatestStockData() {
         return fetchStockData(getCodeList());
     }
 
@@ -205,19 +208,18 @@ public class StockView {
         updateStockData(fetchStockData(codeList), null);
     }
 
-    private List<StockInfo> fetchStockData(Set<String> codeList) {
+    private List<RealStockInfo> fetchStockData(Set<String> codeList) {
         if (CollectionUtils.isEmpty(codeList)) {
             return Lists.newArrayList();
         }
-        FetchStockStrategy fetchStockStrategy = new TencentFetchStockStrategy();
-        return fetchStockStrategy.fetch(codeList);
+        return tencentApiService.stockList(codeList);
     }
 
 
     // 提供方法更新数据（实际可通过接口实时刷新）
-    public void updateStockData(List<StockInfo> stockInfoList, String tag) {
+    public void updateStockData(List<RealStockInfo> realStockInfoList, String tag) {
         tableModel.setRowCount(0); // 清空现有数据
-        stockInfoList.forEach(f -> tableModel.addRow(toTableData(f)));
+        realStockInfoList.forEach(f -> tableModel.addRow(toTableData(f)));
         // 2. 更新时间标签（格式化当前时间）
         updateTime(tag);
     }
@@ -233,13 +235,13 @@ public class StockView {
         updateStockData(fetchLatestStockData(), "[ 手动刷新中... ]");
     }
 
-    private Vector<Object> toTableData(StockInfo stockInfo) {
+    private Vector<Object> toTableData(RealStockInfo realStockInfo) {
         Vector<Object> vector = new Vector<>();
-        vector.add(stockInfo.getStockCode());
-        vector.add(stockInfo.getStockName());
-        vector.add(stockInfo.getCurrentPrice());
-        vector.add(stockInfo.getIncreaseRate());
-        vector.add(stockInfo.getVolume());
+        vector.add(realStockInfo.getStockCode());
+        vector.add(realStockInfo.getStockName());
+        vector.add(realStockInfo.getCurrentPrice());
+        vector.add(realStockInfo.getIncreaseRate());
+        vector.add(realStockInfo.getVolume());
         return vector;
     }
 
