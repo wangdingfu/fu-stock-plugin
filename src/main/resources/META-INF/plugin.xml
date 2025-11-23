@@ -19,10 +19,14 @@
                     secondary="false"
                     doNotActivateOnStart="true"
                     order="last"
-                    factoryClass="cn.fudoc.trade.toolwindow.FuTradeToolWindowFactory"/>
+                    factoryClass="cn.fudoc.trade.view.toolwindow.FuTradeToolWindowFactory"/>
 
         <applicationService serviceImplementation="cn.fudoc.trade.state.StockGroupPersistentState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.state.MarketAllStockPersistentState"/>
         <applicationService serviceInterface="cn.fudoc.trade.api.TencentApiService" serviceImplementation="cn.fudoc.trade.api.impl.TencentApiServiceImpl"/>
+        <applicationService serviceInterface="cn.fudoc.trade.api.ZTApiService" serviceImplementation="cn.fudoc.trade.api.impl.ZTApiServiceImpl"/>
+
+        <postStartupActivity implementation="cn.fudoc.trade.startup.FuStockStartupActivity" />
     </extensions>
 
 

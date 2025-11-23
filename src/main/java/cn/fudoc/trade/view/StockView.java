@@ -51,7 +51,6 @@ public class StockView {
     private final JBTable stockTable;
 
     private final ScheduledTaskManager scheduledTaskManager;
-    @Inject
     private final TencentApiService tencentApiService;
 
     public StockView(Project project, String group) {

@@ -37,7 +37,7 @@ dependencies {
     implementation("cn.hutool:hutool-http:5.8.36")
     implementation("cn.hutool:hutool-extra:5.8.36")
     implementation("com.belerweb:pinyin4j:2.5.1")
-    implementation("org.apache.commons:commons-lang3:5.3")
+    implementation("org.apache.commons:commons-lang3:3.10")
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
 

@@ -4,6 +4,7 @@ import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.state.index.MatchResult;
 import cn.fudoc.trade.state.index.StockIndex;
 import com.google.common.collect.Lists;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -29,14 +30,23 @@ import java.util.stream.Collectors;
 public class MarketAllStockPersistentState implements PersistentStateComponent<MarketAllStockPersistentState> {
 
     /**
+     * 每次更新市场股票数据时间
+     */
+    @Setter
+    private Long updateTime;
+
+    /**
      * 大A股票索引
      */
-    private StockIndex A = new StockIndex(false);
+    private StockIndex A;
     /**
      * 香港股票索引
      */
-    private StockIndex HK = new StockIndex(true);
+    private StockIndex HK;
 
+    public static MarketAllStockPersistentState getInstance() {
+        return ApplicationManager.getApplication().getService(MarketAllStockPersistentState.class);
+    }
 
     public void initMarketA(List<StockInfo> stockInfoList) {
         this.A = new StockIndex(stockInfoList, false);
@@ -51,14 +61,14 @@ public class MarketAllStockPersistentState implements PersistentStateComponent<M
         if (StringUtils.isBlank(keyword)) {
             return new ArrayList<>();
         }
+        if (Objects.isNull(A)) {
+            A = new StockIndex(false);
+        }
+        if (Objects.isNull(HK)) {
+            HK = new StockIndex(true);
+        }
         List<MatchResult> marketAMatchList = A.match(keyword);
-        if (Objects.nonNull(marketAMatchList) && !marketAMatchList.isEmpty() && marketAMatchList.stream().anyMatch(a -> a.getSimilarity() == 1L)) {
-            return marketAMatchList.stream().filter(f -> f.getSimilarity() == 1D).map(MatchResult::getStockInfo).collect(Collectors.toList());
-        }
         List<MatchResult> marketHKMatchList = HK.match(keyword);
-        if (Objects.nonNull(marketHKMatchList) && !marketHKMatchList.isEmpty() && marketHKMatchList.stream().anyMatch(a -> a.getSimilarity() == 1L)) {
-            return marketHKMatchList.stream().filter(f -> f.getSimilarity() == 1D).map(MatchResult::getStockInfo).collect(Collectors.toList());
-        }
         List<MatchResult> matchList = Lists.newArrayList();
         if (Objects.nonNull(marketAMatchList) && !marketAMatchList.isEmpty()) {
             matchList.addAll(marketAMatchList);

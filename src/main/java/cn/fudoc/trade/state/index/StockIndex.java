@@ -1,16 +1,17 @@
 package cn.fudoc.trade.state.index;
 
 import cn.fudoc.trade.api.data.StockInfo;
+import cn.fudoc.trade.util.PinyinUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.extra.pinyin.PinyinUtil;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
 public class StockIndex {
 
-    private final boolean isHK;
+    private boolean isHK;
     /**
      * 代码映射 key:代码 value：股票信息
      */
@@ -18,11 +19,14 @@ public class StockIndex {
     /**
      * 首字母映射 key：首字母 value：代码
      */
-    private final Map<String, String> firstMap = new HashMap<>(8000);
+    private final Map<String, Set<String>> firstMap = new HashMap<>(8000);
     /**
      * 名称映射 key：名称 value：代码
      */
     private final Map<String, String> nameMap = new HashMap<>(8000);
+
+    public StockIndex() {
+    }
 
     public StockIndex(boolean isHK) {
         this.isHK = isHK;
@@ -38,7 +42,17 @@ public class StockIndex {
             }
             codeMap.put(code, stockInfo);
             //首字母
-            firstMap.put(getFirstPinyin(name), code);
+            Set<String> firstPinyin = getFirstPinyin(name);
+            if (firstPinyin != null && !firstPinyin.isEmpty()) {
+                firstPinyin.forEach(s -> {
+                    Set<String> codeSet = firstMap.get(s);
+                    if (Objects.isNull(codeSet)) {
+                        codeSet = new HashSet<>();
+                        firstMap.put(s, codeSet);
+                    }
+                    codeSet.add(code);
+                });
+            }
             //名称
             nameMap.put(name.trim(), code);
         }
@@ -66,12 +80,37 @@ public class StockIndex {
             });
         } else if (isAlpha(keyword)) {
             //首字母匹配
-            return match(keyword, firstMap);
+            Set<String> codeSet = firstMap.get(keyword);
+            if (CollectionUtils.isNotEmpty(codeSet)) {
+                matchFirstMap(codeSet, matchResultList, 1D);
+                return matchResultList;
+            }
+            int keyWordLength = keyword.length();
+            firstMap.forEach((n, c) -> {
+                if (n.contains(keyword)) {
+                    double similarity = NumberUtil.div(keyWordLength, n.length());
+                    matchFirstMap(c, matchResultList, similarity);
+                }
+            });
+            return matchResultList;
         } else {
             //名称匹配
             return match(keyword, nameMap);
         }
         return matchResultList;
+    }
+
+
+    private void matchFirstMap(Set<String> codeSet, List<MatchResult> matchResultList, double similarity) {
+        if (CollectionUtils.isNotEmpty(codeSet)) {
+            for (String code : codeSet) {
+                StockInfo stockInfo = codeMap.get(code);
+                if (stockInfo != null) {
+                    //完全匹配
+                    matchResultList.add(new MatchResult(stockInfo, similarity));
+                }
+            }
+        }
     }
 
     private List<MatchResult> match(String keyword, Map<String, String> map) {
@@ -106,9 +145,9 @@ public class StockIndex {
         return true;
     }
 
-    private String getFirstPinyin(String name) {
+    private Set<String> getFirstPinyin(String name) {
         name = name.trim().replace("*", "").replace("ST", "");
-        return PinyinUtil.getFirstLetter(name, null);
+        return PinyinUtil.getFirstLetter(name);
     }
 
 }

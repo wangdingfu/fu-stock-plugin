@@ -1,4 +1,4 @@
-package cn.fudoc.trade.toolwindow;
+package cn.fudoc.trade.view.toolwindow;
 
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
