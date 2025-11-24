@@ -1,11 +1,12 @@
 package cn.fudoc.trade.view.toolwindow;
 
+import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.CompatibleAdvancedSearchDialog;
 import cn.fudoc.trade.view.StockView;
+import cn.fudoc.trade.view.search.StockSearchDialog;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -168,20 +169,20 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         this.actionGroup.add(new AnAction(ADD_STOCK_TITLE, "", AllIcons.General.Add) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                CompatibleAdvancedSearchDialog compatibleAdvancedSearchDialog = new CompatibleAdvancedSearchDialog();
-                if(compatibleAdvancedSearchDialog.showAndGet()){
-                    String selectedResult = compatibleAdvancedSearchDialog.getSelectedResult();
-                    System.out.println("selectedResult:"+selectedResult);
+                Optional<StockView> selected = getSelected();
+                StockSearchDialog stockSearchDialog = new StockSearchDialog();
+                if (stockSearchDialog.showAndGet()) {
+                    StockInfo stockInfo = stockSearchDialog.getSelectedResult();
+                    if (Objects.isNull(stockInfo) || StringUtils.isBlank(stockInfo.getCode())) {
+                        return;
+                    }
+                    selected.ifPresent(stockView -> {
+                        String stockCode = stockInfo.getStockCode();
+                        stockView.addStock(stockCode);
+                        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+                        instance.addStock(stockView.getGroup(), stockCode);
+                    });
                 }
-//                String userInput = Messages.showInputDialog(project, ADD_STOCK_MESSAGE, ADD_STOCK_TITLE, IconUtil.getAddIcon(), "sz300037", null);
-//                // 处理用户输入（点击“确定”返回输入内容，点击“取消”返回 null）
-//                if (userInput != null && !userInput.isEmpty()) {
-//                    getSelected().ifPresent(stockView -> {
-//                        stockView.addStock(userInput);
-//                        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
-//                        instance.addStock(stockView.getGroup(), userInput);
-//                    });
-//                }
             }
         });
         //启动定时刷新股票

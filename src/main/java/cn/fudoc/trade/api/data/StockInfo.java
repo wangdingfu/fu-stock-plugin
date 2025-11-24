@@ -25,4 +25,16 @@ public class StockInfo {
      */
     private String jys;
 
+
+    public String getStockCode() {
+        if ("SZ".equals(this.jys)) {
+            return "sz" + this.code;
+        } else if ("SH".equals(this.jys)) {
+            return "sh" + this.code;
+        } else if ("HK".equals(this.jys)) {
+            return "hk" + this.code;
+        }
+        return this.code;
+    }
+
 }

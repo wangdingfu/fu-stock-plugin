@@ -2,6 +2,7 @@ package cn.fudoc.trade.startup;
 
 import cn.fudoc.trade.api.ZTApiService;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
+import cn.fudoc.trade.state.index.StockIndex;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -34,8 +35,8 @@ public class FuStockStartupActivity implements ProjectActivity {
             if (Objects.isNull(updateTime) || (updateTime + ONE_DAY) < System.currentTimeMillis()) {
                 //触发更新
                 ZTApiService ztApiService = ApplicationManager.getApplication().getService(ZTApiService.class);
-                instance.initMarketA(ztApiService.marketA());
-                instance.initMarketHK(ztApiService.marketHK());
+                instance.setA(new StockIndex(ztApiService.marketA(), false));
+                instance.setHK(new StockIndex(ztApiService.marketHK(), true));
                 instance.setUpdateTime(System.currentTimeMillis());
             }
         });

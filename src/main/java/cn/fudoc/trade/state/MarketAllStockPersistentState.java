@@ -32,7 +32,6 @@ public class MarketAllStockPersistentState implements PersistentStateComponent<M
     /**
      * 每次更新市场股票数据时间
      */
-    @Setter
     private Long updateTime;
 
     /**
@@ -46,14 +45,6 @@ public class MarketAllStockPersistentState implements PersistentStateComponent<M
 
     public static MarketAllStockPersistentState getInstance() {
         return ApplicationManager.getApplication().getService(MarketAllStockPersistentState.class);
-    }
-
-    public void initMarketA(List<StockInfo> stockInfoList) {
-        this.A = new StockIndex(stockInfoList, false);
-    }
-
-    public void initMarketHK(List<StockInfo> stockInfoList) {
-        this.HK = new StockIndex(stockInfoList, true);
     }
 
 

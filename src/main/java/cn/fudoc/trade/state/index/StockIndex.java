@@ -4,26 +4,30 @@ import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.util.PinyinUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
+@Getter
+@Setter
 public class StockIndex {
 
     private boolean isHK;
     /**
      * 代码映射 key:代码 value：股票信息
      */
-    private final Map<String, StockInfo> codeMap = new HashMap<>(8000);
+    private Map<String, StockInfo> codeMap;
     /**
      * 首字母映射 key：首字母 value：代码
      */
-    private final Map<String, Set<String>> firstMap = new HashMap<>(8000);
+    private Map<String, Set<String>> firstMap;
     /**
      * 名称映射 key：名称 value：代码
      */
-    private final Map<String, String> nameMap = new HashMap<>(8000);
+    private Map<String, String> nameMap;
 
     public StockIndex() {
     }
@@ -34,6 +38,11 @@ public class StockIndex {
 
     public StockIndex(List<StockInfo> stockInfoList, boolean isHK) {
         this.isHK = isHK;
+        if (CollectionUtils.isNotEmpty(stockInfoList)) {
+            this.codeMap = new HashMap<>(stockInfoList.size());
+            this.firstMap = new HashMap<>(stockInfoList.size() * 2);
+            this.nameMap = new HashMap<>(stockInfoList.size());
+        }
         for (StockInfo stockInfo : stockInfoList) {
             String code = stockInfo.getCode();
             String name = stockInfo.getName();

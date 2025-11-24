@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view;
+package cn.fudoc.trade.view.search;
 
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
@@ -20,17 +20,17 @@ import java.util.TimerTask;
 /**
  * 兼容版高级实时搜索对话框（替代 EditorSearchComponent）
  */
-public class CompatibleAdvancedSearchDialog extends DialogWrapper {
+public class StockSearchDialog extends DialogWrapper {
     // 基础搜索框（稳定 API）
     private final SearchTextField searchField;
     // 搜索选项面板（正则、大小写敏感等）
     private final JPanel searchOptionsPanel;
     // 结果列表相关
-    private final DefaultListModel<String> resultModel;
-    private final JBList<String> resultList;
+    private final DefaultListModel<StockInfo> resultModel;
+    private final JBList<StockInfo> resultList;
     private Timer debounceTimer;
     private final MarketAllStockPersistentState dataSource;
-    public CompatibleAdvancedSearchDialog() {
+    public StockSearchDialog() {
         super(true);
         dataSource =  MarketAllStockPersistentState.getInstance();
         // 1. 初始化核心搜索框（SearchTextField 是稳定 API）
@@ -62,14 +62,7 @@ public class CompatibleAdvancedSearchDialog extends DialogWrapper {
         resultModel = new DefaultListModel<>();
         resultList = new JBList<>(resultModel);
         resultList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        resultList.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                setBorder(JBUI.Borders.empty(4, 8));
-                return this;
-            }
-        });
+        resultList.setCellRenderer(new StockListCellRenderer());
 
         // 4. 防抖定时器（避免频繁搜索）
         debounceTimer = new Timer();
@@ -128,7 +121,7 @@ public class CompatibleAdvancedSearchDialog extends DialogWrapper {
         List<StockInfo> stockInfoList = dataSource.match(keyword);
         if(CollectionUtils.isNotEmpty(stockInfoList)){
             for (StockInfo stockInfo : stockInfoList) {
-                resultModel.addElement(stockInfo.getName());
+                resultModel.addElement(stockInfo);
             }
         }
 
@@ -138,7 +131,7 @@ public class CompatibleAdvancedSearchDialog extends DialogWrapper {
      * 获取选中结果（供外部调用）
      */
     @Nullable
-    public String getSelectedResult() {
+    public StockInfo getSelectedResult() {
         return resultList.getSelectedValue();
     }
 
