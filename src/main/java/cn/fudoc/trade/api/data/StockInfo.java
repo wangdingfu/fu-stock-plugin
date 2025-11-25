@@ -37,4 +37,8 @@ public class StockInfo {
         return this.code;
     }
 
+    public boolean isAdd() {
+        return "HK".equals(this.jys);
+    }
+
 }

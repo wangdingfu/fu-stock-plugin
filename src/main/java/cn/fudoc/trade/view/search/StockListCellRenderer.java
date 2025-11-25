@@ -2,9 +2,10 @@ package cn.fudoc.trade.view.search;
 
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.state.StockGroupPersistentState;
+import cn.fudoc.trade.util.ToolBarUtils;
+import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBOptionButton;
@@ -17,6 +18,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Objects;
 
 /**
@@ -55,7 +60,11 @@ public class StockListCellRenderer extends DefaultListCellRenderer {
 
         leftPanel.add(mainLabel);
         cellPanel.add(leftPanel, BorderLayout.WEST);
-//        cellPanel.add(actionLabel, BorderLayout.EAST);
+        JButton jButton = buildToolBarButton(stockInfo);
+        jButton.setOpaque(true);
+        jButton.setBackground(selectBackground);
+        cellPanel.add(jButton, BorderLayout.EAST);
+
 
         // 5. 选中状态背景（同步 JBList 选中色）
         cellPanel.setBackground(selectBackground);
@@ -63,6 +72,21 @@ public class StockListCellRenderer extends DefaultListCellRenderer {
 
         return cellPanel;
     }
+
+
+    private JButton buildToolBarButton(StockInfo stockInfo) {
+        JButton button = new JButton();
+        button.setIcon(stockInfo.isAdd() ? AllIcons.General.GreenCheckmark : AllIcons.General.Add);
+        button.addActionListener(e -> {
+            button.setEnabled(false);
+            button.setIcon(AllIcons.General.GreenCheckmark);
+            System.out.println("456" + stockInfo.getCode());
+        });
+        button.setPreferredSize(new Dimension(32, 32));
+        button.setEnabled(!stockInfo.isAdd());
+        return button;
+    }
+
 
     private Icon getIcon(String jys) {
         if ("SH".equals(jys)) {
