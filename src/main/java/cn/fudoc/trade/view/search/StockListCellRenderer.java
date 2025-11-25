@@ -57,7 +57,7 @@ public class StockListCellRenderer extends DefaultListCellRenderer {
         mainLabel.setBackground(selectBackground);
         mainLabel.setText(buildHtmlText(stockInfo, list, isSelected));
         mainLabel.setVerticalAlignment(SwingConstants.CENTER); // 垂直居中
-
+        mainLabel.setPreferredSize(new Dimension(200, 26));
         leftPanel.add(mainLabel);
         cellPanel.add(leftPanel, BorderLayout.WEST);
         JButton jButton = buildToolBarButton(stockInfo);
@@ -82,7 +82,7 @@ public class StockListCellRenderer extends DefaultListCellRenderer {
             button.setIcon(AllIcons.General.GreenCheckmark);
             System.out.println("456" + stockInfo.getCode());
         });
-        button.setPreferredSize(new Dimension(32, 32));
+        button.setPreferredSize(new Dimension(32, 26));
         button.setEnabled(!stockInfo.isAdd());
         return button;
     }
