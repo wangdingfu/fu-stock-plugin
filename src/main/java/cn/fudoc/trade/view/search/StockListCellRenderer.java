@@ -78,12 +78,10 @@ public class StockListCellRenderer extends DefaultListCellRenderer {
         JButton button = new JButton();
         button.setIcon(stockInfo.isAdd() ? AllIcons.General.GreenCheckmark : AllIcons.General.Add);
         button.addActionListener(e -> {
-            button.setEnabled(false);
             button.setIcon(AllIcons.General.GreenCheckmark);
             System.out.println("456" + stockInfo.getCode());
         });
         button.setPreferredSize(new Dimension(32, 26));
-        button.setEnabled(!stockInfo.isAdd());
         return button;
     }
 
