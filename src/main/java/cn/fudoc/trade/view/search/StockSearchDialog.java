@@ -62,7 +62,7 @@ public class StockSearchDialog extends DialogWrapper {
         resultModel = new DefaultListModel<>();
         resultList = new JBList<>(resultModel);
         resultList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        resultList.setCellRenderer(new StockListCellRenderer());
+        resultList.setCellRenderer(new SearchListCellRenderer());
 
         // 4. 防抖定时器（避免频繁搜索）
         debounceTimer = new Timer();
