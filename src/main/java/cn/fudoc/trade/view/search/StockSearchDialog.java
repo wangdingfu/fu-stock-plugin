@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -62,13 +64,21 @@ public class StockSearchDialog extends DialogWrapper {
         resultModel = new DefaultListModel<>();
         resultList = new JBList<>(resultModel);
         resultList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        resultList.setCellRenderer(new SearchListCellRenderer());
+        resultList.setCellRenderer(new ComplexListCellRenderer());
 
+        resultList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Point point = e.getPoint();
+                int index = resultList.getSelectedIndex();
+            }
+        });
         // 4. 防抖定时器（避免频繁搜索）
         debounceTimer = new Timer();
         setTitle("添加股票");
         init();
     }
+
 
     /**
      * 构建对话框布局（搜索框 + 选项面板 + 结果列表）

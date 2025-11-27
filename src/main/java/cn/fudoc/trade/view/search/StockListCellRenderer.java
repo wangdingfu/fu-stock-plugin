@@ -30,7 +30,6 @@ import java.util.Objects;
 public class StockListCellRenderer extends DefaultListCellRenderer {
     // 描述文本颜色（适配 IDEA 主题：亮色主题浅灰，暗色主题深灰）
     private static final JBColor DESCRIPTION_COLOR = new JBColor(0x666666, 0xAAAAAA);
-
     @Override
     public Component getListCellRendererComponent(
             @NotNull JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -69,7 +68,6 @@ public class StockListCellRenderer extends DefaultListCellRenderer {
         // 5. 选中状态背景（同步 JBList 选中色）
         cellPanel.setBackground(selectBackground);
         cellPanel.setOpaque(true);
-
         return cellPanel;
     }
 
@@ -84,6 +82,7 @@ public class StockListCellRenderer extends DefaultListCellRenderer {
         button.setPreferredSize(new Dimension(32, 26));
         return button;
     }
+
 
 
     private Icon getIcon(String jys) {
