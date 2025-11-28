@@ -2,6 +2,7 @@ package cn.fudoc.trade.view.search;
 
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
+import cn.fudoc.trade.view.StockView;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBList;
@@ -33,9 +34,13 @@ public class StockSearchDialog extends DialogWrapper {
     private final JBList<StockInfo> resultList;
     private Timer debounceTimer;
     private final MarketAllStockPersistentState dataSource;
-    public StockSearchDialog() {
+
+    private final StockView stockView;
+
+    public StockSearchDialog(StockView stockView) {
         super(true);
-        dataSource =  MarketAllStockPersistentState.getInstance();
+        this.stockView = stockView;
+        dataSource = MarketAllStockPersistentState.getInstance();
         // 1. 初始化核心搜索框（SearchTextField 是稳定 API）
         searchField = new SearchTextField();
         // 监听输入变化，触发实时搜索
@@ -101,56 +106,23 @@ public class StockSearchDialog extends DialogWrapper {
                     resultList.repaint(cellRect); // 只刷新当前单元格，性能更好
                 }
             }
-
-
-        });
-        resultList.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                handleButtonRollover(e);
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                handleButtonRollover(e);
-            }
-
-
-            // 处理按钮 hover 逻辑
-            private void handleButtonRollover(MouseEvent e) {
-                int hoverIndex = resultList.locationToIndex(e.getPoint());
-                if (hoverIndex == -1) {
-                    // 鼠标在列表空白区域，重置 hover
-                    complexListCellRenderer.setButtonRollover(false, -1);
-                    resultList.repaint();
-                    return;
-                }
-
-                // 获取 hover 单元格的矩形区域
-                Rectangle cellRect = resultList.getCellBounds(hoverIndex, hoverIndex);
-                if (cellRect == null) {
-                    complexListCellRenderer.setButtonRollover(false, -1);
-                    return;
-                }
-
-                // 判断是否 hover 到按钮区域
-                boolean isHoverButton = complexListCellRenderer.isButtonClicked(resultList, cellRect, e.getX(), e.getY());
-                complexListCellRenderer.setButtonRollover(isHoverButton, hoverIndex);
-
-                // 只刷新当前 hover 的单元格（性能优化，避免整个列表重绘）
-                complexListCellRenderer.repaint(cellRect);
-            }
         });
         // 4. 防抖定时器（避免频繁搜索）
         debounceTimer = new Timer();
         setTitle("添加股票");
         init();
     }
+
     // 按钮点击逻辑：切换 StockInfo 的 isAdd 状态（根据你的实际数据模型调整）
     private void toggleStockAddStatus(StockInfo stock) {
-        stock.setAdd(!stock.isAdd()); // 假设 StockInfo 有 setAdd 方法
-        // 若数据模型是 DefaultListModel，需通知模型更新（可选）
-        // ((DefaultListModel<StockInfo>) stockList.getModel()).fireContentsChanged(stock, clickIndex, clickIndex);
+        stock.setAdd(!stock.isAdd());
+        if(stock.isAdd()){
+            //添加股票
+            stockView.addStock(stock.getStockCode());
+        }else {
+            //移除股票
+            stockView.removeStock(stock.getStockCode());
+        }
     }
 
     /**
@@ -202,8 +174,9 @@ public class StockSearchDialog extends DialogWrapper {
     private void doSearch(String keyword) {
         resultModel.clear();
         List<StockInfo> stockInfoList = dataSource.match(keyword);
-        if(CollectionUtils.isNotEmpty(stockInfoList)){
+        if (CollectionUtils.isNotEmpty(stockInfoList)) {
             for (StockInfo stockInfo : stockInfoList) {
+                stockInfo.setAdd(stockView.isConstants(stockInfo.getStockCode()));
                 resultModel.addElement(stockInfo);
             }
         }

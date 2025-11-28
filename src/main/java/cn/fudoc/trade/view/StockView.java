@@ -161,6 +161,18 @@ public class StockView {
         }
     }
 
+    public void removeStock(String code) {
+        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            Object valueAt = tableModel.getValueAt(i, 0);
+            if (code.equals(valueAt.toString())) {
+                int modelRow = stockTable.convertRowIndexToModel(i);
+                tableModel.removeRow(modelRow);
+                instance.removeStock(group, code);
+            }
+        }
+    }
+
     /**
      * 加载列表中的股票
      */
@@ -176,6 +188,9 @@ public class StockView {
         return fetchStockData(getCodeList());
     }
 
+    public boolean isConstants(String code) {
+        return getCodeList().contains(code);
+    }
 
     private Set<String> getCodeList() {
         Vector<Vector> dataVector = tableModel.getDataVector();
@@ -198,6 +213,8 @@ public class StockView {
         Set<String> codeList = getCodeList();
         codeList.add(code);
         initStock(codeList);
+        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+        instance.addStock(group, code);
     }
 
     public void initStock(Set<String> codeList) {

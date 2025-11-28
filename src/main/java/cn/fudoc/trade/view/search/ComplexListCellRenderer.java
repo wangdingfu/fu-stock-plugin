@@ -18,8 +18,7 @@ public class ComplexListCellRenderer extends JPanel implements ListCellRenderer<
     private final JLabel iconLabel = new JLabel();
     private final JLabel textLabel = new JLabel();
     private final JButton jButton = new JButton();
-    private boolean isButtonRollover = false; // 当前是否 hover
-    private int rolloverIndex = -1; // 正在 hover 的单元格索引
+
     // 初始化布局
     public ComplexListCellRenderer() {
         // 设置布局：左侧图标，右侧上下两行文本
@@ -37,18 +36,16 @@ public class ComplexListCellRenderer extends JPanel implements ListCellRenderer<
 
         add(leftPanel, BorderLayout.WEST);
         jButton.setPreferredSize(new Dimension(32, 26));
-        jButton.setOpaque(false);
+        jButton.setOpaque(true);
         jButton.setRolloverEnabled(true);
         jButton.setContentAreaFilled(false); // 去掉按钮背景
+        jButton.setFocusPainted(false); // 去掉焦点边框
         add(jButton, BorderLayout.EAST);
         // 设置面板透明（避免遮挡背景）
         setOpaque(true);
     }
 
-    public void setButtonRollover(boolean isRollover, int index) {
-        this.isButtonRollover = isRollover;
-        this.rolloverIndex = index;
-    }
+
 
 
     @Override
@@ -57,14 +54,7 @@ public class ComplexListCellRenderer extends JPanel implements ListCellRenderer<
         if (value != null) {
             iconLabel.setIcon(getIcon(value.getJys()));
             textLabel.setText(buildHtmlText(value,list,isSelected));
-            // 核心修改：根据 hover 状态和 isAdd 状态，切换按钮图标
-            if (isButtonRollover && index == rolloverIndex) {
-                // 鼠标 hover 在当前单元格的按钮上：显示 rolloverIcon
-                jButton.setIcon(value.isAdd() ? AllIcons.General.GearHover : AllIcons.General.InlineAddHover);
-            } else {
-                // 未 hover：显示正常图标
-                jButton.setIcon(value.isAdd() ? AllIcons.General.GreenCheckmark : AllIcons.General.Add);
-            }
+            jButton.setIcon(value.isAdd() ? AllIcons.General.GreenCheckmark : AllIcons.General.Add);
         }
         Color selectBackground = isSelected ? list.getSelectionBackground() : list.getBackground();
         setBackground(selectBackground);

@@ -169,20 +169,10 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         this.actionGroup.add(new AnAction(ADD_STOCK_TITLE, "", AllIcons.General.Add) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                Optional<StockView> selected = getSelected();
-                StockSearchDialog stockSearchDialog = new StockSearchDialog();
-                if (stockSearchDialog.showAndGet()) {
-                    StockInfo stockInfo = stockSearchDialog.getSelectedResult();
-                    if (Objects.isNull(stockInfo) || StringUtils.isBlank(stockInfo.getCode())) {
-                        return;
-                    }
-                    selected.ifPresent(stockView -> {
-                        String stockCode = stockInfo.getStockCode();
-                        stockView.addStock(stockCode);
-                        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
-                        instance.addStock(stockView.getGroup(), stockCode);
-                    });
-                }
+                getSelected().ifPresent(stock -> {
+                    StockSearchDialog stockSearchDialog = new StockSearchDialog(stock);
+                    stockSearchDialog.showAndGet();
+                });
             }
         });
         //启动定时刷新股票
