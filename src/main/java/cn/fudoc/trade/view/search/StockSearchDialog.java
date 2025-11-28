@@ -15,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -64,13 +65,80 @@ public class StockSearchDialog extends DialogWrapper {
         resultModel = new DefaultListModel<>();
         resultList = new JBList<>(resultModel);
         resultList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        resultList.setCellRenderer(new ComplexListCellRenderer());
+        ComplexListCellRenderer complexListCellRenderer = new ComplexListCellRenderer();
+        resultList.setCellRenderer(complexListCellRenderer);
 
+        // 给 JList 绑定鼠标点击事件
         resultList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Point point = e.getPoint();
-                int index = resultList.getSelectedIndex();
+                // 1. 获取点击的单元格索引
+                int clickIndex = resultList.locationToIndex(e.getPoint());
+                if (clickIndex == -1) {
+                    return; // 点击了列表空白区域，忽略
+                }
+
+                // 2. 获取该单元格的矩形区域（相对于 JList）
+                Rectangle cellRect = resultList.getCellBounds(clickIndex, clickIndex);
+                if (cellRect == null) {
+                    return;
+                }
+
+                // 3. 判断是否点击了按钮区域
+                boolean isButtonClick = complexListCellRenderer.isButtonClicked(
+                        resultList,
+                        cellRect,
+                        e.getX(),
+                        e.getY()
+                );
+
+                // 4. 若是按钮点击，执行逻辑
+                if (isButtonClick) {
+                    StockInfo clickedStock = resultList.getModel().getElementAt(clickIndex);
+                    // 执行按钮点击逻辑（例如切换 isAdd 状态）
+                    toggleStockAddStatus(clickedStock);
+                    // 刷新列表，让渲染器重新绘制图标
+                    resultList.repaint(cellRect); // 只刷新当前单元格，性能更好
+                }
+            }
+
+
+        });
+        resultList.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                handleButtonRollover(e);
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                handleButtonRollover(e);
+            }
+
+
+            // 处理按钮 hover 逻辑
+            private void handleButtonRollover(MouseEvent e) {
+                int hoverIndex = resultList.locationToIndex(e.getPoint());
+                if (hoverIndex == -1) {
+                    // 鼠标在列表空白区域，重置 hover
+                    complexListCellRenderer.setButtonRollover(false, -1);
+                    resultList.repaint();
+                    return;
+                }
+
+                // 获取 hover 单元格的矩形区域
+                Rectangle cellRect = resultList.getCellBounds(hoverIndex, hoverIndex);
+                if (cellRect == null) {
+                    complexListCellRenderer.setButtonRollover(false, -1);
+                    return;
+                }
+
+                // 判断是否 hover 到按钮区域
+                boolean isHoverButton = complexListCellRenderer.isButtonClicked(resultList, cellRect, e.getX(), e.getY());
+                complexListCellRenderer.setButtonRollover(isHoverButton, hoverIndex);
+
+                // 只刷新当前 hover 的单元格（性能优化，避免整个列表重绘）
+                complexListCellRenderer.repaint(cellRect);
             }
         });
         // 4. 防抖定时器（避免频繁搜索）
@@ -78,7 +146,12 @@ public class StockSearchDialog extends DialogWrapper {
         setTitle("添加股票");
         init();
     }
-
+    // 按钮点击逻辑：切换 StockInfo 的 isAdd 状态（根据你的实际数据模型调整）
+    private void toggleStockAddStatus(StockInfo stock) {
+        stock.setAdd(!stock.isAdd()); // 假设 StockInfo 有 setAdd 方法
+        // 若数据模型是 DefaultListModel，需通知模型更新（可选）
+        // ((DefaultListModel<StockInfo>) stockList.getModel()).fireContentsChanged(stock, clickIndex, clickIndex);
+    }
 
     /**
      * 构建对话框布局（搜索框 + 选项面板 + 结果列表）

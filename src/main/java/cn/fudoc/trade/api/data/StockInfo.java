@@ -25,6 +25,11 @@ public class StockInfo {
      */
     private String jys;
 
+    /**
+     * 是否需要添加
+     */
+    private boolean isAdd;
+
 
     public String getStockCode() {
         if ("SZ".equals(this.jys)) {
@@ -35,10 +40,6 @@ public class StockInfo {
             return "hk" + this.code;
         }
         return this.code;
-    }
-
-    public boolean isAdd() {
-        return "HK".equals(this.jys);
     }
 
 }
