@@ -9,6 +9,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTextField;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
@@ -23,7 +24,6 @@ public class FuStockSearchPopupView {
 
 
     private final JPanel rootPanel;
-    private final JPanel searchPanel = new JPanel();
     // 基础搜索框（稳定 API）
     private final SearchTextField searchField = new SearchTextField();
     // 结果列表相关
@@ -46,7 +46,6 @@ public class FuStockSearchPopupView {
 
         //给搜索框和搜索结果添加监听器
         addListener(fuStockSearchListCellRenderer);
-
         //防抖定时器（避免频繁搜索）
         this.debounceTimer = new Timer();
         this.rootPanel = new JPanel(new BorderLayout());
@@ -61,13 +60,18 @@ public class FuStockSearchPopupView {
 
     public void showPopup(Project project) {
         JBPopup popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(this.rootPanel, this.searchField) // 焦点绑定到搜索框
-                .setProject(project)
-                .setRequestFocus(true) // 自动获取焦点
-                .setResizable(true) // 可调整大小
-                .setCancelOnClickOutside(true) // 点击外部关闭
-                .setCancelKeyEnabled(true)
-                .createPopup();
+                .createComponentPopupBuilder(this.rootPanel, this.searchField) // 焦点绑定到搜索框\
+                .setResizable(true)
+                .setMovable(true)
+                .setModalContext(false)
+                .setRequestFocus(true)
+                .setBelongsToGlobalPopupStack(true)
+                .setLocateWithinScreenBounds(false)
+                // 单击外部时取消弹窗
+                .setCancelOnClickOutside(false)
+                // 在其他窗口打开时取消
+                .setCancelOnOtherWindowOpen(false)
+                .setCancelOnWindowDeactivation(false).createPopup();
         // 4. 显示面板（居中显示）
         popup.showCenteredInCurrentWindow(project);
     }
