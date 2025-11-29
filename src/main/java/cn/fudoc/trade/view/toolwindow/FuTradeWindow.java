@@ -6,6 +6,7 @@ import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockView;
+import cn.fudoc.trade.view.search.FuStockSearchPopupView;
 import cn.fudoc.trade.view.search.StockSearchDialog;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
@@ -170,8 +171,10 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 getSelected().ifPresent(stock -> {
-                    StockSearchDialog stockSearchDialog = new StockSearchDialog(stock);
-                    stockSearchDialog.showAndGet();
+//                    StockSearchDialog stockSearchDialog = new StockSearchDialog(stock);
+//                    stockSearchDialog.showAndGet();
+                    FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stock);
+                    fuStockSearchPopupView.showPopup(project);
                 });
             }
         });

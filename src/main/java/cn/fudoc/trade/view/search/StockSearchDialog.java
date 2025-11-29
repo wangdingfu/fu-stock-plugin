@@ -69,8 +69,8 @@ public class StockSearchDialog extends DialogWrapper {
         resultModel = new DefaultListModel<>();
         resultList = new JBList<>(resultModel);
         resultList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        ComplexListCellRenderer complexListCellRenderer = new ComplexListCellRenderer();
-        resultList.setCellRenderer(complexListCellRenderer);
+        FuStockSearchListCellRenderer fuStockSearchListCellRenderer = new FuStockSearchListCellRenderer();
+        resultList.setCellRenderer(fuStockSearchListCellRenderer);
 
         // 给 JList 绑定鼠标点击事件
         resultList.addMouseListener(new MouseAdapter() {
@@ -89,7 +89,7 @@ public class StockSearchDialog extends DialogWrapper {
                 }
 
                 // 3. 判断是否点击了按钮区域
-                boolean isButtonClick = complexListCellRenderer.isButtonClicked(
+                boolean isButtonClick = fuStockSearchListCellRenderer.isButtonClicked(
                         resultList,
                         cellRect,
                         e.getX(),

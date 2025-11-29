@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.swing.*;
 import java.awt.*;
 
-public class ComplexListCellRenderer extends JPanel implements ListCellRenderer<StockInfo> {
+public class FuStockSearchListCellRenderer extends JPanel implements ListCellRenderer<StockInfo> {
     // 描述文本颜色（适配 IDEA 主题：亮色主题浅灰，暗色主题深灰）
     private static final JBColor DESCRIPTION_COLOR = new JBColor(0x666666, 0xAAAAAA);
     private final JPanel leftPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 6, 0));
@@ -20,7 +20,7 @@ public class ComplexListCellRenderer extends JPanel implements ListCellRenderer<
     private final JButton jButton = new JButton();
 
     // 初始化布局
-    public ComplexListCellRenderer() {
+    public FuStockSearchListCellRenderer() {
         // 设置布局：左侧图标，右侧上下两行文本
         setLayout(new BorderLayout(8, 0)); // 组件间距8px，垂直4px
         setBorder(JBUI.Borders.empty(4, 8));
