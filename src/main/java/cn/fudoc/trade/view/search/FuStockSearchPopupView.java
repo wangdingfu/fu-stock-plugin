@@ -9,7 +9,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBTextField;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
