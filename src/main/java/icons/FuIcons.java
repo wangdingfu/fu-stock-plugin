@@ -13,4 +13,5 @@ public interface FuIcons {
     Icon FU_SH = IconLoader.getIcon("icon/sh.svg", FuIcons.class);
     Icon FU_SZ = IconLoader.getIcon("icon/sz.svg", FuIcons.class);
     Icon FU_HK = IconLoader.getIcon("icon/hk.svg", FuIcons.class);
+    Icon FU_STOCK = IconLoader.getIcon("icon/stock.svg", FuIcons.class);
 }
