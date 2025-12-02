@@ -3,6 +3,7 @@ package cn.fudoc.trade.view.toolwindow;
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.common.FuNotification;
+import cn.fudoc.trade.common.FuTradeConstants;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockView;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider {
@@ -100,15 +102,18 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
 
         isExecute.set(instance.isAutoRefresh());
         Map<String, Set<String>> stockMap = instance.getStockMap();
-        if (MapUtils.isNotEmpty(stockMap)) {
-            stockMap.forEach((key, value) -> {
-                StockView stockView = addGroup(key);
-                if (Objects.isNull(stockView)) {
-                    return;
-                }
-                stockView.initStock(value);
-            });
+        List<String> groupList = instance.getGroupList();
+        addTab(FuTradeConstants.MY_SELECTED_GROUP, stockMap.get(FuTradeConstants.MY_SELECTED_GROUP));
+        groupList.forEach(f -> addTab(f, stockMap.get(f)));
+    }
+
+
+    private void addTab(String group, Set<String> stockList) {
+        StockView stockView = addGroup(group);
+        if (Objects.isNull(stockView)) {
+            return;
         }
+        stockView.initStock(stockList);
     }
 
     public void autoSelectedTab() {

@@ -5,27 +5,18 @@ import cn.fudoc.trade.common.PinToolBarAction;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockView;
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.UIUtil;
 import icons.FuIcons;
 import org.apache.commons.collections.CollectionUtils;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -124,7 +115,7 @@ public class FuStockSearchPopupView {
      * 创建支持中文输入的SearchTextField
      */
     private SearchTextField createSearchField() {
-        SearchTextField searchField = createSearchFieldWithPaintHint();
+        SearchTextField searchField = new SearchTextField();
         // 关键：直接配置文本编辑器
         JTextComponent textEditor = searchField.getTextEditor();
         textEditor.enableInputMethods(true);
@@ -154,65 +145,6 @@ public class FuStockSearchPopupView {
         return searchField;
     }
 
-    private SearchTextField createSearchFieldWithPaintHint() {
-        SearchTextField searchField = new SearchTextField() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                JTextComponent editor = getTextEditor();
-                if (editor.getText().isEmpty() && !editor.hasFocus()) {
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    try {
-                        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                        g2.setColor(JBColor.gray);
-                        g2.setFont(UIUtil.getLabelFont().deriveFont(Font.ITALIC, 11f));
-
-                        FontMetrics fm = g2.getFontMetrics();
-                        String hintText = "中文/拼音/代码";
-                        int x = getWidth() - fm.stringWidth(hintText) - 8; // 右侧留出8像素边距
-                        int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-
-                        g2.drawString(hintText, x, y);
-                    } finally {
-                        g2.dispose();
-                    }
-                }
-            }
-        };
-
-        // 添加重绘触发
-        searchField.getTextEditor().getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                searchField.repaint();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                searchField.repaint();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                searchField.repaint();
-            }
-        });
-
-        searchField.getTextEditor().addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                searchField.repaint();
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                searchField.repaint();
-            }
-        });
-
-        return searchField;
-    }
 
     private void addListener(FuStockSearchListCellRenderer renderer) {
         //输入框监听事件

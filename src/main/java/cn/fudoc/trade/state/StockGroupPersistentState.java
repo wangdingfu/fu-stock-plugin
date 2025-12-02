@@ -1,5 +1,6 @@
 package cn.fudoc.trade.state;
 
+import cn.fudoc.trade.common.FuTradeConstants;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -9,7 +10,6 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,13 +33,10 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
      * key：分组 value：股票代码
      */
     private Map<String, Set<String>> stockMap = new HashMap<>();
-
-    public Map<String, Set<String>> getStockMap() {
-        if (!stockMap.containsKey("我的自选")) {
-            stockMap.put("我的自选", Sets.newHashSet());
-        }
-        return stockMap;
-    }
+    /**
+     * 分组列表
+     */
+    private List<String> groupList = new ArrayList<>();
 
     public void addGroup(String group) {
         if (StringUtils.isEmpty(group)) {
@@ -49,6 +46,9 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
             return;
         }
         this.stockMap.put(group, new HashSet<>());
+        if(!FuTradeConstants.MY_SELECTED_GROUP.equals(group)){
+            this.groupList.add(group);
+        }
     }
 
     public void removeGroup(String group) {
@@ -56,6 +56,7 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
             return;
         }
         this.stockMap.remove(group);
+        this.groupList.remove(group);
     }
 
 
