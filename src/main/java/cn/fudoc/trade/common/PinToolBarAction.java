@@ -1,0 +1,46 @@
+package cn.fudoc.trade.common;
+
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.ToggleAction;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/**
+ * @author wangdingfu
+ * @date 2022-09-17 18:50:14
+ */
+public class PinToolBarAction extends ToggleAction {
+
+    private final AtomicBoolean pinStatus;
+
+    public PinToolBarAction(AtomicBoolean pinStatus) {
+        super("Pin", "固定窗口", AllIcons.General.Pin);
+
+        this.pinStatus = pinStatus;
+    }
+
+
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
+    @Override
+    public boolean isDumbAware() {
+        return true;
+    }
+
+    @Override
+    public boolean isSelected(@NotNull AnActionEvent e) {
+        return pinStatus.get();
+    }
+
+    @Override
+    public void setSelected(@NotNull AnActionEvent e, boolean state) {
+        pinStatus.set(state);
+    }
+}

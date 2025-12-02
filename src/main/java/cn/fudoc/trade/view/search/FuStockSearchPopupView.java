@@ -1,18 +1,27 @@
 package cn.fudoc.trade.view.search;
 
 import cn.fudoc.trade.api.data.StockInfo;
+import cn.fudoc.trade.common.PinToolBarAction;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
+import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockView;
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SearchTextField;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import icons.FuIcons;
 import org.apache.commons.collections.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -28,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FuStockSearchPopupView {
 
@@ -42,6 +52,8 @@ public class FuStockSearchPopupView {
     private final MarketAllStockPersistentState dataSource;
 
     private final StockView stockView;
+
+    private final AtomicBoolean pinStatus = new AtomicBoolean(false);
 
     public FuStockSearchPopupView(StockView stockView) {
         this.stockView = stockView;
@@ -60,17 +72,30 @@ public class FuStockSearchPopupView {
         this.debounceTimer = new Timer();
         this.rootPanel = new JPanel(new BorderLayout());
         JPanel contentPanel = new JPanel(new BorderLayout());
-        JLabel title = new JLabel("添加股票");
+        JBLabel title = new JBLabel("添加股票");
         title.setIcon(FuIcons.FU_STOCK);
         title.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
-        this.rootPanel.add(title, BorderLayout.NORTH);
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.add(title, BorderLayout.WEST);
+        ToolBarUtils.addActionToToolBar(titlePanel, "fu.stock.search.title", createSearchActionGroup(), BorderLayout.EAST);
+        this.rootPanel.add(titlePanel, BorderLayout.NORTH);
         this.rootPanel.add(contentPanel, BorderLayout.CENTER);
-
+        JLabel bottom = new JLabel();
+        bottom.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+        bottom.setText("可输入股票代码/首字母/名称 搜索股票");
+        this.rootPanel.add(bottom, BorderLayout.SOUTH);
         contentPanel.add(this.searchField, BorderLayout.NORTH);
         // 中间：结果列表（带滚动条）
         JBScrollPane scrollPane = new JBScrollPane(this.jbList);
         scrollPane.setPreferredSize(new Dimension(450, 350));
         contentPanel.add(scrollPane, BorderLayout.CENTER);
+    }
+
+
+    private DefaultActionGroup createSearchActionGroup() {
+        DefaultActionGroup defaultActionGroup = new DefaultActionGroup();
+        defaultActionGroup.add(new PinToolBarAction(pinStatus));
+        return defaultActionGroup;
     }
 
 
@@ -84,9 +109,12 @@ public class FuStockSearchPopupView {
                 .setFocusable(true)
                 .setBelongsToGlobalPopupStack(true)
                 .setLocateWithinScreenBounds(false)
-                .setCancelOnClickOutside(true)
-                .setCancelOnOtherWindowOpen(true)
+                // 单击外部时取消弹窗
+                .setCancelOnClickOutside(false)
+                // 在其他窗口打开时取消
+                .setCancelOnOtherWindowOpen(false)
                 .setCancelOnWindowDeactivation(false)
+                .setCancelOnMouseOutCallback(event -> event.getID() == MouseEvent.MOUSE_PRESSED && !pinStatus.get())
                 .createPopup();
         popup.showCenteredInCurrentWindow(project);
 
@@ -97,7 +125,6 @@ public class FuStockSearchPopupView {
      */
     private SearchTextField createSearchField() {
         SearchTextField searchField = createSearchFieldWithPaintHint();
-
         // 关键：直接配置文本编辑器
         JTextComponent textEditor = searchField.getTextEditor();
         textEditor.enableInputMethods(true);
@@ -126,6 +153,7 @@ public class FuStockSearchPopupView {
         });
         return searchField;
     }
+
     private SearchTextField createSearchFieldWithPaintHint() {
         SearchTextField searchField = new SearchTextField() {
             @Override
@@ -155,14 +183,32 @@ public class FuStockSearchPopupView {
 
         // 添加重绘触发
         searchField.getTextEditor().getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e) { searchField.repaint(); }
-            @Override public void removeUpdate(DocumentEvent e) { searchField.repaint(); }
-            @Override public void changedUpdate(DocumentEvent e) { searchField.repaint(); }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchField.repaint();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchField.repaint();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchField.repaint();
+            }
         });
 
         searchField.getTextEditor().addFocusListener(new FocusAdapter() {
-            @Override public void focusGained(FocusEvent e) { searchField.repaint(); }
-            @Override public void focusLost(FocusEvent e) { searchField.repaint(); }
+            @Override
+            public void focusGained(FocusEvent e) {
+                searchField.repaint();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                searchField.repaint();
+            }
         });
 
         return searchField;
