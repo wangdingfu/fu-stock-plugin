@@ -1,6 +1,5 @@
 package cn.fudoc.trade.view.toolwindow;
 
-import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.common.FuTradeConstants;
@@ -8,7 +7,6 @@ import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockView;
 import cn.fudoc.trade.view.search.FuStockSearchPopupView;
-import cn.fudoc.trade.view.search.StockSearchDialog;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -24,7 +22,6 @@ import com.intellij.ui.tabs.TabsListener;
 import com.intellij.util.IconUtil;
 import icons.FuIcons;
 import lombok.Getter;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -97,6 +94,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         //股票分组
         rootPanel.add(tabs.getComponent(), BorderLayout.CENTER);
         //todo 我的持仓
+
         //初始化工具栏事件
         initActionGroup();
 
