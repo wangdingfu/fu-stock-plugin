@@ -93,7 +93,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         rootPanel.add(initToolBarUI(), BorderLayout.NORTH);
         //股票分组
         rootPanel.add(tabs.getComponent(), BorderLayout.CENTER);
-        //todo 我的持仓
+        //todo 我的持仓tab新增
+
 
         //初始化工具栏事件
         initActionGroup();
