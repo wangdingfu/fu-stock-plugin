@@ -37,7 +37,8 @@ public class StockView {
     /**
      * 定义表格列名
      */
-    private static final String[] columnNames = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
+    private static final String[] stockTableColumn = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
+    private static final String[] myPositionsColumn = {"名称/市值", "持仓盈亏", "持仓/可用", "现价/成本"};
     private static final String STOCK_UN_SELECTED_TITLE = FuBundle.message("stock.un_selected.title");
     private static final String STOCK_UN_SELECTED_REFRESH_TITLE = FuBundle.message("stock.un_selected.refresh.title");
 
@@ -60,7 +61,7 @@ public class StockView {
         // 添加上下左右边距
         showTextLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         this.rootPanel.add(showTextLabel, BorderLayout.PAGE_END);
-        this.tableModel = new DefaultTableModel(columnNames, 0) {
+        this.tableModel = new DefaultTableModel(stockTableColumn, 0) {
             // 设置单元格不可编辑
             @Override
             public boolean isCellEditable(int row, int column) {
