@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.List;
 
 @Slf4j
-public class StockView {
+public class StockInfoView {
 
     private final Project project;
 
@@ -53,7 +53,7 @@ public class StockView {
     private final ScheduledTaskManager scheduledTaskManager;
     private final TencentApiService tencentApiService;
 
-    public StockView(Project project, String group) {
+    public StockInfoView(Project project, String group) {
         this.project = project;
         this.group = group;
         this.rootPanel = new JPanel(new BorderLayout());

@@ -4,7 +4,7 @@ import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.common.PinToolBarAction;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.StockView;
+import cn.fudoc.trade.view.StockInfoView;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -42,12 +42,12 @@ public class FuStockSearchPopupView {
     private Timer debounceTimer;
     private final MarketAllStockPersistentState dataSource;
 
-    private final StockView stockView;
+    private final StockInfoView stockInfoView;
 
     private final AtomicBoolean pinStatus = new AtomicBoolean(false);
 
-    public FuStockSearchPopupView(StockView stockView) {
-        this.stockView = stockView;
+    public FuStockSearchPopupView(StockInfoView stockInfoView) {
+        this.stockInfoView = stockInfoView;
         this.searchField = createSearchField();
         this.dataSource = MarketAllStockPersistentState.getInstance();
         //初始化结果列表
@@ -228,7 +228,7 @@ public class FuStockSearchPopupView {
         List<StockInfo> stockInfoList = this.dataSource.match(keyword);
         if (CollectionUtils.isNotEmpty(stockInfoList)) {
             for (StockInfo stockInfo : stockInfoList) {
-                stockInfo.setAdd(this.stockView.isConstants(stockInfo.getStockCode()));
+                stockInfo.setAdd(this.stockInfoView.isConstants(stockInfo.getStockCode()));
                 this.resultModel.addElement(stockInfo);
             }
         }
@@ -240,10 +240,10 @@ public class FuStockSearchPopupView {
         stock.setAdd(!stock.isAdd());
         if (stock.isAdd()) {
             //添加股票
-            stockView.addStock(stock.getStockCode());
+            stockInfoView.addStock(stock.getStockCode());
         } else {
             //移除股票
-            stockView.removeStock(stock.getStockCode());
+            stockInfoView.removeStock(stock.getStockCode());
         }
     }
 }

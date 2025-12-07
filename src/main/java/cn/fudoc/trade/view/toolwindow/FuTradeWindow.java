@@ -5,7 +5,7 @@ import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.common.FuTradeConstants;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.StockView;
+import cn.fudoc.trade.view.StockInfoView;
 import cn.fudoc.trade.view.search.FuStockSearchPopupView;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
@@ -14,7 +14,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.tabs.JBTabs;
 import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
@@ -49,9 +48,9 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
     @Getter
     private final AtomicBoolean isExecute = new AtomicBoolean(false);
 
-    private final Map<String, StockView> stockViewMap = new HashMap<>();
+    private final Map<String, StockInfoView> stockViewMap = new HashMap<>();
 
-    public FuTradeWindow(@NotNull Project project, ToolWindow toolWindow) {
+    public FuTradeWindow(@NotNull Project project) {
         super(Boolean.TRUE, Boolean.TRUE);
         this.project = project;
         JPanel rootPanel = new JPanel(new BorderLayout());
@@ -63,17 +62,17 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
             @Override
             public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
                 if (Objects.nonNull(oldSelection)) {
-                    StockView stockView = stockViewMap.get(oldSelection.getText());
-                    if (Objects.nonNull(stockView)) {
-                        stockView.stopTask();
+                    StockInfoView stockInfoView = stockViewMap.get(oldSelection.getText());
+                    if (Objects.nonNull(stockInfoView)) {
+                        stockInfoView.stopTask();
                     }
                 }
                 //切换新窗口时 判断当前是否开启自动刷新 开启时才刷新股票数据
                 if (isExecute.get() && Objects.nonNull(newSelection)) {
-                    StockView newStockView = stockViewMap.get(newSelection.getText());
-                    if (Objects.nonNull(newStockView)) {
+                    StockInfoView newStockInfoView = stockViewMap.get(newSelection.getText());
+                    if (Objects.nonNull(newStockInfoView)) {
                         //添加新窗口时 默认启动刷新
-                        newStockView.startTask();
+                        newStockInfoView.startTask();
                         refreshTime = System.currentTimeMillis();
                     }
                 }
@@ -106,11 +105,11 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
 
 
     private void addTab(String group, Set<String> stockList) {
-        StockView stockView = addGroup(group);
-        if (Objects.isNull(stockView)) {
+        StockInfoView stockInfoView = addGroup(group);
+        if (Objects.isNull(stockInfoView)) {
             return;
         }
-        stockView.initStock(stockList);
+        stockInfoView.initStock(stockList);
     }
 
     public void autoSelectedTab() {
@@ -129,11 +128,11 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         if (Objects.isNull(selectedInfo)) {
             return;
         }
-        StockView stockView = stockViewMap.get(selectedInfo.getText());
-        if (Objects.isNull(stockView)) {
+        StockInfoView stockInfoView = stockViewMap.get(selectedInfo.getText());
+        if (Objects.isNull(stockInfoView)) {
             return;
         }
-        stockView.stopTask();
+        stockInfoView.stopTask();
     }
 
 
@@ -142,11 +141,11 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         if (Objects.isNull(selectedInfo)) {
             return false;
         }
-        StockView stockView = stockViewMap.get(selectedInfo.getText());
-        if (Objects.isNull(stockView)) {
+        StockInfoView stockInfoView = stockViewMap.get(selectedInfo.getText());
+        if (Objects.isNull(stockInfoView)) {
             return false;
         }
-        stockView.startTask();
+        stockInfoView.startTask();
         return true;
     }
 
@@ -195,8 +194,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                getSelected().ifPresent(stockView -> {
-                    boolean isStart = stockView.startTask(null, "[ 将于开盘后自动刷新 ]");
+                getSelected().ifPresent(stockInfoView -> {
+                    boolean isStart = stockInfoView.startTask(null, "[ 将于开盘后自动刷新 ]");
                     if (!isStart) {
                         //没有启动成功 则提示
                         FuNotification.notifyWarning(STOCK_AUTO_LOAD_TIME_TITLE, project);
@@ -223,8 +222,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                getSelected().ifPresent(stockView -> {
-                    stockView.stopTask();
+                getSelected().ifPresent(stockInfoView -> {
+                    stockInfoView.stopTask();
                     isExecute.set(false);
                     StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
                     instance.setAutoRefresh(isExecute.get());
@@ -242,40 +241,40 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                getSelected().ifPresent(StockView::manualUpdate);
+                getSelected().ifPresent(StockInfoView::manualUpdate);
             }
         });
     }
 
 
-    private StockView addGroup(String group) {
+    private StockInfoView addGroup(String group) {
         if (StringUtils.isEmpty(group)) {
             return null;
         }
         if (stockViewMap.containsKey(group)) {
             return stockViewMap.get(group);
         }
-        StockView stockView = new StockView(project, group);
-        TabInfo tabInfo = new TabInfo(stockView.getRootPanel());
+        StockInfoView stockInfoView = new StockInfoView(project, group);
+        TabInfo tabInfo = new TabInfo(stockInfoView.getRootPanel());
         tabInfo.setText(group);
         tabs.addTab(tabInfo);
         // 可选：切换到新添加的标签
         tabs.select(tabInfo, true);
-        stockViewMap.put(group, stockView);
-        return stockView;
+        stockViewMap.put(group, stockInfoView);
+        return stockInfoView;
     }
 
 
-    public Optional<StockView> getSelected() {
+    public Optional<StockInfoView> getSelected() {
         TabInfo selectedInfo = tabs.getSelectedInfo();
         if (Objects.isNull(selectedInfo)) {
             return Optional.empty();
         }
-        StockView stockView = stockViewMap.get(selectedInfo.getText());
-        if (Objects.isNull(stockView)) {
+        StockInfoView stockInfoView = stockViewMap.get(selectedInfo.getText());
+        if (Objects.isNull(stockInfoView)) {
             return Optional.empty();
         }
-        return Optional.of(stockView);
+        return Optional.of(stockInfoView);
     }
 
 
