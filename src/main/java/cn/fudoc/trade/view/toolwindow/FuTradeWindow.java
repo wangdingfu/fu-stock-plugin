@@ -93,8 +93,6 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         rootPanel.add(initToolBarUI(), BorderLayout.NORTH);
         //股票分组
         rootPanel.add(tabs.getComponent(), BorderLayout.CENTER);
-        //todo 我的持仓tab新增
-
 
         //初始化工具栏事件
         initActionGroup();
@@ -235,7 +233,7 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
         });
 
         //手动刷新股票
-        this.actionGroup.addAction(new DumbAwareAction("刷新", "", AllIcons.Actions.ForceRefresh) {
+        this.actionGroup.addAction(new DumbAwareAction("刷新", "", AllIcons.Actions.Refresh) {
             @Override
             public @NotNull ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
