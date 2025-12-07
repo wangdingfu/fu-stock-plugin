@@ -5,7 +5,6 @@ import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.common.StockTabEnum;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.StockInfoView;
 import cn.fudoc.trade.view.search.FuStockSearchPopupView;
 import cn.fudoc.trade.view.stock.StockTabFactory;
 import cn.fudoc.trade.view.stock.StockTabView;
