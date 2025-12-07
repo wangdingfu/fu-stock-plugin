@@ -174,8 +174,8 @@ public class FuTradeWindow extends SimpleToolWindowPanel implements DataProvider
                 getSelected().ifPresent(stock -> {
 //                    StockSearchDialog stockSearchDialog = new StockSearchDialog(stock);
 //                    stockSearchDialog.showAndGet();
-                    FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stock);
-                    fuStockSearchPopupView.showPopup(project);
+//                    FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stock);
+//                    fuStockSearchPopupView.showPopup(project);
                 });
             }
         });
