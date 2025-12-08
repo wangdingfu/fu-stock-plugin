@@ -19,7 +19,7 @@
                     secondary="false"
                     doNotActivateOnStart="true"
                     order="last"
-                    factoryClass="cn.fudoc.trade.view.toolwindow.FuTradeToolWindowFactory"/>
+                    factoryClass="cn.fudoc.trade.view.toolwindow.FuStockToolWindowFactory"/>
 
         <applicationService serviceImplementation="cn.fudoc.trade.state.StockGroupPersistentState"/>
         <applicationService serviceImplementation="cn.fudoc.trade.state.MarketAllStockPersistentState"/>

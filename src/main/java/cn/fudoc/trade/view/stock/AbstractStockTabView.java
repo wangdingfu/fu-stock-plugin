@@ -26,4 +26,10 @@ public abstract class AbstractStockTabView implements StockTabView {
         }
         return stockCodeSet.contains(stockCode);
     }
+
+
+    @Override
+    public void shutdownTask() {
+
+    }
 }

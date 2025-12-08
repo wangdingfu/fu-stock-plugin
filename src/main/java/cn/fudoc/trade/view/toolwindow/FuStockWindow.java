@@ -15,11 +15,16 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.ui.Splitter;
+import com.intellij.ui.BrowserHyperlinkListener;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.tabs.JBTabs;
 import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.util.IconUtil;
+import com.intellij.util.ui.HTMLEditorKitBuilder;
+import com.intellij.util.ui.UIUtil;
 import icons.FuIcons;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +47,19 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     private static final String STOCK_AUTO_LOAD_TIME_TITLE = FuBundle.message("stock.auto.load.time.tip");
     private static final String REMOVE_STOCK_GROUP_TITLE = FuBundle.message("remove.stock.group.title");
 
-    private JBTabs tabs;
+    /**
+     * 股票tab
+     */
+    private JBTabs stockTabs;
+    /**
+     * 持仓交易tab
+     */
+    private JBTabs tradeTabs;
+
+    /**
+     * 提示栏
+     */
+    private JEditorPane messagePane;
 
     private Long lastRefreshTime = 0L;
     /**
@@ -63,8 +80,9 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 窗体由四部分组成
      * 第一部分：动作栏，主要展示一些操作图标，用于添加股票分组，添加股票，刷新股票，启动/定制任务实时获取股票等操作
      * 第二部分：指数栏，主要展示上证指数，创业板指数信息
-     * 第三部分：股票栏，主要展示我的自选（股票实时价格等信息），我的持仓（股票实时收益等信息），自定义分组（分组股票实时价格信息）
-     * 第四部分：提示栏，主要展示一些炒股组训，炒股纪律等文案
+     * 第三部分：股票栏，主要展示自选股票实时信息以及自定义分组管理股票
+     * 第四部分：交易栏，主要展示我的持仓交易信息
+     * 第五部分：提示栏，主要展示一些炒股组训，炒股纪律等文案
      *
      * @param project 当前项目
      */
@@ -88,18 +106,23 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         JPanel indexPanel = new JPanel(new FlowLayout());
         contentPanel.add(indexPanel, BorderLayout.NORTH);
         //3、股票面板
-        tabs = JBTabsFactory.createTabs(project);
-        contentPanel.add(tabs.getComponent(), BorderLayout.CENTER);
+        Splitter splitter = new Splitter(true, 0.6F);
+        stockTabs = JBTabsFactory.createTabs(project);
+        splitter.setFirstComponent(stockTabs.getComponent());
+        //4、交易栏
+        tradeTabs = JBTabsFactory.createTabs(project);
+        splitter.setSecondComponent(tradeTabs.getComponent());
+        contentPanel.add(splitter, BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
-        //4、提示栏
-        JPanel messagePanel = new JPanel();
-        rootPanel.add(messagePanel, BorderLayout.SOUTH);
+        //5、提示栏
+        this.messagePane = initPanel();
+        rootPanel.add(ScrollPaneFactory.createScrollPane(this.messagePane), BorderLayout.SOUTH);
         //设置当前面板到窗口
         setContent(rootPanel);
     }
 
     private void initListener() {
-        tabs.addListener(new TabsListener() {
+        stockTabs.addListener(new TabsListener() {
             @Override
             public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
                 if (Objects.nonNull(oldSelection)) {
@@ -129,9 +152,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         }, () -> stockTabViewMap.forEach((key, value) -> value.shutdownTask()));
     }
 
-
     private void initData() {
-
     }
 
 
@@ -145,10 +166,21 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 if (f.startTask()) {
                     lastRefreshTime = System.currentTimeMillis();
                 } else {
-                    tabs.select(tabs.getTabAt(0), true);
+                    stockTabs.select(stockTabs.getTabAt(0), true);
                 }
             });
         }
+    }
+
+
+    private JEditorPane initPanel() {
+        JEditorPane messagePanel = new JEditorPane();
+        messagePanel.setContentType("text/html");
+        messagePanel.setEditable(false);
+        messagePanel.setEditorKit(HTMLEditorKitBuilder.simple());
+        messagePanel.addHyperlinkListener(BrowserHyperlinkListener.INSTANCE);
+        UIUtil.doNotScrollToCaret(messagePanel);
+        return messagePanel;
     }
 
     /**
@@ -275,9 +307,9 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         StockTabView stockTabView = StockTabFactory.create(group, stockTabEnum);
         TabInfo tabInfo = new TabInfo(stockTabView.getTabComponent());
         tabInfo.setText(group);
-        tabs.addTab(tabInfo);
+        stockTabs.addTab(tabInfo);
         // 可选：切换到新添加的标签
-        tabs.select(tabInfo, true);
+        stockTabs.select(tabInfo, true);
         stockTabViewMap.put(group, stockTabView);
         return stockTabView;
     }

@@ -26,8 +26,8 @@ public class HoldingsStockTabView extends AbstractStockTabView {
     }
 
     @Override
-    public void startTask() {
-
+    public boolean startTask() {
+        return true;
     }
 
     @Override

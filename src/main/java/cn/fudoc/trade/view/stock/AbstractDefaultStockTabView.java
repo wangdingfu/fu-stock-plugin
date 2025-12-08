@@ -16,8 +16,8 @@ public abstract class AbstractDefaultStockTabView extends AbstractStockTabView {
     }
 
     @Override
-    public void startTask() {
-
+    public boolean startTask() {
+        return true;
     }
 
     @Override
