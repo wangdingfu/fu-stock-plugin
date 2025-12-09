@@ -153,6 +153,11 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     }
 
     private void initData() {
+        StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
+        //新增我的自选tab
+        //新增自定义分组
+
+
     }
 
 
@@ -207,13 +212,13 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      */
     private DefaultActionGroup initActionGroup(Project project) {
         DefaultActionGroup actionGroup = new DefaultActionGroup();
-        actionGroup.add(new AnAction("添加股票分组", "", FuIcons.FU_ADD_GROUP) {
+        actionGroup.add(new AnAction(ADD_STOCK_GROUP_TITLE, "", FuIcons.FU_ADD_GROUP) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String userInput = Messages.showInputDialog(project, ADD_STOCK_GROUP_MESSAGE, ADD_STOCK_GROUP_TITLE, IconUtil.getAddIcon(), "我的分组", null);
                 StockTabView stockTabView = addGroup(userInput, StockTabEnum.STOCK_INFO);
                 if (Objects.isNull(stockTabView)) {
-                    //提示添加失败
+                    return;
                 }
                 StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
                 instance.addGroup(userInput);
