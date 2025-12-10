@@ -1,7 +1,6 @@
 package cn.fudoc.trade.view.stock;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,17 +18,9 @@ public abstract class AbstractStockTabView implements StockTabView {
         }
     }
 
-    @Override
-    public boolean isContainsStock(String stockCode) {
-        if (StringUtils.isBlank(stockCode)) {
-            return false;
-        }
-        return stockCodeSet.contains(stockCode);
-    }
-
 
     @Override
-    public void shutdownTask() {
-
+    public Set<String> getStockCodes() {
+        return stockCodeSet;
     }
 }

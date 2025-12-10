@@ -1,6 +1,9 @@
 package cn.fudoc.trade.view.stock;
 
+import cn.fudoc.trade.api.data.RealStockInfo;
+
 import javax.swing.*;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,32 +29,17 @@ public class HoldingsStockTabView extends AbstractStockTabView {
     }
 
     @Override
-    public boolean startTask() {
-        return true;
-    }
-
-    @Override
-    public void stopTask() {
-
-    }
-
-    @Override
-    public void reloadStock() {
-
-    }
-
-    @Override
-    public boolean isContainsStock(String stockCode) {
-        return false;
-    }
-
-    @Override
     public void addStock(String stockCode) {
 
     }
 
     @Override
     public void removeStock(String stockCode) {
+
+    }
+
+    @Override
+    public void initStockList(List<RealStockInfo> stockInfoList) {
 
     }
 }

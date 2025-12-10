@@ -36,7 +36,7 @@ public class FuStockToolWindowFactory implements ToolWindowFactory, DumbAware {
                 ToolWindow myToolWindow = toolWindowManager.getToolWindow("Fu Trade Stock");
                 if (myToolWindow == null) return;
                 //当前窗口被影藏
-                fuStockWindow.hideWindow();
+                fuStockWindow.stopTask();
             }
         });
     }

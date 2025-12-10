@@ -1,5 +1,8 @@
 package cn.fudoc.trade.view.stock;
 
+import cn.fudoc.trade.api.data.RealStockInfo;
+
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,5 +20,10 @@ public class WatchListStockTabView extends AbstractDefaultStockTabView {
     @Override
     public String getTabName() {
         return tabName;
+    }
+
+    @Override
+    public void initStockList(List<RealStockInfo> stockInfoList) {
+
     }
 }
