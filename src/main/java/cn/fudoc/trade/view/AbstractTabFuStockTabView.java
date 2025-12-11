@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractTabFuStockItemView implements FuStockItemView {
+public abstract class AbstractTabFuStockTabView implements FuStockTabView {
 
 
     private static final String REMOVE_STOCK_GROUP_TITLE = FuBundle.message("remove.stock.group.title");
@@ -24,7 +24,10 @@ public abstract class AbstractTabFuStockItemView implements FuStockItemView {
     private final Map<String, StockTabView> stockTabViewMap = new ConcurrentHashMap<>();
     private final JBTabs tabs;
 
-    public AbstractTabFuStockItemView(Project project) {
+
+    protected abstract StockTabView createStockTabView(String tab);
+
+    public AbstractTabFuStockTabView(Project project) {
         this.tabs = JBTabsFactory.createTabs(project);
         registerListener();
     }
@@ -43,7 +46,12 @@ public abstract class AbstractTabFuStockItemView implements FuStockItemView {
 
     @Override
     public void add(String tab) {
-
+        if (stockTabViewMap.containsKey(tab)) {
+            return;
+        }
+        StockTabView stockTabView = createStockTabView(tab);
+        this.tabs.addTab(new TabInfo(stockTabView.getComponent()));
+        stockTabViewMap.put(tab, stockTabView);
     }
 
     /**

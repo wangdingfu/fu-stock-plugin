@@ -20,14 +20,14 @@ public interface StockTabView {
     /**
      * tab展示的组件
      */
-    JPanel getTabComponent();
+    JPanel getComponent();
 
     /**
      * 添加股票至当前tab分组
      *
-     * @param stockCode 股票代码
+     * @param realStockInfo 股票实时信息
      */
-    void addStock(String stockCode);
+    void addStock(RealStockInfo realStockInfo);
 
     /**
      * 从当前tab分组移除股票
@@ -48,7 +48,11 @@ public interface StockTabView {
      *
      * @param stockInfoList 股票实时信息
      */
-    void initStockList(List<RealStockInfo> stockInfoList);
+    default void initStockList(List<RealStockInfo> stockInfoList) {
+        if (CollectionUtils.isNotEmpty(stockInfoList)) {
+            stockInfoList.forEach(this::addStock);
+        }
+    }
 
     /**
      * 当前tab中是否包含指定股票

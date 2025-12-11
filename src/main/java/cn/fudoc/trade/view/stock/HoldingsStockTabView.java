@@ -24,7 +24,7 @@ public class HoldingsStockTabView extends AbstractStockTabView {
     }
 
     @Override
-    public JPanel getTabComponent() {
+    public JPanel getComponent() {
         return null;
     }
 

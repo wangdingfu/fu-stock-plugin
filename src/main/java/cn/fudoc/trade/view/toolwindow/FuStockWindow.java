@@ -48,15 +48,15 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     /**
      * 指数栏视图
      */
-    private final FuStockItemView indexView;
+    private final FuStockTabView indexView;
     /**
      * 股票栏视图
      */
-    private final FuStockItemView stockView;
+    private final FuStockTabView stockView;
     /**
      * 交易栏视图
      */
-    private final FuStockItemView tradeView;
+    private final FuStockTabView tradeView;
     /**
      * 消息栏视图
      */

@@ -4,7 +4,7 @@ import cn.fudoc.trade.view.stock.StockTabView;
 
 import javax.swing.*;
 
-public class FuStockIndexView implements FuStockItemView{
+public class FuStockIndexView implements FuStockTabView {
     @Override
     public JComponent getComponent() {
         return null;
