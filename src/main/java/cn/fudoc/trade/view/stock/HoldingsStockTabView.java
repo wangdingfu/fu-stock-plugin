@@ -11,7 +11,7 @@ import java.util.Vector;
 public class HoldingsStockTabView extends AbstractStockTabView {
 
     private final String tabName;
-    private static final String[] columnNames = {"名称/市值", "持仓盈亏", "持仓/可用", "现价/成本"};
+    private static final String[] columnNames = {"名称","数量","市值", "盈亏", "成本"};
 
     public HoldingsStockTabView(String tabName, Set<String> stockCodeSet) {
         super(stockCodeSet);
@@ -26,7 +26,7 @@ public class HoldingsStockTabView extends AbstractStockTabView {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[0];
+        return columnNames;
     }
 
     @Override

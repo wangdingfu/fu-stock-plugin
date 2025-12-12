@@ -56,10 +56,10 @@ public class FuStockInfoView {
             return;
         }
         StockTabView stockTabView = createStockTabView(tab);
+        stockTabViewMap.put(tab, stockTabView);
         TabInfo tabInfo = new TabInfo(stockTabView.getComponent());
         tabInfo.setText(tab);
         this.tabs.addTab(tabInfo);
-        stockTabViewMap.put(tab, stockTabView);
         // 可选：切换到新添加的标签
         tabs.select(tabInfo, true);
     }

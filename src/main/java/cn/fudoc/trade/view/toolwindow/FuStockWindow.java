@@ -4,6 +4,7 @@ import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.common.FuNotification;
+import cn.fudoc.trade.common.FuTradeConstants;
 import cn.fudoc.trade.common.StockTabEnum;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
@@ -93,7 +94,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * @param project 当前项目
      */
     public FuStockWindow(Project project) {
-        super(true,true);
+        super(true, true);
         JPanel rootPanel = new JPanel(new BorderLayout());
         //1、动作栏
         rootPanel.add(initToolBarUI(project), BorderLayout.NORTH);
@@ -117,7 +118,14 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         setContent(rootPanel);
         //随机展示炒股心灵鸡汤文案
         showTips();
+        //初始化持仓
+        initGroup();
+    }
 
+
+    private void initGroup() {
+        stockView.add(FuTradeConstants.MY_SELECTED_GROUP);
+        tradeView.add(FuTradeConstants.MY_POSITIONS_GROUP);
     }
 
 

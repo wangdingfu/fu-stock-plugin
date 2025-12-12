@@ -7,7 +7,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -20,7 +19,6 @@ public abstract class AbstractStockTabView implements StockTabView {
      */
     protected final Set<String> stockCodeSet = new HashSet<>();
 
-    protected final JPanel rootPanel;
     protected final JBTable stockTable;
     private final DefaultTableModel tableModel;
 
@@ -45,8 +43,6 @@ public abstract class AbstractStockTabView implements StockTabView {
         if (CollectionUtils.isNotEmpty(stockCodeSet)) {
             this.stockCodeSet.addAll(stockCodeSet);
         }
-        this.rootPanel = new JPanel(new BorderLayout());
-        stockTable = initStockTable();
         this.tableModel = new DefaultTableModel(getColumnNames(), 0) {
             // 设置单元格不可编辑
             @Override
@@ -54,6 +50,7 @@ public abstract class AbstractStockTabView implements StockTabView {
                 return false;
             }
         };
+        stockTable = new JBTable(tableModel);
     }
 
 
@@ -70,12 +67,18 @@ public abstract class AbstractStockTabView implements StockTabView {
      */
     @Override
     public JPanel getComponent() {
-        return this.rootPanel;
+        //  创建右键菜单
+        JPopupMenu popupMenu = createPopupMenu();
+        stockTable.setComponentPopupMenu(popupMenu);
+        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(stockTable);
+        stockTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        return decorator.createPanel();
     }
 
 
     /**
      * 新增股票至表格
+     *
      * @param realStockInfo 股票实时信息
      */
     @Override
@@ -91,6 +94,7 @@ public abstract class AbstractStockTabView implements StockTabView {
 
     /**
      * 从表格中删除股票
+     *
      * @param stockCode 股票代码
      */
     @Override
@@ -104,18 +108,6 @@ public abstract class AbstractStockTabView implements StockTabView {
                 stockCodeSet.remove(stockCode);
             }
         }
-    }
-
-
-    private JBTable initStockTable() {
-        JBTable stockTable = new JBTable(tableModel);
-        // 2. 创建右键菜单
-        JPopupMenu popupMenu = createPopupMenu();
-        stockTable.setComponentPopupMenu(popupMenu);
-        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(stockTable);
-        stockTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        this.rootPanel.add(decorator.createPanel(), BorderLayout.CENTER);
-        return stockTable;
     }
 
 
