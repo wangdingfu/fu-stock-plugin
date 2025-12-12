@@ -1,20 +1,93 @@
 package cn.fudoc.trade.view;
 
+import cn.fudoc.trade.common.FuBundle;
+import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.view.stock.HoldingsStockTabView;
 import cn.fudoc.trade.view.stock.StockTabView;
 import cn.fudoc.trade.view.stock.WatchListStockTabView;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.ui.tabs.JBTabs;
+import com.intellij.ui.tabs.JBTabsFactory;
+import com.intellij.ui.tabs.TabInfo;
+import com.intellij.ui.tabs.TabsListener;
+import org.jetbrains.annotations.NotNull;
 
-public class FuStockInfoView extends AbstractTabFuStockTabView {
+import javax.swing.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class FuStockInfoView {
+
+    private static final String REMOVE_STOCK_GROUP_TITLE = FuBundle.message("remove.stock.group.title");
 
 
-    @Override
-    protected StockTabView createStockTabView(String tab) {
-        return new WatchListStockTabView(tab, Sets.newHashSet());
+    private StockTabView currentSelected;
+    private final Map<String, StockTabView> stockTabViewMap = new ConcurrentHashMap<>();
+    private final JBTabs tabs;
+    private final StockTabEnum stockTabEnum;
+
+    public FuStockInfoView(Project project, StockTabEnum stockTabEnum) {
+        this.stockTabEnum = stockTabEnum;
+        this.tabs = JBTabsFactory.createTabs(project);
+        registerListener();
     }
 
-    public FuStockInfoView(Project project) {
-        super(project);
+
+    public JComponent getComponent() {
+        return this.tabs.getComponent();
     }
 
+
+    public StockTabView getSelected() {
+        return currentSelected;
+    }
+
+
+    public void add(String tab) {
+        if (stockTabViewMap.containsKey(tab) || Objects.isNull(stockTabEnum)) {
+            return;
+        }
+        StockTabView stockTabView = createStockTabView(tab);
+        if (Objects.isNull(stockTabView)) {
+            return;
+        }
+        this.tabs.addTab(new TabInfo(stockTabView.getComponent()));
+        stockTabViewMap.put(tab, stockTabView);
+    }
+
+
+    /**
+     * 注册tab监听器
+     */
+    protected void registerListener() {
+        tabs.addListener(new TabsListener() {
+            @Override
+            public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
+                //切换新窗口时 判断当前是否开启自动刷新 开启时才刷新股票数据
+                if (Objects.nonNull(newSelection)) {
+                    currentSelected = stockTabViewMap.get(newSelection.getText());
+                }
+            }
+
+            @Override
+            public void tabRemoved(@NotNull TabInfo tabToRemove) {
+                int result = Messages.showYesNoDialog(REMOVE_STOCK_GROUP_TITLE, "确认移除", Messages.getQuestionIcon());
+                if (result == Messages.YES) {
+                    //持久化数据更新
+                    stockTabViewMap.remove(tabToRemove.getText());
+                }
+            }
+        });
+    }
+
+
+    private StockTabView createStockTabView(String tab) {
+        return switch (stockTabEnum) {
+            case STOCK_INFO -> new WatchListStockTabView(tab, Sets.newHashSet());
+            case STOCK_HOLD -> new HoldingsStockTabView(tab, Sets.newHashSet());
+        };
+    }
 }

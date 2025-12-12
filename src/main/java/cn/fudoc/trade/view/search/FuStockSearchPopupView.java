@@ -1,12 +1,17 @@
 package cn.fudoc.trade.view.search;
 
+import cn.fudoc.trade.api.TencentApiService;
+import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.api.data.StockInfo;
+import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.common.PinToolBarAction;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.StockInfoView;
 import cn.fudoc.trade.view.stock.StockTabView;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -46,6 +51,8 @@ public class FuStockSearchPopupView {
     private final StockTabView stockTabView;
 
     private final AtomicBoolean pinStatus = new AtomicBoolean(false);
+
+    private final TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
 
     public FuStockSearchPopupView(StockTabView stockTabView) {
         this.stockTabView = stockTabView;
@@ -241,7 +248,12 @@ public class FuStockSearchPopupView {
         stock.setAdd(!stock.isAdd());
         if (stock.isAdd()) {
             //添加股票
-            this.stockTabView.addStock(stock.getStockCode());
+            List<RealStockInfo> realStockInfos = tencentApiService.stockList(Sets.newHashSet(stock.getStockCode()));
+            if (CollectionUtils.isEmpty(realStockInfos)) {
+                FuNotification.notifyWarning(stock.getStockCode() + "股票不存在");
+                return;
+            }
+            this.stockTabView.addStock(realStockInfos.get(0));
         } else {
             //移除股票
             this.stockTabView.removeStock(stock.getStockCode());

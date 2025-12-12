@@ -4,11 +4,14 @@ import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.common.FuBundle;
 import cn.fudoc.trade.common.FuNotification;
+import cn.fudoc.trade.common.StockTabEnum;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.*;
+import cn.fudoc.trade.view.ScheduledTaskManager;
 import cn.fudoc.trade.view.search.FuStockSearchPopupView;
 import cn.fudoc.trade.view.stock.StockTabView;
+import cn.fudoc.trade.view.FuIndexView;
+import cn.fudoc.trade.view.FuStockInfoView;
 import cn.hutool.core.date.DateUtil;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
@@ -48,15 +51,15 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     /**
      * 指数栏视图
      */
-    private final FuStockTabView indexView;
+    private final FuIndexView indexView;
     /**
      * 股票栏视图
      */
-    private final FuStockTabView stockView;
+    private final FuStockInfoView stockView;
     /**
      * 交易栏视图
      */
-    private final FuStockTabView tradeView;
+    private final FuStockInfoView tradeView;
     /**
      * 消息栏视图
      */
@@ -96,14 +99,14 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         rootPanel.add(initToolBarUI(project), BorderLayout.NORTH);
         JPanel contentPanel = new JPanel(new BorderLayout());
         //2、指数面板
-        this.indexView = new FuStockIndexView();
-        contentPanel.add(this.indexView.getComponent(), BorderLayout.NORTH);
+        this.indexView = new FuIndexView();
+        contentPanel.add(this.indexView, BorderLayout.NORTH);
         //3、股票面板
         Splitter splitter = new Splitter(true, 0.6F);
-        this.stockView = new FuStockInfoView(project);
+        this.stockView = new FuStockInfoView(project, StockTabEnum.STOCK_INFO);
         splitter.setFirstComponent(this.stockView.getComponent());
         //4、交易栏
-        this.tradeView = new FuStockTradeView(project);
+        this.tradeView = new FuStockInfoView(project, StockTabEnum.STOCK_HOLD);
         splitter.setSecondComponent(this.tradeView.getComponent());
         contentPanel.add(splitter, BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
@@ -262,31 +265,27 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 重新加载股票信息
      */
     private void reloadStock() {
-        StockTabView indexSelected = this.indexView.getSelected();
+        //指数栏单独加载
+        indexView.reload();
+
+        //股票信息合并加载
         StockTabView stockSelected = this.stockView.getSelected();
         StockTabView tradeSelected = this.tradeView.getSelected();
-        Set<String> indexCodes = Objects.isNull(indexSelected) ? Collections.emptySet() : indexSelected.getStockCodes();
         Set<String> stockCodes = Objects.isNull(stockSelected) ? Collections.emptySet() : stockSelected.getStockCodes();
         Set<String> tradeCodes = Objects.isNull(tradeSelected) ? Collections.emptySet() : tradeSelected.getStockCodes();
 
         Set<String> allCodes = new HashSet<>();
-        allCodes.addAll(indexCodes);
         allCodes.addAll(stockCodes);
         allCodes.addAll(tradeCodes);
 
         List<RealStockInfo> realStockInfos = tencentApiService.stockList(allCodes);
         Map<String, RealStockInfo> map = new HashMap<>(realStockInfos.size());
         realStockInfos.forEach(stockInfo -> map.put(stockInfo.getStockCode(), stockInfo));
-
-
-        if (CollectionUtils.isNotEmpty(indexCodes) && Objects.nonNull(indexSelected)) {
-            indexSelected.initStockList(indexCodes.stream().map(map::get).filter(Objects::nonNull).collect(Collectors.toList()));
-        }
         if (CollectionUtils.isNotEmpty(stockCodes) && Objects.nonNull(stockSelected)) {
-            indexSelected.initStockList(stockCodes.stream().map(map::get).filter(Objects::nonNull).collect(Collectors.toList()));
+            stockSelected.initStockList(stockCodes.stream().map(map::get).filter(Objects::nonNull).collect(Collectors.toList()));
         }
         if (CollectionUtils.isNotEmpty(tradeCodes) && Objects.nonNull(tradeSelected)) {
-            indexSelected.initStockList(tradeCodes.stream().map(map::get).filter(Objects::nonNull).collect(Collectors.toList()));
+            tradeSelected.initStockList(tradeCodes.stream().map(map::get).filter(Objects::nonNull).collect(Collectors.toList()));
         }
     }
 

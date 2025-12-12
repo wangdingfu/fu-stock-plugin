@@ -8,7 +8,7 @@ import java.util.Vector;
 /**
  * 自选tab
  */
-public class WatchListStockTabView extends AbstractDefaultStockTabView {
+public class WatchListStockTabView extends AbstractStockTabView {
 
     private final String tabName;
     private static final String[] stockTableColumn = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
@@ -36,6 +36,12 @@ public class WatchListStockTabView extends AbstractDefaultStockTabView {
 
     @Override
     protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
-        return null;
+        Vector<Object> vector = new Vector<>();
+        vector.add(realStockInfo.getStockCode());
+        vector.add(realStockInfo.getStockName());
+        vector.add(realStockInfo.getCurrentPrice());
+        vector.add(realStockInfo.getIncreaseRate());
+        vector.add(realStockInfo.getVolume());
+        return vector;
     }
 }

@@ -2,9 +2,8 @@ package cn.fudoc.trade.view.stock;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
 
-import javax.swing.*;
-import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 /**
  * 持仓
@@ -12,6 +11,7 @@ import java.util.Set;
 public class HoldingsStockTabView extends AbstractStockTabView {
 
     private final String tabName;
+    private static final String[] columnNames = {"名称/市值", "持仓盈亏", "持仓/可用", "现价/成本"};
 
     public HoldingsStockTabView(String tabName, Set<String> stockCodeSet) {
         super(stockCodeSet);
@@ -23,23 +23,19 @@ public class HoldingsStockTabView extends AbstractStockTabView {
         return tabName;
     }
 
+
     @Override
-    public JPanel getComponent() {
+    protected String[] getColumnNames() {
+        return new String[0];
+    }
+
+    @Override
+    protected void removeStockFromState(String stockCode) {
+
+    }
+
+    @Override
+    protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
         return null;
-    }
-
-    @Override
-    public void addStock(String stockCode) {
-
-    }
-
-    @Override
-    public void removeStock(String stockCode) {
-
-    }
-
-    @Override
-    public void initStockList(List<RealStockInfo> stockInfoList) {
-
     }
 }

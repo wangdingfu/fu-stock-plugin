@@ -1,5 +1,6 @@
 package cn.fudoc.trade.common;
 
+import cn.fudoc.trade.util.ProjectUtils;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
@@ -12,5 +13,9 @@ public class FuNotification {
 
     public static void notifyWarning(String content, Project project) {
         NOTIFICATION_GROUP.createNotification(FuTradeConstants.FU_TRADE, content, NotificationType.WARNING).notify(project);
+    }
+
+    public static void notifyWarning(String content) {
+        NOTIFICATION_GROUP.createNotification(FuTradeConstants.FU_TRADE, content, NotificationType.WARNING).notify(ProjectUtils.getCurrProject());
     }
 }
