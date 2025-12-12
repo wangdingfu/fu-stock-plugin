@@ -12,9 +12,11 @@ import com.intellij.ui.tabs.JBTabs;
 import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +39,10 @@ public class FuStockInfoView {
 
 
     public JComponent getComponent() {
-        return this.tabs.getComponent();
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.add(tabs.getComponent());
+        rootPanel.setFont(JBUI.Fonts.label(11));
+        return rootPanel;
     }
 
 
@@ -51,11 +56,12 @@ public class FuStockInfoView {
             return;
         }
         StockTabView stockTabView = createStockTabView(tab);
-        if (Objects.isNull(stockTabView)) {
-            return;
-        }
-        this.tabs.addTab(new TabInfo(stockTabView.getComponent()));
+        TabInfo tabInfo = new TabInfo(stockTabView.getComponent());
+        tabInfo.setText(tab);
+        this.tabs.addTab(tabInfo);
         stockTabViewMap.put(tab, stockTabView);
+        // 可选：切换到新添加的标签
+        tabs.select(tabInfo, true);
     }
 
 

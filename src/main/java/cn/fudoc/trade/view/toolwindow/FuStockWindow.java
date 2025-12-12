@@ -93,7 +93,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * @param project 当前项目
      */
     public FuStockWindow(Project project) {
-        super(Boolean.TRUE, Boolean.TRUE);
+        super(true,true);
         JPanel rootPanel = new JPanel(new BorderLayout());
         //1、动作栏
         rootPanel.add(initToolBarUI(project), BorderLayout.NORTH);
@@ -117,6 +117,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         setContent(rootPanel);
         //随机展示炒股心灵鸡汤文案
         showTips();
+
     }
 
 
