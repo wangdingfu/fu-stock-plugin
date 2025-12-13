@@ -23,6 +23,8 @@
 
         <applicationService serviceImplementation="cn.fudoc.trade.state.StockGroupPersistentState"/>
         <applicationService serviceImplementation="cn.fudoc.trade.state.MarketAllStockPersistentState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.state.HoldingsStockState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.state.FuCommonState"/>
         <applicationService serviceInterface="cn.fudoc.trade.api.TencentApiService" serviceImplementation="cn.fudoc.trade.api.impl.TencentApiServiceImpl"/>
         <applicationService serviceInterface="cn.fudoc.trade.api.ZTApiService" serviceImplementation="cn.fudoc.trade.api.impl.ZTApiServiceImpl"/>
 

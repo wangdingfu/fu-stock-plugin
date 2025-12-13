@@ -20,7 +20,7 @@ public abstract class AbstractStockTabView implements StockTabView {
     protected final Set<String> stockCodeSet = new HashSet<>();
 
     protected final JBTable stockTable;
-    private final DefaultTableModel tableModel;
+    protected final DefaultTableModel tableModel;
 
     /**
      * 表格展示的标题

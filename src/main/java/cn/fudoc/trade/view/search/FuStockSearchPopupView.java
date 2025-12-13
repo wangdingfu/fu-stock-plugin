@@ -6,7 +6,9 @@ import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.common.PinToolBarAction;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
+import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.util.ToolBarUtils;
+import cn.fudoc.trade.view.HoldingsStockDialog;
 import cn.fudoc.trade.view.StockInfoView;
 import cn.fudoc.trade.view.stock.StockTabView;
 import com.google.common.collect.Sets;
@@ -253,7 +255,7 @@ public class FuStockSearchPopupView {
                 FuNotification.notifyWarning(stock.getStockCode() + "股票不存在");
                 return;
             }
-            this.stockTabView.addStock(realStockInfos.get(0));
+            this.stockTabView.addStock(realStockInfos.getFirst());
         } else {
             //移除股票
             this.stockTabView.removeStock(stock.getStockCode());

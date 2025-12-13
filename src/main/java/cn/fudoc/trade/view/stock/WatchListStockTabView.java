@@ -1,6 +1,7 @@
 package cn.fudoc.trade.view.stock;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.common.StockTabEnum;
 
 import java.util.Set;
 import java.util.Vector;
@@ -21,6 +22,11 @@ public class WatchListStockTabView extends AbstractStockTabView {
     @Override
     public String getTabName() {
         return tabName;
+    }
+
+    @Override
+    public StockTabEnum getTabEnum() {
+        return StockTabEnum.STOCK_INFO;
     }
 
 

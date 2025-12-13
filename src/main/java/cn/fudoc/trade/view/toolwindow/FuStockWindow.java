@@ -2,17 +2,15 @@ package cn.fudoc.trade.view.toolwindow;
 
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.common.FuBundle;
-import cn.fudoc.trade.common.FuNotification;
-import cn.fudoc.trade.common.FuTradeConstants;
-import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.common.*;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
+import cn.fudoc.trade.view.FuIndexView;
+import cn.fudoc.trade.view.FuStockInfoView;
+import cn.fudoc.trade.view.GroupAddDialog;
 import cn.fudoc.trade.view.ScheduledTaskManager;
 import cn.fudoc.trade.view.search.FuStockSearchPopupView;
 import cn.fudoc.trade.view.stock.StockTabView;
-import cn.fudoc.trade.view.FuIndexView;
-import cn.fudoc.trade.view.FuStockInfoView;
 import cn.hutool.core.date.DateUtil;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
@@ -20,17 +18,13 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.ui.Splitter;
 import com.intellij.ui.BrowserHyperlinkListener;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.util.IconUtil;
 import com.intellij.util.ui.HTMLEditorKitBuilder;
 import com.intellij.util.ui.UIUtil;
 import icons.FuIcons;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -38,7 +32,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider {
 
@@ -57,10 +50,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 股票栏视图
      */
     private final FuStockInfoView stockView;
-    /**
-     * 交易栏视图
-     */
-    private final FuStockInfoView tradeView;
     /**
      * 消息栏视图
      */
@@ -103,13 +92,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         this.indexView = new FuIndexView();
         contentPanel.add(this.indexView, BorderLayout.NORTH);
         //3、股票面板
-        Splitter splitter = new Splitter(true, 0.6F);
-        this.stockView = new FuStockInfoView(project, StockTabEnum.STOCK_INFO);
-        splitter.setFirstComponent(this.stockView.getComponent());
-        //4、交易栏
-        this.tradeView = new FuStockInfoView(project, StockTabEnum.STOCK_HOLD);
-        splitter.setSecondComponent(this.tradeView.getComponent());
-        contentPanel.add(splitter, BorderLayout.CENTER);
+        this.stockView = new FuStockInfoView(project);
+        contentPanel.add(this.stockView.getComponent(), BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
         //5、消息栏
         this.messagePane = initPanel();
@@ -124,8 +108,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
 
     private void initGroup() {
-        stockView.add(FuTradeConstants.MY_SELECTED_GROUP);
-        tradeView.add(FuTradeConstants.MY_POSITIONS_GROUP);
+        stockView.add(FuTradeConstants.MY_SELECTED_GROUP, StockTabEnum.STOCK_INFO);
+        stockView.add(FuTradeConstants.MY_SELECTED_GROUP, StockTabEnum.STOCK_HOLD);
     }
 
 
@@ -177,12 +161,10 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         actionGroup.add(new AnAction(ADD_STOCK_GROUP_TITLE, "", FuIcons.FU_ADD_GROUP) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                String groupName = Messages.showInputDialog(project, ADD_STOCK_GROUP_MESSAGE, ADD_STOCK_GROUP_TITLE, IconUtil.getAddIcon(), "我的分组", null);
-                if (StringUtils.isBlank(groupName)) {
-                    return;
+                GroupAddDialog groupAddDialog = new GroupAddDialog(project);
+                if (groupAddDialog.showAndGet()) {
+                    stockView.add(groupAddDialog.getGroupName(), groupAddDialog.getStockTabEnum());
                 }
-                stockView.add(groupName);
-
             }
         });
         actionGroup.add(new AnAction(ADD_STOCK_TITLE, "", AllIcons.General.Add) {
@@ -256,6 +238,13 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 reloadStock();
             }
         });
+        //摸鱼模式
+        actionGroup.add(new HideShowAction(new DefaultHideShowCallback() {
+            @Override
+            public void callback(boolean isShow) {
+                System.out.println(isShow);
+            }
+        }));
         return actionGroup;
     }
 
@@ -279,22 +268,11 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
         //股票信息合并加载
         StockTabView stockSelected = this.stockView.getSelected();
-        StockTabView tradeSelected = this.tradeView.getSelected();
         Set<String> stockCodes = Objects.isNull(stockSelected) ? Collections.emptySet() : stockSelected.getStockCodes();
-        Set<String> tradeCodes = Objects.isNull(tradeSelected) ? Collections.emptySet() : tradeSelected.getStockCodes();
 
-        Set<String> allCodes = new HashSet<>();
-        allCodes.addAll(stockCodes);
-        allCodes.addAll(tradeCodes);
-
-        List<RealStockInfo> realStockInfos = tencentApiService.stockList(allCodes);
-        Map<String, RealStockInfo> map = new HashMap<>(realStockInfos.size());
-        realStockInfos.forEach(stockInfo -> map.put(stockInfo.getStockCode(), stockInfo));
+        List<RealStockInfo> realStockInfos = tencentApiService.stockList(stockCodes);
         if (CollectionUtils.isNotEmpty(stockCodes) && Objects.nonNull(stockSelected)) {
-            stockSelected.initStockList(stockCodes.stream().map(map::get).filter(Objects::nonNull).collect(Collectors.toList()));
-        }
-        if (CollectionUtils.isNotEmpty(tradeCodes) && Objects.nonNull(tradeSelected)) {
-            tradeSelected.initStockList(tradeCodes.stream().map(map::get).filter(Objects::nonNull).collect(Collectors.toList()));
+            stockSelected.initStockList(realStockInfos);
         }
     }
 

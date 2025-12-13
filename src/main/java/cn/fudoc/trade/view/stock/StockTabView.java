@@ -1,6 +1,7 @@
 package cn.fudoc.trade.view.stock;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.common.StockTabEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +17,10 @@ public interface StockTabView {
      */
     String getTabName();
 
+    /**
+     * 股票tab类型
+     */
+    StockTabEnum getTabEnum();
 
     /**
      * tab展示的组件

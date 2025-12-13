@@ -13,6 +13,7 @@ import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.util.ui.JBUI;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -29,10 +30,8 @@ public class FuStockInfoView {
     private StockTabView currentSelected;
     private final Map<String, StockTabView> stockTabViewMap = new ConcurrentHashMap<>();
     private final JBTabs tabs;
-    private final StockTabEnum stockTabEnum;
 
-    public FuStockInfoView(Project project, StockTabEnum stockTabEnum) {
-        this.stockTabEnum = stockTabEnum;
+    public FuStockInfoView(Project project) {
         this.tabs = JBTabsFactory.createTabs(project);
         registerListener();
     }
@@ -51,11 +50,11 @@ public class FuStockInfoView {
     }
 
 
-    public void add(String tab) {
-        if (stockTabViewMap.containsKey(tab) || Objects.isNull(stockTabEnum)) {
+    public void add(String tab, StockTabEnum stockTabEnum) {
+        if (StringUtils.isBlank(tab) || Objects.isNull(stockTabEnum) || stockTabViewMap.containsKey(tab) ) {
             return;
         }
-        StockTabView stockTabView = createStockTabView(tab);
+        StockTabView stockTabView = createStockTabView(tab, stockTabEnum);
         stockTabViewMap.put(tab, stockTabView);
         TabInfo tabInfo = new TabInfo(stockTabView.getComponent());
         tabInfo.setText(tab);
@@ -90,7 +89,7 @@ public class FuStockInfoView {
     }
 
 
-    private StockTabView createStockTabView(String tab) {
+    private StockTabView createStockTabView(String tab, StockTabEnum stockTabEnum) {
         return switch (stockTabEnum) {
             case STOCK_INFO -> new WatchListStockTabView(tab, Sets.newHashSet());
             case STOCK_HOLD -> new HoldingsStockTabView(tab, Sets.newHashSet());
