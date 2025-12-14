@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view;
+package cn.fudoc.trade.view.dialog;
 
 import cn.fudoc.trade.state.HoldingsStockState;
 import cn.fudoc.trade.state.pojo.HoldingsInfo;
@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 // 分组弹框

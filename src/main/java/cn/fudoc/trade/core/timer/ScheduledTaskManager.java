@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view;
+package cn.fudoc.trade.core.timer;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

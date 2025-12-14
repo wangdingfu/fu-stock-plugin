@@ -1,10 +1,10 @@
 package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.common.FuBundle;
-import cn.fudoc.trade.common.StockTabEnum;
-import cn.fudoc.trade.view.stock.HoldingsStockTabView;
-import cn.fudoc.trade.view.stock.StockTabView;
-import cn.fudoc.trade.view.stock.WatchListStockTabView;
+import cn.fudoc.trade.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.view.table.HoldStockGroupTableView;
+import cn.fudoc.trade.view.table.StockGroupTableView;
+import cn.fudoc.trade.view.table.StockTableView;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.tabs.JBTabs;
@@ -21,16 +21,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FuStockInfoView {
+public class FuStockTabView {
 
     private static final String REMOVE_STOCK_GROUP_TITLE = FuBundle.message("remove.stock.group.title");
 
 
-    private StockTabView currentSelected;
-    private final Map<String, StockTabView> stockTabViewMap = new ConcurrentHashMap<>();
+    private StockTableView currentSelected;
+    private final Map<String, StockTableView> stockTabViewMap = new ConcurrentHashMap<>();
     private final JBTabs tabs;
 
-    public FuStockInfoView(Project project) {
+    public FuStockTabView(Project project) {
         this.tabs = JBTabsFactory.createTabs(project);
         registerListener();
     }
@@ -44,22 +44,33 @@ public class FuStockInfoView {
     }
 
 
-    public StockTabView getSelected() {
+    public StockTableView getSelected() {
         return currentSelected;
     }
 
 
     public void add(String tab, StockTabEnum stockTabEnum) {
-        if (StringUtils.isBlank(tab) || Objects.isNull(stockTabEnum) || stockTabViewMap.containsKey(tab) ) {
+        if (StringUtils.isBlank(tab) || Objects.isNull(stockTabEnum) || stockTabViewMap.containsKey(tab)) {
             return;
         }
-        StockTabView stockTabView = createStockTabView(tab, stockTabEnum);
-        stockTabViewMap.put(tab, stockTabView);
-        TabInfo tabInfo = new TabInfo(stockTabView.getComponent());
+        StockTableView stockTableView = createStockTabView(tab, stockTabEnum);
+        stockTabViewMap.put(tab, stockTableView);
+        TabInfo tabInfo = new TabInfo(stockTableView.getComponent());
         tabInfo.setText(tab);
         this.tabs.addTab(tabInfo);
-        // 可选：切换到新添加的标签
+        // 切换到新添加的标签
         tabs.select(tabInfo, true);
+
+    }
+
+
+    public void selectMySelected(String tab) {
+        for (TabInfo tabsTab : tabs.getTabs()) {
+            if (tabsTab.getText().equals(tab)) {
+                tabs.select(tabsTab, true);
+                return;
+            }
+        }
     }
 
 
@@ -88,10 +99,10 @@ public class FuStockInfoView {
     }
 
 
-    private StockTabView createStockTabView(String tab, StockTabEnum stockTabEnum) {
+    private StockTableView createStockTabView(String tab, StockTabEnum stockTabEnum) {
         return switch (stockTabEnum) {
-            case STOCK_INFO -> new WatchListStockTabView(tab);
-            case STOCK_HOLD -> new HoldingsStockTabView(tab);
+            case STOCK_INFO -> new StockGroupTableView(tab);
+            case STOCK_HOLD -> new HoldStockGroupTableView(tab);
         };
     }
 }

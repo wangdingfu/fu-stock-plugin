@@ -1,7 +1,5 @@
 package cn.fudoc.trade.state;
 
-import cn.fudoc.trade.common.FuTradeConstants;
-import com.google.common.collect.Sets;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -18,8 +16,8 @@ import java.util.*;
 
 
 @State(
-        name = "fuTradeGroup",
-        storages = @Storage("fu-trade-group.xml")
+        name = "fuStockInfo",
+        storages = @Storage("fu-stock-info.xml")
 )
 @Getter
 @Setter
@@ -33,10 +31,6 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
      * key：分组 value：股票代码
      */
     private Map<String, Set<String>> stockMap = new HashMap<>();
-    /**
-     * 分组列表
-     */
-    private List<String> groupList = new ArrayList<>();
 
     public void addGroup(String group) {
         if (StringUtils.isEmpty(group)) {
@@ -46,9 +40,6 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
             return;
         }
         this.stockMap.put(group, new HashSet<>());
-        if (!FuTradeConstants.MY_SELECTED_GROUP.equals(group)) {
-            this.groupList.add(group);
-        }
     }
 
 
@@ -64,7 +55,6 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
             return;
         }
         this.stockMap.remove(group);
-        this.groupList.remove(group);
     }
 
 

@@ -1,15 +1,14 @@
-package cn.fudoc.trade.view.stock;
+package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.common.enumtype.StockTabEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import java.util.List;
 import java.util.Set;
 
-public interface StockTabView {
+public interface StockTableView {
 
     /**
      *
@@ -51,7 +50,22 @@ public interface StockTabView {
     /**
      * 重新加载所有股票
      */
-    void reloadAllStock();
+    default void reloadAllStock() {
+        reloadAllStock(null);
+    }
+
+    /**
+     * 重新加载所有股票
+     */
+    void reloadAllStock(String tag);
+
+
+    /**
+     * 更新提示信息 tag标识
+     *
+     * @param tag 例如开盘后自动刷新等提示信息
+     */
+    void updateTipTag(String tag);
 
     /**
      * 当前tab中是否包含指定股票

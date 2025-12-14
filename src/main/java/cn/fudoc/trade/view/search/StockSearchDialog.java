@@ -2,7 +2,6 @@ package cn.fudoc.trade.view.search;
 
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
-import cn.fudoc.trade.view.StockInfoView;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBList;

@@ -1,4 +1,4 @@
-package cn.fudoc.trade.common;
+package cn.fudoc.trade.core.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;

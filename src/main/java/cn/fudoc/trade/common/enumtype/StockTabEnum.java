@@ -1,4 +1,4 @@
-package cn.fudoc.trade.common;
+package cn.fudoc.trade.common.enumtype;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

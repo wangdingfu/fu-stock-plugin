@@ -1,7 +1,7 @@
-package cn.fudoc.trade.view.stock;
+package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.hutool.core.util.NumberUtil;
 
@@ -14,14 +14,14 @@ import java.util.Vector;
 /**
  * 自选tab
  */
-public class WatchListStockTabView extends AbstractStockTabView {
+public class StockGroupTableView extends AbstractStockTableView {
 
     private final String tabName;
     private static final String[] stockTableColumn = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
     private static final String[] colorColumnNames = {"涨跌幅(%)"};
     private final StockGroupPersistentState state;
 
-    public WatchListStockTabView(String tabName) {
+    public StockGroupTableView(String tabName) {
         this.tabName = tabName;
         for (String columnName : colorColumnNames) {
             stockTable.getColumn(columnName).setCellRenderer(new DefaultTableCellRenderer() {

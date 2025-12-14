@@ -4,15 +4,15 @@ import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.common.FuNotification;
-import cn.fudoc.trade.common.PinToolBarAction;
-import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.core.action.PinToolBarAction;
+import cn.fudoc.trade.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.state.HoldingsStockState;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.HoldingsStockDialog;
-import cn.fudoc.trade.view.stock.StockTabView;
+import cn.fudoc.trade.view.dialog.HoldingsStockDialog;
+import cn.fudoc.trade.view.table.StockTableView;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
@@ -52,14 +52,14 @@ public class FuStockSearchPopupView {
     private Timer debounceTimer;
     private final MarketAllStockPersistentState dataSource;
 
-    private final StockTabView stockTabView;
+    private final StockTableView stockTableView;
 
     private final AtomicBoolean pinStatus = new AtomicBoolean(false);
 
     private final TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
 
-    public FuStockSearchPopupView(StockTabView stockTabView) {
-        this.stockTabView = stockTabView;
+    public FuStockSearchPopupView(StockTableView stockTableView) {
+        this.stockTableView = stockTableView;
         this.searchField = createSearchField();
         this.dataSource = MarketAllStockPersistentState.getInstance();
         //初始化结果列表
@@ -240,7 +240,7 @@ public class FuStockSearchPopupView {
         List<StockInfo> stockInfoList = this.dataSource.match(keyword);
         if (CollectionUtils.isNotEmpty(stockInfoList)) {
             for (StockInfo stockInfo : stockInfoList) {
-                stockInfo.setAdd(this.stockTabView.isContainsStock(stockInfo.getStockCode()));
+                stockInfo.setAdd(this.stockTableView.isContainsStock(stockInfo.getStockCode()));
                 this.resultModel.addElement(stockInfo);
             }
         }
@@ -257,18 +257,18 @@ public class FuStockSearchPopupView {
                 FuNotification.notifyWarning(stock.getStockCode() + "股票不存在");
                 return;
             }
-            if(StockTabEnum.STOCK_HOLD.equals(this.stockTabView.getTabEnum())){
+            if(StockTabEnum.STOCK_HOLD.equals(this.stockTableView.getTabEnum())){
                 //如果是加入持仓 则需要输入成本价和持仓数量
-                HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(),this.stockTabView.getTabName(), stock.getStockCode(), stock.getName());
+                HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(),this.stockTableView.getTabName(), stock.getStockCode(), stock.getName());
                 if (holdingsStockDialog.showAndGet()) {
                     HoldingsInfo holdingsInfo = holdingsStockDialog.getHoldingsInfo();
-                    HoldingsStockState.getInstance().add(this.stockTabView.getTabName(), stock.getStockCode(), holdingsInfo.getCost(), holdingsInfo.getCount());
+                    HoldingsStockState.getInstance().add(this.stockTableView.getTabName(), stock.getStockCode(), holdingsInfo.getCost(), holdingsInfo.getCount());
                 }
             }
-            this.stockTabView.addStock(realStockInfos.getFirst());
+            this.stockTableView.addStock(realStockInfos.getFirst());
         } else {
             //移除股票
-            this.stockTabView.removeStock(stock.getStockCode());
+            this.stockTableView.removeStock(stock.getStockCode());
         }
     }
 }

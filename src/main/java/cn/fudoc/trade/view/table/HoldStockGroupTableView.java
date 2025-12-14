@@ -1,12 +1,12 @@
-package cn.fudoc.trade.view.stock;
+package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.state.HoldingsStockState;
 import cn.fudoc.trade.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.fudoc.trade.util.ProjectUtils;
-import cn.fudoc.trade.view.HoldingsStockDialog;
+import cn.fudoc.trade.view.dialog.HoldingsStockDialog;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
 import com.google.common.collect.Lists;
 
@@ -20,15 +20,15 @@ import java.util.Objects;
 import java.util.Vector;
 
 /**
- * 持仓
+ * 持仓tab
  */
-public class HoldingsStockTabView extends AbstractStockTabView {
+public class HoldStockGroupTableView extends AbstractStockTableView {
 
     private final String tabName;
     private static final String[] columnNames = {"代码", "名称 / 市值", "持仓盈亏", "持仓数量", "现价 / 成本"};
     private final HoldingsStockState state;
 
-    public HoldingsStockTabView(String tabName) {
+    public HoldStockGroupTableView(String tabName) {
         this.tabName = tabName;
         super.stockTable.addMouseListener(new MouseListener() {
             @Override
