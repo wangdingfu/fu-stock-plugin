@@ -22,7 +22,7 @@ public class FuStockToolWindowFactory implements ToolWindowFactory, DumbAware {
 
             @Override
             public void toolWindowShown(@NotNull ToolWindow toolWindow) {
-                if ("Fu Trade Stock".equals(toolWindow.getId()) && toolWindow.isVisible()) {
+                if ("FuStock".equals(toolWindow.getId()) && toolWindow.isVisible()) {
                     fuStockWindow.showWindow();
                 }
             }
@@ -33,7 +33,7 @@ public class FuStockToolWindowFactory implements ToolWindowFactory, DumbAware {
                     return;
                 }
                 // 获取目标 ToolWindow（通过 id 匹配）
-                ToolWindow myToolWindow = toolWindowManager.getToolWindow("Fu Trade Stock");
+                ToolWindow myToolWindow = toolWindowManager.getToolWindow("FuStock");
                 if (myToolWindow == null) return;
                 //当前窗口被影藏
                 fuStockWindow.stopTask();
