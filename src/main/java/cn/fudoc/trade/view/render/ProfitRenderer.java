@@ -20,7 +20,7 @@ public class ProfitRenderer extends JPanel {
         JBLabel titleLabel = new JBLabel(title);
         titleLabel.setForeground(JBColor.GRAY);
         titleLabel.setFont(titleLabel.getFont().deriveFont(11.0f));
-        valueLabel.setFont(valueLabel.getFont().deriveFont(16.0f).deriveFont(Font.BOLD));
+        valueLabel.setFont(valueLabel.getFont().deriveFont(18.0f).deriveFont(Font.BOLD));
         add(titleLabel);
         add(valueLabel);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(5, 20, 3, 12));

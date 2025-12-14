@@ -14,7 +14,6 @@ import cn.hutool.core.util.NumberUtil;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.ui.Splitter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -23,8 +22,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
 
 /**
  * 持仓tab
@@ -92,9 +93,9 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         return rootPanel;
     }
 
+
     @Override
-    public void reloadAllStock(String tag) {
-        super.reloadAllStock(tag);
+    protected void tableDataChanged() {
         List<HoldStockDataDto> tableDataList = getTableDataList();
         //计算今日收益
         todayProfit.setValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getTodayProfit).reduce(BigDecimal.ZERO, BigDecimal::add)), true);
@@ -104,9 +105,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
 
         //计算总市值
         todayAllMoney.setValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getCompanyValue).reduce(BigDecimal.ZERO, BigDecimal::add)), false);
-
     }
-
 
     @Override
     public String getTabName() {

@@ -50,6 +50,14 @@ public abstract class AbstractStockTableView implements StockTableView {
     protected abstract Vector<Object> toTableData(RealStockInfo realStockInfo);
 
 
+    /**
+     * 表格数据发生变更
+     */
+    protected void tableDataChanged(){
+
+    }
+
+
     public AbstractStockTableView() {
         this.tableModel = new DefaultTableModel(getColumnNames(), 0) {
             // 设置单元格不可编辑
@@ -78,6 +86,7 @@ public abstract class AbstractStockTableView implements StockTableView {
         tableModel.setRowCount(0);
         realStockInfos.forEach(this::addStock);
         lastUpdateTime = DateUtil.now();
+        tableDataChanged();
     }
 
     @Override
@@ -141,6 +150,7 @@ public abstract class AbstractStockTableView implements StockTableView {
         }
         tableModel.addRow(toTableData(realStockInfo));
         stockCodeSet.add(realStockInfo.getStockCode());
+        tableDataChanged();
     }
 
 
@@ -160,6 +170,7 @@ public abstract class AbstractStockTableView implements StockTableView {
                 stockCodeSet.remove(stockCode);
             }
         }
+        tableDataChanged();
     }
 
 
@@ -192,5 +203,6 @@ public abstract class AbstractStockTableView implements StockTableView {
             removeStockFromState(code);
             stockCodeSet.remove(code);
         }
+        tableDataChanged();
     }
 }
