@@ -2,7 +2,12 @@ package cn.fudoc.trade.view.stock;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.common.StockTabEnum;
+import cn.hutool.core.util.NumberUtil;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 
@@ -13,10 +18,22 @@ public class WatchListStockTabView extends AbstractStockTabView {
 
     private final String tabName;
     private static final String[] stockTableColumn = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
+    private static final String[] colorColumnNames = {"涨跌幅(%)"};
 
     public WatchListStockTabView(String tabName, Set<String> stockCodeSet) {
         super(stockCodeSet);
         this.tabName = tabName;
+        for (String columnName : colorColumnNames) {
+            stockTable.getColumn(columnName).setCellRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    if (Objects.nonNull(value)) {
+                        setForeground(getTextColor(NumberUtil.parseDouble(value.toString(), 0.0)));
+                    }
+                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                }
+            });
+        }
     }
 
     @Override
@@ -34,6 +51,7 @@ public class WatchListStockTabView extends AbstractStockTabView {
     protected String[] getColumnNames() {
         return stockTableColumn;
     }
+
 
     @Override
     protected void removeStockFromState(String stockCode) {

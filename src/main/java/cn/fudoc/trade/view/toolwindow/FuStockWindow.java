@@ -109,7 +109,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
     private void initGroup() {
         stockView.add(FuTradeConstants.MY_SELECTED_GROUP, StockTabEnum.STOCK_INFO);
-        stockView.add(FuTradeConstants.MY_SELECTED_GROUP, StockTabEnum.STOCK_HOLD);
+        stockView.add(FuTradeConstants.MY_POSITIONS_GROUP, StockTabEnum.STOCK_HOLD);
     }
 
 
@@ -268,11 +268,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
         //股票信息合并加载
         StockTabView stockSelected = this.stockView.getSelected();
-        Set<String> stockCodes = Objects.isNull(stockSelected) ? Collections.emptySet() : stockSelected.getStockCodes();
-
-        List<RealStockInfo> realStockInfos = tencentApiService.stockList(stockCodes);
-        if (CollectionUtils.isNotEmpty(stockCodes) && Objects.nonNull(stockSelected)) {
-            stockSelected.initStockList(realStockInfos);
+        if (Objects.nonNull(stockSelected)) {
+            stockSelected.reloadAllStock();
         }
     }
 

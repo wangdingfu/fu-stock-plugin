@@ -4,14 +4,19 @@ import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.common.StockTabEnum;
 import cn.fudoc.trade.state.HoldingsStockState;
 import cn.fudoc.trade.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.view.HoldingsStockDialog;
+import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
+import cn.hutool.core.util.NumberUtil;
+import com.google.common.collect.Lists;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
@@ -22,26 +27,27 @@ import java.util.Vector;
 public class HoldingsStockTabView extends AbstractStockTabView {
 
     private final String tabName;
-    private static final String[] columnNames = {"代码", "名称", "市值", "持仓", "盈亏", "当前价", "成本"};
+    private static final String[] columnNames = {"代码", "名称 / 市值", "持仓盈亏", "持仓数量", "现价 / 成本"};
     private final HoldingsStockState holdingsStockState;
 
     public HoldingsStockTabView(String tabName, Set<String> stockCodeSet) {
         super(stockCodeSet);
         this.tabName = tabName;
-        this.holdingsStockState = HoldingsStockState.getInstance();
         super.stockTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
                     int selectedRow = stockTable.getSelectedRow();
-                    //持久化移除
                     int modelRow = stockTable.convertRowIndexToModel(selectedRow);
                     Object valueAt = tableModel.getValueAt(modelRow, 0);
+                    Object valueAt1 = tableModel.getValueAt(modelRow, 1);
                     String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
-                    HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject());
+                    String name = Objects.isNull(valueAt1) ? "" : valueAt1.toString();
+                    HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), code, name);
                     if (holdingsStockDialog.showAndGet()) {
                         HoldingsInfo holdingsInfo = holdingsStockDialog.getHoldingsInfo();
                         holdingsStockState.add(tabName, code, holdingsInfo.getCost(), holdingsInfo.getCount());
+                        reloadAllStock();
                     }
                 }
             }
@@ -66,10 +72,18 @@ public class HoldingsStockTabView extends AbstractStockTabView {
 
             }
         });
+        int rowHeight = stockTable.getRowHeight();
+        stockTable.setRowHeight(rowHeight * 2);
+        for (String columnName : getColumnNames()) {
+            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1)));
+        }
+
         TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
         // 从视图中移除，模型仍保留
         stockTable.getColumnModel().removeColumn(idColumn);
+        this.holdingsStockState = HoldingsStockState.getInstance();
     }
+
 
     @Override
     public String getTabName() {
@@ -96,31 +110,32 @@ public class HoldingsStockTabView extends AbstractStockTabView {
     protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
         Vector<Object> vector = new Vector<>();
         HoldingsInfo holdingsInfo = holdingsStockState.getHoldingsInfo(tabName, realStockInfo.getStockCode());
-        if (Objects.isNull(holdingsInfo)) {
-            HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject());
-            if (holdingsStockDialog.showAndGet()) {
-                holdingsInfo = holdingsStockDialog.getHoldingsInfo();
-                holdingsStockState.add(tabName, realStockInfo.getStockCode(), holdingsInfo.getCost(), holdingsInfo.getCount());
-            }
-        }
         //持仓成本价
-        BigDecimal cost = Objects.isNull(holdingsInfo) ? BigDecimal.ZERO : holdingsInfo.getCost();
+        BigDecimal cost = Objects.isNull(holdingsInfo) ? BigDecimal.ZERO : new BigDecimal(holdingsInfo.getCost());
         //持仓数量
         int count = Objects.isNull(holdingsInfo) ? 0 : holdingsInfo.getCount();
+        BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
+        BigDecimal countDecimal = new BigDecimal(count);
+        //市值=持仓*当前价
+        BigDecimal companyValue = countDecimal.multiply(currentPrice).setScale(2, RoundingMode.CEILING);
+        //盈亏=持仓*(当前价-成本价)
+        BigDecimal PL = currentPrice.subtract(cost).multiply(countDecimal).setScale(2, RoundingMode.CEILING);
+        //盈亏比=(成本价-当前价)/成本价
+        BigDecimal PLRate = currentPrice.subtract(cost).divide(cost,4, RoundingMode.CEILING);
+
+        //表格数据
+
         //股票代码
         vector.add(realStockInfo.getStockCode());
-        //股票名称
-        vector.add(realStockInfo.getStockName());
-        //市值=持仓*当前价
-        vector.add(cost.multiply(new BigDecimal(realStockInfo.getCurrentPrice())));
+        //名称/市值
+        vector.add(new String[]{realStockInfo.getStockName(), NumberFormatUtil.format(companyValue)});
+        //持仓盈亏
+        String prefix = PLRate.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
+        vector.add(new String[]{NumberFormatUtil.format(PL), prefix + NumberFormatUtil.formatRate(PLRate)});
         //持仓数量
         vector.add(count);
-        //盈亏=持仓*(当前价-成本价)
-        vector.add(new BigDecimal(realStockInfo.getCurrentPrice()).subtract(cost).multiply(new BigDecimal(count)));
-        //当前价
-        vector.add(realStockInfo.getCurrentPrice());
-        //成本价
-        vector.add(cost);
+        //现价/成本
+        vector.add(new String[]{realStockInfo.getCurrentPrice(), cost.setScale(3, RoundingMode.CEILING).toString()});
         return vector;
     }
 }

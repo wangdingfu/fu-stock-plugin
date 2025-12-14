@@ -49,15 +49,9 @@ public interface StockTabView {
     Set<String> getStockCodes();
 
     /**
-     * 初始化股票实时信息
-     *
-     * @param stockInfoList 股票实时信息
+     * 重新加载所有股票
      */
-    default void initStockList(List<RealStockInfo> stockInfoList) {
-        if (CollectionUtils.isNotEmpty(stockInfoList)) {
-            stockInfoList.forEach(this::addStock);
-        }
-    }
+    void reloadAllStock();
 
     /**
      * 当前tab中是否包含指定股票

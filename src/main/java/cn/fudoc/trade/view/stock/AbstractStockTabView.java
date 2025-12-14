@@ -1,16 +1,20 @@
 package cn.fudoc.trade.view.stock;
 
+import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.hutool.core.util.NumberUtil;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Vector;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public abstract class AbstractStockTabView implements StockTabView {
 
@@ -39,6 +43,7 @@ public abstract class AbstractStockTabView implements StockTabView {
      */
     protected abstract Vector<Object> toTableData(RealStockInfo realStockInfo);
 
+
     public AbstractStockTabView(Set<String> stockCodeSet) {
         if (CollectionUtils.isNotEmpty(stockCodeSet)) {
             this.stockCodeSet.addAll(stockCodeSet);
@@ -53,6 +58,23 @@ public abstract class AbstractStockTabView implements StockTabView {
         stockTable = new JBTable(tableModel);
     }
 
+
+    protected JBColor getTextColor(double offset) {
+        return offset > 0 ? JBColor.RED : JBColor.GREEN;
+    }
+
+
+    @Override
+    public void reloadAllStock() {
+        TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
+        List<RealStockInfo> realStockInfos = tencentApiService.stockList(getStockCodes());
+        if (CollectionUtils.isEmpty(realStockInfos)) {
+            return;
+        }
+        // 清空现有数据
+        tableModel.setRowCount(0);
+        realStockInfos.forEach(this::addStock);
+    }
 
     /**
      * 当前表格展示的股票集合
@@ -75,12 +97,6 @@ public abstract class AbstractStockTabView implements StockTabView {
         return decorator.createPanel();
     }
 
-
-    /**
-     * 新增股票至表格
-     *
-     * @param realStockInfo 股票实时信息
-     */
     @Override
     public void addStock(RealStockInfo realStockInfo) {
         String stockCode = realStockInfo.getStockCode();

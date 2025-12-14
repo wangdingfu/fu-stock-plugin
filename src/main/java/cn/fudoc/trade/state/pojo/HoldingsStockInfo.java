@@ -1,19 +1,20 @@
 package cn.fudoc.trade.state.pojo;
 
+import cn.fudoc.trade.api.data.RealStockInfo;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 持仓信息
- */
+import java.math.BigDecimal;
+
 @Getter
 @Setter
-public class HoldingsInfo {
+public class HoldingsStockInfo extends RealStockInfo {
+
 
     /**
      * 成本价
      */
-    private String cost;
+    private BigDecimal cost;
     /**
      * 持仓数量
      */

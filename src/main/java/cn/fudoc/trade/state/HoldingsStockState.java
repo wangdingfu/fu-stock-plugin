@@ -60,8 +60,8 @@ public class HoldingsStockState implements PersistentStateComponent<HoldingsStoc
      * @param cost  成本价
      * @param count 持仓数量
      */
-    public void add(String group, String code, BigDecimal cost, Integer count) {
-        if (StringUtils.isBlank(group) || StringUtils.isBlank(code) || Objects.isNull(cost) || Objects.isNull(count)) {
+    public void add(String group, String code, String cost, Integer count) {
+        if (StringUtils.isBlank(group) || StringUtils.isBlank(code) || StringUtils.isBlank(code) || Objects.isNull(count)) {
             return;
         }
         Map<String, HoldingsInfo> codeMap = holdings.computeIfAbsent(group, k -> new HashMap<>());

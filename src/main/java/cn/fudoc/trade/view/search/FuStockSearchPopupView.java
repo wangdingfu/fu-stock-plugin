@@ -5,11 +5,13 @@ import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.common.FuNotification;
 import cn.fudoc.trade.common.PinToolBarAction;
+import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.state.HoldingsStockState;
 import cn.fudoc.trade.state.MarketAllStockPersistentState;
+import cn.fudoc.trade.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.HoldingsStockDialog;
-import cn.fudoc.trade.view.StockInfoView;
 import cn.fudoc.trade.view.stock.StockTabView;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -254,6 +256,14 @@ public class FuStockSearchPopupView {
             if (CollectionUtils.isEmpty(realStockInfos)) {
                 FuNotification.notifyWarning(stock.getStockCode() + "股票不存在");
                 return;
+            }
+            if(StockTabEnum.STOCK_HOLD.equals(this.stockTabView.getTabEnum())){
+                //如果是加入持仓 则需要输入成本价和持仓数量
+                HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), stock.getStockCode(), stock.getName());
+                if (holdingsStockDialog.showAndGet()) {
+                    HoldingsInfo holdingsInfo = holdingsStockDialog.getHoldingsInfo();
+                    HoldingsStockState.getInstance().add(this.stockTabView.getTabName(), stock.getStockCode(), holdingsInfo.getCost(), holdingsInfo.getCount());
+                }
             }
             this.stockTabView.addStock(realStockInfos.getFirst());
         } else {
