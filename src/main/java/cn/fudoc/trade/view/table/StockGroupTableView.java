@@ -1,8 +1,8 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.common.enumtype.StockTabEnum;
-import cn.fudoc.trade.state.StockGroupPersistentState;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.state.StockGroupPersistentState;
 import cn.hutool.core.util.NumberUtil;
 
 import javax.swing.*;

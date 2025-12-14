@@ -1,4 +1,4 @@
-package cn.fudoc.trade.state.pojo;
+package cn.fudoc.trade.core.state.pojo;
 
 import lombok.Getter;
 import lombok.Setter;

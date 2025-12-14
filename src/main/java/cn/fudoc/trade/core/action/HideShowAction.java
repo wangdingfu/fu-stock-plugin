@@ -1,6 +1,6 @@
 package cn.fudoc.trade.core.action;
 
-import cn.fudoc.trade.state.FuCommonState;
+import cn.fudoc.trade.core.state.FuCommonState;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;

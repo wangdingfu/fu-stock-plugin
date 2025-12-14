@@ -19,17 +19,17 @@
                     secondary="false"
                     doNotActivateOnStart="true"
                     order="last"
-                    factoryClass="cn.fudoc.trade.view.toolwindow.FuStockToolWindowFactory"/>
+                    factoryClass="cn.fudoc.trade.toolwindow.FuStockToolWindowFactory"/>
 
-        <applicationService serviceImplementation="cn.fudoc.trade.state.StockGroupPersistentState"/>
-        <applicationService serviceImplementation="cn.fudoc.trade.state.MarketAllStockPersistentState"/>
-        <applicationService serviceImplementation="cn.fudoc.trade.state.HoldingsStockState"/>
-        <applicationService serviceImplementation="cn.fudoc.trade.state.FuCommonState"/>
-        <applicationService serviceImplementation="cn.fudoc.trade.state.StockGroupState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.core.state.StockGroupPersistentState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.core.state.MarketAllStockPersistentState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.core.state.HoldingsStockState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.core.state.FuCommonState"/>
+        <applicationService serviceImplementation="cn.fudoc.trade.core.state.StockGroupState"/>
         <applicationService serviceInterface="cn.fudoc.trade.api.TencentApiService" serviceImplementation="cn.fudoc.trade.api.impl.TencentApiServiceImpl"/>
         <applicationService serviceInterface="cn.fudoc.trade.api.ZTApiService" serviceImplementation="cn.fudoc.trade.api.impl.ZTApiServiceImpl"/>
 
-        <postStartupActivity implementation="cn.fudoc.trade.startup.FuStockStartupActivity" />
+        <postStartupActivity implementation="cn.fudoc.trade.core.startup.FuStockStartupActivity" />
     </extensions>
 
 

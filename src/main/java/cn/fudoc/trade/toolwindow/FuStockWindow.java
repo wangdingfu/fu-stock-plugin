@@ -1,12 +1,14 @@
-package cn.fudoc.trade.view.toolwindow;
+package cn.fudoc.trade.toolwindow;
 
-import cn.fudoc.trade.common.*;
-import cn.fudoc.trade.common.enumtype.StockTabEnum;
-import cn.fudoc.trade.common.enumtype.UpdateTipTagEnum;
+import cn.fudoc.trade.core.common.FuBundle;
+import cn.fudoc.trade.core.common.FuNotification;
+import cn.fudoc.trade.core.common.FuTradeConstants;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.UpdateTipTagEnum;
 import cn.fudoc.trade.core.action.DefaultHideShowCallback;
 import cn.fudoc.trade.core.action.HideShowAction;
-import cn.fudoc.trade.state.StockGroupPersistentState;
-import cn.fudoc.trade.state.StockGroupState;
+import cn.fudoc.trade.core.state.StockGroupPersistentState;
+import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.FuIndexView;
 import cn.fudoc.trade.view.FuStockTabView;

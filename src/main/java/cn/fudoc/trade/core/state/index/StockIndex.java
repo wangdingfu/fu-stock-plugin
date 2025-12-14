@@ -1,4 +1,4 @@
-package cn.fudoc.trade.state.index;
+package cn.fudoc.trade.core.state.index;
 
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.util.PinyinUtil;

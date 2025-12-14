@@ -1,6 +1,6 @@
-package cn.fudoc.trade.state;
+package cn.fudoc.trade.core.state;
 
-import cn.fudoc.trade.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;

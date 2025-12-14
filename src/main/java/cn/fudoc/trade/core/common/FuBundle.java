@@ -1,4 +1,4 @@
-package cn.fudoc.trade.common;
+package cn.fudoc.trade.core.common;
 
 import com.intellij.BundleBase;
 import com.intellij.DynamicBundle;

@@ -1,4 +1,4 @@
-package cn.fudoc.trade.common;
+package cn.fudoc.trade.core.common;
 
 public interface FuTradeConstants {
 

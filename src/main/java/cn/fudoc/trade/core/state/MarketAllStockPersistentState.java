@@ -1,8 +1,8 @@
-package cn.fudoc.trade.state;
+package cn.fudoc.trade.core.state;
 
 import cn.fudoc.trade.api.data.StockInfo;
-import cn.fudoc.trade.state.index.MatchResult;
-import cn.fudoc.trade.state.index.StockIndex;
+import cn.fudoc.trade.core.state.index.MatchResult;
+import cn.fudoc.trade.core.state.index.StockIndex;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;

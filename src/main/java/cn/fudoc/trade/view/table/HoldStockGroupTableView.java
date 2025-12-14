@@ -1,9 +1,9 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.common.enumtype.StockTabEnum;
-import cn.fudoc.trade.state.HoldingsStockState;
-import cn.fudoc.trade.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.state.HoldingsStockState;
+import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.view.dialog.HoldingsStockDialog;

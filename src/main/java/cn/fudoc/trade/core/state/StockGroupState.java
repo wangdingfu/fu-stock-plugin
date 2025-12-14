@@ -1,6 +1,6 @@
-package cn.fudoc.trade.state;
+package cn.fudoc.trade.core.state;
 
-import cn.fudoc.trade.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;

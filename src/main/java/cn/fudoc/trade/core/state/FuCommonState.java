@@ -1,4 +1,4 @@
-package cn.fudoc.trade.state;
+package cn.fudoc.trade.core.state;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;

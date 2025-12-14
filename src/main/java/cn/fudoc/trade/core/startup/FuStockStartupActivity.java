@@ -1,12 +1,11 @@
-package cn.fudoc.trade.startup;
+package cn.fudoc.trade.core.startup;
 
 import cn.fudoc.trade.api.ZTApiService;
-import cn.fudoc.trade.state.MarketAllStockPersistentState;
-import cn.fudoc.trade.state.index.StockIndex;
+import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
+import cn.fudoc.trade.core.state.index.StockIndex;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
-import com.intellij.openapi.startup.StartupActivity;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;

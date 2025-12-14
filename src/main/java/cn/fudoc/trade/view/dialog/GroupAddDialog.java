@@ -1,6 +1,6 @@
 package cn.fudoc.trade.view.dialog;
 
-import cn.fudoc.trade.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;

@@ -1,4 +1,4 @@
-package cn.fudoc.trade.state.pojo;
+package cn.fudoc.trade.core.state.pojo;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
 import lombok.Getter;

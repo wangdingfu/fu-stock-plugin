@@ -1,7 +1,7 @@
 package cn.fudoc.trade.view;
 
-import cn.fudoc.trade.common.FuBundle;
-import cn.fudoc.trade.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.FuBundle;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.view.table.HoldStockGroupTableView;
 import cn.fudoc.trade.view.table.StockGroupTableView;
 import cn.fudoc.trade.view.table.StockTableView;

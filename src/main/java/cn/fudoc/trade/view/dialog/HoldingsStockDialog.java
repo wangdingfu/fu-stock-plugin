@@ -1,7 +1,7 @@
 package cn.fudoc.trade.view.dialog;
 
-import cn.fudoc.trade.state.HoldingsStockState;
-import cn.fudoc.trade.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.core.state.HoldingsStockState;
+import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;

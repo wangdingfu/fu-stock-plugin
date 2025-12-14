@@ -1,7 +1,7 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
