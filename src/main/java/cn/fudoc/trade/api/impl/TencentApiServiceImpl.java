@@ -64,7 +64,8 @@ public class TencentApiServiceImpl implements TencentApiService {
             bean.setStockCode(code);
             bean.setStockName(values[1]);
             bean.setCurrentPrice(values[3]);
-            bean.setIncreaseRate(values[32] + "%");
+            bean.setYesterdayPrice(values[4]);
+            bean.setIncreaseRate(values[32]);
             bean.setVolume(formatVolume(values[37]));
             realStockInfoList.add(bean);
         }

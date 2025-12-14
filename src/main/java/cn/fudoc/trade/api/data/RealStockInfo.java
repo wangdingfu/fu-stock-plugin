@@ -23,7 +23,11 @@ public class RealStockInfo {
      */
     private String currentPrice;
     /**
-     * 涨跌幅(%)
+     * 昨日收盘价
+     */
+    private String yesterdayPrice;
+    /**
+     * 涨跌幅
      */
     private String increaseRate;
     /**

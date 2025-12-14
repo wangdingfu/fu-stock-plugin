@@ -3,11 +3,13 @@ package cn.fudoc.trade.view.table;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
+import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.hutool.core.util.NumberUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -71,7 +73,7 @@ public class StockGroupTableView extends AbstractStockTableView {
         vector.add(realStockInfo.getStockCode());
         vector.add(realStockInfo.getStockName());
         vector.add(realStockInfo.getCurrentPrice());
-        vector.add(realStockInfo.getIncreaseRate());
+        vector.add(realStockInfo.getIncreaseRate()+"%");
         vector.add(realStockInfo.getVolume());
         return vector;
     }

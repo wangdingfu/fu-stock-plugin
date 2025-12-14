@@ -15,4 +15,6 @@ public interface FuIcons {
     Icon FU_HK = IconLoader.getIcon("icon/hk.svg", FuIcons.class);
     Icon FU_STOCK = IconLoader.getIcon("icon/stock.svg", FuIcons.class);
     Icon FU_UNSHARE = IconLoader.getIcon("icon/unshare.svg", FuIcons.class);
+    Icon FU_STOCK_INFO_GROUP = IconLoader.getIcon("icon/stock_info.svg", FuIcons.class);
+    Icon FU_STOCK_HOLD_GROUP = IconLoader.getIcon("icon/stock_hold.svg", FuIcons.class);
 }

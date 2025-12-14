@@ -30,6 +30,8 @@ public abstract class AbstractStockTableView implements StockTableView {
 
     protected String lastUpdateTime;
 
+    protected TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
+
     /**
      * 表格展示的标题
      */
@@ -68,7 +70,6 @@ public abstract class AbstractStockTableView implements StockTableView {
 
     @Override
     public void reloadAllStock(String tag) {
-        TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
         List<RealStockInfo> realStockInfos = tencentApiService.stockList(getStockCodes());
         if (CollectionUtils.isEmpty(realStockInfos)) {
             return;
@@ -113,6 +114,14 @@ public abstract class AbstractStockTableView implements StockTableView {
      */
     @Override
     public JPanel getComponent() {
+        JPanel rootPanel = getTableComponent();
+        tipLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        rootPanel.add(tipLabel, BorderLayout.PAGE_END);
+        return rootPanel;
+    }
+
+
+    protected JPanel getTableComponent(){
         //  创建右键菜单
         JPopupMenu popupMenu = createPopupMenu();
         stockTable.setComponentPopupMenu(popupMenu);
@@ -120,10 +129,9 @@ public abstract class AbstractStockTableView implements StockTableView {
         stockTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JPanel rootPanel = new JPanel(new BorderLayout());
         rootPanel.add(decorator.createPanel(), BorderLayout.CENTER);
-        tipLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        rootPanel.add(tipLabel, BorderLayout.PAGE_END);
         return rootPanel;
     }
+
 
     @Override
     public void addStock(RealStockInfo realStockInfo) {
@@ -156,7 +164,7 @@ public abstract class AbstractStockTableView implements StockTableView {
 
 
     // 创建右键菜单（包含“删除”选项）
-    private JPopupMenu createPopupMenu() {
+    protected JPopupMenu createPopupMenu() {
         JPopupMenu menu = new JPopupMenu();
 
         // 添加“删除”菜单项

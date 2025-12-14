@@ -57,6 +57,7 @@ public class FuStockTabView {
         stockTabViewMap.put(tab, stockTableView);
         TabInfo tabInfo = new TabInfo(stockTableView.getComponent());
         tabInfo.setText(tab);
+        tabInfo.setIcon(stockTabEnum.getIcon());
         this.tabs.addTab(tabInfo);
         // 切换到新添加的标签
         tabs.select(tabInfo, true);

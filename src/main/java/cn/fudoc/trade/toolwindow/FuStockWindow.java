@@ -11,6 +11,7 @@ import cn.fudoc.trade.core.timer.ScheduledTaskManager;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.FuIndexView;
 import cn.fudoc.trade.view.FuStockTabView;
+import cn.fudoc.trade.view.TodayProfitView;
 import cn.fudoc.trade.view.dialog.GroupAddDialog;
 import cn.fudoc.trade.view.search.FuStockSearchPopupView;
 import cn.fudoc.trade.view.table.StockTableView;
@@ -50,10 +51,11 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 股票栏视图
      */
     private final FuStockTabView stockView;
+
     /**
      * 消息栏视图
      */
-    private final JEditorPane messagePane;
+//    private final JEditorPane messagePane;
 
     /**
      * 任务调度管理 主要保证每隔固定时间刷新股票实时信息
@@ -96,9 +98,11 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         this.stockView = new FuStockTabView(project);
         contentPanel.add(this.stockView.getComponent(), BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
-        //5、消息栏
-        this.messagePane = initPanel();
-        rootPanel.add(ScrollPaneFactory.createScrollPane(this.messagePane), BorderLayout.SOUTH);
+
+//        //5、消息栏
+//        this.messagePane = initPanel();
+//        rootPanel.add(ScrollPaneFactory.createScrollPane(this.messagePane), BorderLayout.SOUTH);
+
         //设置当前面板到窗口
         setContent(rootPanel);
         //随机展示炒股心灵鸡汤文案
@@ -145,7 +149,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 随机展示消息
      */
     private void showTips() {
-        this.messagePane.setText("");
+//        this.messagePane.setText("");
     }
 
 
