@@ -1,6 +1,7 @@
 package cn.fudoc.trade.state;
 
 import cn.fudoc.trade.state.pojo.HoldingsInfo;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -12,10 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -36,6 +37,13 @@ public class HoldingsStockState implements PersistentStateComponent<HoldingsStoc
      */
     private Map<String, Map<String, HoldingsInfo>> holdings = new HashMap<>();
 
+    public Set<String> getStockCodes(String group) {
+        if (StringUtils.isBlank(group)) {
+            return Sets.newHashSet();
+        }
+        Map<String, HoldingsInfo> holdingsInfoMap = holdings.get(group);
+        return Objects.isNull(holdingsInfoMap) ? Sets.newHashSet() : holdingsInfoMap.keySet();
+    }
 
     /**
      * 获取持仓信息
@@ -69,6 +77,18 @@ public class HoldingsStockState implements PersistentStateComponent<HoldingsStoc
         holdingsInfo.setCost(cost);
         holdingsInfo.setCount(count);
         codeMap.put(code, holdingsInfo);
+    }
+
+
+    public void remove(String group, String code) {
+        if (StringUtils.isBlank(group) || StringUtils.isBlank(code)) {
+            return;
+        }
+        Map<String, HoldingsInfo> holdingsInfoMap = holdings.get(group);
+        if (Objects.isNull(holdingsInfoMap)) {
+            return;
+        }
+        holdingsInfoMap.remove(code);
     }
 
 

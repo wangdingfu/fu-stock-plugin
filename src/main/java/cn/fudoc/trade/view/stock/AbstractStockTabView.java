@@ -2,7 +2,6 @@ package cn.fudoc.trade.view.stock;
 
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ToolbarDecorator;
@@ -10,11 +9,8 @@ import com.intellij.ui.table.JBTable;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public abstract class AbstractStockTabView implements StockTabView {
 
@@ -44,10 +40,7 @@ public abstract class AbstractStockTabView implements StockTabView {
     protected abstract Vector<Object> toTableData(RealStockInfo realStockInfo);
 
 
-    public AbstractStockTabView(Set<String> stockCodeSet) {
-        if (CollectionUtils.isNotEmpty(stockCodeSet)) {
-            this.stockCodeSet.addAll(stockCodeSet);
-        }
+    public AbstractStockTabView() {
         this.tableModel = new DefaultTableModel(getColumnNames(), 0) {
             // 设置单元格不可编辑
             @Override
@@ -74,6 +67,17 @@ public abstract class AbstractStockTabView implements StockTabView {
         // 清空现有数据
         tableModel.setRowCount(0);
         realStockInfos.forEach(this::addStock);
+    }
+
+
+    /**
+     * 初始化当前表格股票信息
+     *
+     * @param stockCodeSet 股票集合
+     */
+    protected void init(Set<String> stockCodeSet) {
+        this.stockCodeSet.addAll(stockCodeSet);
+        reloadAllStock();
     }
 
     /**

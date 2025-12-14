@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view;
 
+import cn.fudoc.trade.state.HoldingsStockState;
 import cn.fudoc.trade.state.pojo.HoldingsInfo;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.project.Project;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 // 分组弹框
 public class HoldingsStockDialog extends DialogWrapper {
@@ -26,10 +28,16 @@ public class HoldingsStockDialog extends DialogWrapper {
     private final JBTextField countField = new JBTextField();
 
     // 构造器：接收父窗口（null 则以 IDE 为父窗口）
-    public HoldingsStockDialog(@Nullable Project project, String stockCode, String stockName) {
+    public HoldingsStockDialog(@Nullable Project project, String group, String stockCode, String stockName) {
         super(project, true);
         this.stockCodeLabel = new JBLabel(stockCode);
         this.stockNameLabel = new JBLabel(stockName);
+        HoldingsInfo holdingsInfo = HoldingsStockState.getInstance().getHoldingsInfo(group, stockCode);
+        if (Objects.nonNull(holdingsInfo)) {
+            costField.setText(holdingsInfo.getCost());
+            Integer count = holdingsInfo.getCount();
+            countField.setText(Objects.isNull(count) ? "" : count.toString());
+        }
         // 弹框标题
         setTitle("设置持仓信息");
         // 初始化 DialogWrapper（必须调用）
@@ -43,7 +51,7 @@ public class HoldingsStockDialog extends DialogWrapper {
         // 使用 GridBagLayout 实现组件对齐布局
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(10); // 组件间距
+        gbc.insets = JBUI.insets(5); // 组件间距
         gbc.fill = GridBagConstraints.HORIZONTAL; // 水平填充
         gbc.weightx = 1.0; // 横向权重（占满剩余空间）
         // 1. 分组名称标签 + 输入框
@@ -54,7 +62,7 @@ public class HoldingsStockDialog extends DialogWrapper {
 
         gbc.gridx = 1;
         gbc.weightx = 1.0; // 输入框占满横向空间
-        stockCodeLabel.setPreferredSize(new Dimension(250, 28)); // 输入框宽度
+        stockCodeLabel.setPreferredSize(new Dimension(200, 28)); // 输入框宽度
         panel.add(stockCodeLabel, gbc);
 
         // 2. 分组类型标签 + 下拉框
@@ -65,7 +73,7 @@ public class HoldingsStockDialog extends DialogWrapper {
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        stockNameLabel.setPreferredSize(new Dimension(250, 28)); // 下拉框宽度
+        stockNameLabel.setPreferredSize(new Dimension(200, 28)); // 下拉框宽度
         panel.add(stockNameLabel, gbc);
 
         // 1. 分组名称标签 + 输入框
@@ -76,7 +84,7 @@ public class HoldingsStockDialog extends DialogWrapper {
 
         gbc.gridx = 1;
         gbc.weightx = 1.0; // 输入框占满横向空间
-        costField.setPreferredSize(new Dimension(100, 28)); // 输入框宽度
+        costField.setPreferredSize(new Dimension(200, 28)); // 输入框宽度
         panel.add(costField, gbc);
 
         // 2. 分组类型标签 + 下拉框
@@ -87,33 +95,9 @@ public class HoldingsStockDialog extends DialogWrapper {
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        countField.setPreferredSize(new Dimension(100, 28)); // 下拉框宽度
+        countField.setPreferredSize(new Dimension(200, 28)); // 下拉框宽度
         panel.add(countField, gbc);
         return panel;
-    }
-
-    private void addTwoPerRow(JPanel jPanel, String label1, JComponent comp1, String label2, JComponent comp2, int rowIndex) {
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        // 第一个组件组合（左）
-        gbc.gridx = 0;
-        gbc.gridy = rowIndex;
-        gbc.weightx = 0;
-        jPanel.add(new JBLabel(label1), gbc);
-
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        comp1.setPreferredSize(new Dimension(250, 28));
-        jPanel.add(comp1, gbc);
-
-        // 第二个组件组合（右）
-        gbc.gridx = 2;
-        gbc.weightx = 0;
-        jPanel.add(new JBLabel(label2), gbc);
-        gbc.gridx = 3;
-        gbc.weightx = 1.0;
-        comp2.setPreferredSize(new Dimension(250, 28));
-        jPanel.add(comp2, gbc);
     }
 
     // 输入校验（必填项检查）

@@ -5,7 +5,6 @@ import cn.fudoc.trade.common.StockTabEnum;
 import cn.fudoc.trade.view.stock.HoldingsStockTabView;
 import cn.fudoc.trade.view.stock.StockTabView;
 import cn.fudoc.trade.view.stock.WatchListStockTabView;
-import com.google.common.collect.Sets;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.tabs.JBTabs;
@@ -91,8 +90,8 @@ public class FuStockInfoView {
 
     private StockTabView createStockTabView(String tab, StockTabEnum stockTabEnum) {
         return switch (stockTabEnum) {
-            case STOCK_INFO -> new WatchListStockTabView(tab, Sets.newHashSet());
-            case STOCK_HOLD -> new HoldingsStockTabView(tab, Sets.newHashSet());
+            case STOCK_INFO -> new WatchListStockTabView(tab);
+            case STOCK_HOLD -> new HoldingsStockTabView(tab);
         };
     }
 }

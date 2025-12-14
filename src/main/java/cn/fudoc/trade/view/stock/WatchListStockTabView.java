@@ -2,13 +2,13 @@ package cn.fudoc.trade.view.stock;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.common.StockTabEnum;
+import cn.fudoc.trade.state.StockGroupPersistentState;
 import cn.hutool.core.util.NumberUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.Objects;
-import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -19,9 +19,9 @@ public class WatchListStockTabView extends AbstractStockTabView {
     private final String tabName;
     private static final String[] stockTableColumn = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
     private static final String[] colorColumnNames = {"涨跌幅(%)"};
+    private final StockGroupPersistentState state;
 
-    public WatchListStockTabView(String tabName, Set<String> stockCodeSet) {
-        super(stockCodeSet);
+    public WatchListStockTabView(String tabName) {
         this.tabName = tabName;
         for (String columnName : colorColumnNames) {
             stockTable.getColumn(columnName).setCellRenderer(new DefaultTableCellRenderer() {
@@ -34,6 +34,8 @@ public class WatchListStockTabView extends AbstractStockTabView {
                 }
             });
         }
+        this.state = StockGroupPersistentState.getInstance();
+        init(this.state.getStockCodes(tabName));
     }
 
     @Override
@@ -52,10 +54,15 @@ public class WatchListStockTabView extends AbstractStockTabView {
         return stockTableColumn;
     }
 
+    @Override
+    public void addStock(RealStockInfo realStockInfo) {
+        super.addStock(realStockInfo);
+        this.state.addStock(tabName, realStockInfo.getStockCode());
+    }
 
     @Override
     protected void removeStockFromState(String stockCode) {
-
+        this.state.removeStock(tabName, stockCode);
     }
 
     @Override

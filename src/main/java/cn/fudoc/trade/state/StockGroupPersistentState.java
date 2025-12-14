@@ -46,9 +46,17 @@ public class StockGroupPersistentState implements PersistentStateComponent<Stock
             return;
         }
         this.stockMap.put(group, new HashSet<>());
-        if(!FuTradeConstants.MY_SELECTED_GROUP.equals(group)){
+        if (!FuTradeConstants.MY_SELECTED_GROUP.equals(group)) {
             this.groupList.add(group);
         }
+    }
+
+
+    public Set<String> getStockCodes(String group) {
+        if (StringUtils.isBlank(group)) {
+            return Collections.emptySet();
+        }
+        return this.stockMap.get(group);
     }
 
     public void removeGroup(String group) {
