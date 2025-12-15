@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class RankListCellRenderer extends JPanel implements ListCellRenderer<HoldStockDataDto> {
 
@@ -17,12 +18,18 @@ public class RankListCellRenderer extends JPanel implements ListCellRenderer<Hol
     private final JLabel profitLabel = new JLabel();
 
     public RankListCellRenderer() {
-        // 设置布局：左侧图标，右侧上下两行文本
-        setLayout(new BorderLayout(8, 0)); // 组件间距8px，垂直4px
+        // 1. 初始化GridLayout：1行N列（N=组件数），间距0
+        setLayout(new GridLayout(1, 3, 0, 0));
         setBorder(JBUI.Borders.empty(4, 8));
-        add(rankLabel, BorderLayout.WEST);
-        add(nameLabel, BorderLayout.CENTER);
-        add(profitLabel, BorderLayout.EAST);
+
+        rankLabel.setFont(rankLabel.getFont().deriveFont(15.0f).deriveFont(Font.BOLD));
+        nameLabel.setFont(nameLabel.getFont().deriveFont(15.0f).deriveFont(Font.BOLD));
+        profitLabel.setFont(profitLabel.getFont().deriveFont(15.0f).deriveFont(Font.BOLD));
+        rankLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        profitLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        add(rankLabel);
+        add(nameLabel);
+        add(profitLabel);
         // 设置面板透明（避免遮挡背景）
         setOpaque(true);
     }
@@ -50,13 +57,16 @@ public class RankListCellRenderer extends JPanel implements ListCellRenderer<Hol
             codeLabel.setText(value.getStockCode());
             nameLabel.setText(value.getStockName());
             profitLabel.setText(NumberFormatUtil.format(value.getTodayProfit()));
-            profitLabel.setForeground(getTextColor(value.getTodayProfit()));
+            JBColor textColor = getTextColor(value.getTodayProfit());
+            if(Objects.nonNull(textColor)){
+                profitLabel.setForeground(textColor);
+            }
         }
         return this;
     }
 
     protected JBColor getTextColor(BigDecimal value) {
-        int diff = BigDecimal.ZERO.compareTo(value);
+        int diff = value.compareTo(BigDecimal.ZERO);
         if (diff == 0) {
             return null;
         }
