@@ -1,35 +1,45 @@
 package cn.fudoc.trade.view.render;
 
+import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.ui.JBColor;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class StockColorTableCellRenderer extends DefaultTableCellRenderer {
     public StockColorTableCellRenderer(Integer left) {
-        if(Objects.nonNull(left)){
-            setBorder(BorderFactory.createEmptyBorder(0,left,0,0));
+        if (Objects.nonNull(left)) {
+            setBorder(BorderFactory.createEmptyBorder(0, left, 0, 0));
         }
+        setAlignmentX(Component.CENTER_ALIGNMENT);
+        setAlignmentY(Component.CENTER_ALIGNMENT);
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (Objects.nonNull(value)) {
-            JBColor textColor = getTextColor(NumberUtil.parseDouble(value.toString(), 0.0));
-            if (Objects.nonNull(textColor)) {
-                setForeground(textColor);
+            if (NumberUtil.isNumber(value.toString())) {
+                BigDecimal bigDecimal = NumberFormatUtil.convertBigDecimal(value);
+                value = NumberFormatUtil.format(bigDecimal);
+                JBColor textColor = getTextColor(bigDecimal);
+                if (Objects.nonNull(textColor)) {
+                    setForeground(textColor);
+                }
             }
+
         }
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     }
 
-    protected JBColor getTextColor(double offset) {
-        if (offset == 0) {
+    protected JBColor getTextColor(BigDecimal value) {
+        int diff = BigDecimal.ZERO.compareTo(value);
+        if (diff == 0) {
             return null;
         }
-        return offset > 0 ? JBColor.RED : JBColor.GREEN;
+        return diff > 0 ? JBColor.RED : JBColor.GREEN;
     }
 }

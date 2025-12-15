@@ -7,15 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ProfitTableModel extends AbstractTableModel {
-    // 列名（注意：实际表格中“排名”是第一列，“股票名称+代码”合并显示）
     private final String[] COLUMN_NAMES = {"排名", "股票信息", "今日收益"};
     private List<HoldStockDataDto> dataList = new ArrayList<>();
 
-    // 初始化测试数据（对应截图内容）
     public ProfitTableModel() {
     }
 
-    // 批量设置数据（核心：动态传入）
     public void setData(List<HoldStockDataDto> newData) {
         this.dataList = newData; // 避免外部修改原列表
         fireTableDataChanged(); // 通知表格刷新所有数据

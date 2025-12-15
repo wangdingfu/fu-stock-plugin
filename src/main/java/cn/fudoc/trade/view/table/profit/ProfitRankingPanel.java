@@ -49,8 +49,6 @@ public class ProfitRankingPanel extends JPanel {
         // 4. 调整表格样式
         table.setShowGrid(false); // 隐藏网格线（对应截图）
         table.setRowHeight(50); // 行高（适配换行显示）
-        // 列宽设置（可根据需求调整）
-        table.getColumnModel().getColumn(0).setPreferredWidth(10);
 
         // 5. 包裹滚动条（IDEA规范）
         JBScrollPane scrollPane = new JBScrollPane(table);

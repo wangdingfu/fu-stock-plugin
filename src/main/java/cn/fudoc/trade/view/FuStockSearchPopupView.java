@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view.search;
+package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
@@ -12,6 +12,7 @@ import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.dialog.HoldingsStockDialog;
+import cn.fudoc.trade.view.render.FuStockSearchListCellRenderer;
 import cn.fudoc.trade.view.table.StockTableView;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;

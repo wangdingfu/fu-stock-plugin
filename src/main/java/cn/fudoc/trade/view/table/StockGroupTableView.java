@@ -3,17 +3,13 @@ package cn.fudoc.trade.view.table;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
+import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.fudoc.trade.view.render.StockColorTableCellRenderer;
-import cn.hutool.core.util.NumberUtil;
-import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.util.Objects;
+import java.util.Comparator;
 import java.util.Vector;
 
 /**
@@ -39,9 +35,9 @@ public class StockGroupTableView extends AbstractStockTableView {
 
     private @NotNull TableRowSorter<DefaultTableModel> getDefaultTableModelTableRowSorter() {
         TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
-        tableRowSorter.setComparator(2, (o1, o2) -> convertBigDecimal(o1.toString()).compareTo(convertBigDecimal(o2.toString())));
-        tableRowSorter.setComparator(3, (o1, o2) -> convertBigDecimal(o1.toString()).compareTo(convertBigDecimal(o2.toString())));
-        tableRowSorter.setComparator(4, (o1, o2) -> convertBigDecimal(o1.toString()).compareTo(convertBigDecimal(o2.toString())));
+        tableRowSorter.setComparator(2, Comparator.comparing(NumberFormatUtil::convertBigDecimal));
+        tableRowSorter.setComparator(3, Comparator.comparing(NumberFormatUtil::convertBigDecimal));
+        tableRowSorter.setComparator(4, Comparator.comparing(NumberFormatUtil::convertBigDecimal));
         return tableRowSorter;
     }
 

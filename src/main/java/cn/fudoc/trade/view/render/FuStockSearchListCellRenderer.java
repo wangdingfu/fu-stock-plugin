@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view.search;
+package cn.fudoc.trade.view.render;
 
 import cn.fudoc.trade.api.data.StockInfo;
 import com.intellij.icons.AllIcons;

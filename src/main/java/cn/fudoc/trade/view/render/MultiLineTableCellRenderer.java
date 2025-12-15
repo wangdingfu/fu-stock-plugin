@@ -23,8 +23,6 @@ public class MultiLineTableCellRenderer extends JPanel implements TableCellRende
         this.boldColumnList = boldColumnList;
         // 设置垂直布局，实现上下分行
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setAlignmentX(Component.CENTER_ALIGNMENT);
-        setAlignmentY(Component.CENTER_ALIGNMENT);
         add(Box.createVerticalGlue());
         add(topLabel);
         add(bottomLabel);
@@ -37,6 +35,8 @@ public class MultiLineTableCellRenderer extends JPanel implements TableCellRende
         if(CollectionUtils.isNotEmpty(boldColumnList)){
             topLabel.setFont(topLabel.getFont().deriveFont(15.0f));
         }
+        setAlignmentX(Component.CENTER_ALIGNMENT);
+        setAlignmentY(Component.CENTER_ALIGNMENT);
     }
 
     @Override

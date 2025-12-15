@@ -204,13 +204,4 @@ public abstract class AbstractStockTableView implements StockTableView {
         tableDataChanged();
     }
 
-    protected BigDecimal convertBigDecimal(String value) {
-        if (StringUtils.isBlank(value)) {
-            return BigDecimal.ZERO;
-        }
-        if (NumberUtil.isNumber(value)) {
-            return new BigDecimal(value);
-        }
-        return NumberUtil.toBigDecimal(value);
-    }
 }

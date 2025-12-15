@@ -6,6 +6,7 @@ import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.fudoc.trade.util.ProjectUtils;
+import cn.fudoc.trade.view.TodayProfitView;
 import cn.fudoc.trade.view.dialog.HoldingsStockDialog;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
@@ -36,23 +37,9 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     private static final String[] columnNames = {"代码", "名称 / 市值", "持仓盈亏", "持仓数量", "现价 / 成本", "今日收益",};
     private final HoldingsStockState state;
 
-    /**
-     * 今日收益
-     */
-    private final ProfitRenderer todayProfit = new ProfitRenderer("今日");
-    /**
-     * 持仓收益
-     */
-    private final ProfitRenderer todayHoldProfit = new ProfitRenderer("持仓收益");
-    /**
-     * 总市值
-     */
-    private final ProfitRenderer todayAllMoney = new ProfitRenderer("总市值");
 
-    /**
-     * 今日收益排行榜
-     */
-    private final ProfitRankingPanel rankingPanel = new ProfitRankingPanel();
+    private final TodayProfitView todayProfitView = new TodayProfitView();
+
 
     public HoldStockGroupTableView(String tabName) {
         this.tabName = tabName;
@@ -75,18 +62,18 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         tableRowSorter.setComparator(1, (o1, o2) -> {
             String value1 = convertValue(o1, 1);
             String value2 = convertValue(o2, 1);
-            return convertBigDecimal(value1).compareTo(convertBigDecimal(value2));
+            return NumberFormatUtil.convertBigDecimal(value1).compareTo(NumberFormatUtil.convertBigDecimal(value2));
         });
         tableRowSorter.setComparator(2, (o1, o2) -> {
             String value1 = convertValue(o1, 0);
             String value2 = convertValue(o2, 0);
-            return convertBigDecimal(value1).compareTo(convertBigDecimal(value2));
+            return NumberFormatUtil.convertBigDecimal(value1).compareTo(NumberFormatUtil.convertBigDecimal(value2));
         });
-        tableRowSorter.setComparator(3, (o1, o2) -> convertBigDecimal(o1.toString()).compareTo(convertBigDecimal(o2.toString())));
+        tableRowSorter.setComparator(3, Comparator.comparing(o -> NumberFormatUtil.convertBigDecimal(o.toString())));
         tableRowSorter.setComparator(5, (o1, o2) -> {
             String value1 = convertValue(o1, 0);
             String value2 = convertValue(o2, 0);
-            return convertBigDecimal(value1).compareTo(convertBigDecimal(value2));
+            return NumberFormatUtil.convertBigDecimal(value1).compareTo(NumberFormatUtil.convertBigDecimal(value2));
         });
         return tableRowSorter;
     }
@@ -98,22 +85,8 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         JPanel tableComponent = getTableComponent();
         Splitter splitter = new Splitter(true);
         splitter.setFirstComponent(tableComponent);
-        //今日收益
-        JPanel profitPanel = new JPanel(new BorderLayout());
-        JPanel indexPanel = new JPanel();
-        indexPanel.setLayout(new BoxLayout(indexPanel, BoxLayout.X_AXIS));
-        indexPanel.add(Box.createHorizontalGlue());
-        indexPanel.add(todayProfit);
-        indexPanel.add(Box.createHorizontalGlue());
-        indexPanel.add(todayHoldProfit);
-        indexPanel.add(Box.createHorizontalGlue());
-        indexPanel.add(todayAllMoney);
-        indexPanel.add(Box.createHorizontalGlue());
-        indexPanel.setPreferredSize(new Dimension(rootPanel.getWidth(), 50));
-        indexPanel.setSize(new Dimension(rootPanel.getWidth(), 50));
-        profitPanel.add(indexPanel, BorderLayout.NORTH);
-        profitPanel.add(rankingPanel, BorderLayout.CENTER);
-        splitter.setSecondComponent(profitPanel);
+
+        splitter.setSecondComponent(todayProfitView.getRootPanel());
         rootPanel.add(splitter, BorderLayout.CENTER);
 
         tipLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -126,16 +99,16 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     protected void tableDataChanged() {
         List<HoldStockDataDto> tableDataList = getTableDataList();
         //计算今日收益
-        todayProfit.setValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getTodayProfit).reduce(BigDecimal.ZERO, BigDecimal::add)), true);
+        todayProfitView.setTodayProfit(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getTodayProfit).reduce(BigDecimal.ZERO, BigDecimal::add)));
 
         //计算持仓收益
-        todayHoldProfit.setValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getAllProfit).reduce(BigDecimal.ZERO, BigDecimal::add)), true);
+        todayProfitView.setHoldProfit(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getAllProfit).reduce(BigDecimal.ZERO, BigDecimal::add)));
 
         //计算总市值
-        todayAllMoney.setValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getCompanyValue).reduce(BigDecimal.ZERO, BigDecimal::add)), false);
+        todayProfitView.setCompanyValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getCompanyValue).reduce(BigDecimal.ZERO, BigDecimal::add)));
 
-        tableDataList.sort(Comparator.comparing(HoldStockDataDto::getTodayProfit));
-        rankingPanel.initDataList(tableDataList);
+        tableDataList.sort(Comparator.comparing(HoldStockDataDto::getTodayProfit).reversed());
+        todayProfitView.initData(tableDataList);
     }
 
     @Override
@@ -214,9 +187,9 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
             HoldStockDataDto holdStockDataDto = new HoldStockDataDto();
             holdStockDataDto.setStockCode(first.toString());
             holdStockDataDto.setStockName(convertValue(vector.get(1), 0));
-            holdStockDataDto.setCompanyValue(convertBigDecimal(convertValue(vector.get(1), 1)));
-            holdStockDataDto.setAllProfit(convertBigDecimal(convertValue(vector.get(2), 0)));
-            holdStockDataDto.setTodayProfit(convertBigDecimal(convertValue(vector.get(5), 0)));
+            holdStockDataDto.setCompanyValue(NumberFormatUtil.convertBigDecimal(convertValue(vector.get(1), 1)));
+            holdStockDataDto.setAllProfit(NumberFormatUtil.convertBigDecimal(convertValue(vector.get(2), 0)));
+            holdStockDataDto.setTodayProfit(NumberFormatUtil.convertBigDecimal(convertValue(vector.get(5), 0)));
             dataList.add(holdStockDataDto);
         });
         return dataList;
