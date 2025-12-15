@@ -32,9 +32,6 @@ public class MultiLineTableCellRenderer extends JPanel implements TableCellRende
         bottomLabel.setHorizontalAlignment(SwingConstants.CENTER);
         topLabel.setBorder(BorderFactory.createEmptyBorder(3, 20, 0, 12));
         bottomLabel.setBorder(BorderFactory.createEmptyBorder(3, 20, 3, 12));
-        if(CollectionUtils.isNotEmpty(boldColumnList)){
-            topLabel.setFont(topLabel.getFont().deriveFont(15.0f));
-        }
         setAlignmentX(Component.CENTER_ALIGNMENT);
         setAlignmentY(Component.CENTER_ALIGNMENT);
     }

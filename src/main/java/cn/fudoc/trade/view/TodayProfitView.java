@@ -53,7 +53,6 @@ public class TodayProfitView {
         this.rankListModel = new DefaultListModel<>();
         this.rankList = new JBList<>(this.rankListModel);
         this.rankList.setFixedCellHeight(40);
-        this.rankList.setFont(this.rankList.getFont().deriveFont(15.0f));
         this.rankList.setCellRenderer(new RankListCellRenderer());
         rankPanel.add(createProfitPanel(), BorderLayout.NORTH);
         rankPanel.add(new JBScrollPane(this.rankList), BorderLayout.CENTER);

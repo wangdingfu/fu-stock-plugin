@@ -10,8 +10,6 @@ import cn.fudoc.trade.view.TodayProfitView;
 import cn.fudoc.trade.view.dialog.HoldingsStockDialog;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
-import cn.fudoc.trade.view.render.ProfitRenderer;
-import cn.fudoc.trade.view.table.profit.ProfitRankingPanel;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.ui.Splitter;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +45,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         int rowHeight = stockTable.getRowHeight();
         stockTable.setRowHeight(rowHeight * 2);
         for (String columnName : getColumnNames()) {
-            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4),Lists.newArrayList(0,1,3,4)));
+            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList(0, 1, 3, 4)));
         }
         TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
         // 从视图中移除，模型仍保留
@@ -58,7 +56,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     }
 
     private @NotNull TableRowSorter<DefaultTableModel> getDefaultTableModelTableRowSorter() {
-        TableRowSorter<DefaultTableModel> tableRowSorter = new  TableRowSorter<>(tableModel);
+        TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
         tableRowSorter.setComparator(1, (o1, o2) -> {
             String value1 = convertValue(o1, 1);
             String value2 = convertValue(o2, 1);
@@ -194,7 +192,6 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         });
         return dataList;
     }
-
 
 
     private String convertValue(Object value, int index) {
