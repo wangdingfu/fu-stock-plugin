@@ -26,7 +26,7 @@ public class RankListCellRenderer extends JPanel implements ListCellRenderer<Hol
         nameLabel.setFont(nameLabel.getFont().deriveFont(15.0f).deriveFont(Font.BOLD));
         profitLabel.setFont(profitLabel.getFont().deriveFont(15.0f).deriveFont(Font.BOLD));
         rankLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        profitLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        profitLabel.setHorizontalAlignment(SwingConstants.LEFT);
         add(rankLabel);
         add(nameLabel);
         add(profitLabel);
