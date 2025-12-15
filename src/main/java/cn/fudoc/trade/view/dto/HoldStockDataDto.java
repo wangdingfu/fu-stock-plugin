@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 public class HoldStockDataDto {
 
     private String stockCode;
+    private String stockName;
 
     private BigDecimal companyValue;
 

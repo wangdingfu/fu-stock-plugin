@@ -3,6 +3,7 @@ package cn.fudoc.trade.view.table;
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ToolbarDecorator;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
@@ -71,11 +73,6 @@ public abstract class AbstractStockTableView implements StockTableView {
     }
 
 
-    protected JBColor getTextColor(double offset) {
-        return offset > 0 ? JBColor.RED : JBColor.GREEN;
-    }
-
-
     @Override
     public void reloadAllStock(String tag) {
         List<RealStockInfo> realStockInfos = tencentApiService.stockList(getStockCodes());
@@ -86,6 +83,7 @@ public abstract class AbstractStockTableView implements StockTableView {
         tableModel.setRowCount(0);
         realStockInfos.forEach(this::addStock);
         lastUpdateTime = DateUtil.now();
+        updateTipTag(tag);
         tableDataChanged();
     }
 
@@ -204,5 +202,15 @@ public abstract class AbstractStockTableView implements StockTableView {
             stockCodeSet.remove(code);
         }
         tableDataChanged();
+    }
+
+    protected BigDecimal convertBigDecimal(String value) {
+        if (StringUtils.isBlank(value)) {
+            return BigDecimal.ZERO;
+        }
+        if (NumberUtil.isNumber(value)) {
+            return new BigDecimal(value);
+        }
+        return NumberUtil.toBigDecimal(value);
     }
 }

@@ -3,32 +3,40 @@ package cn.fudoc.trade.view.render;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPanel;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
-public class MultiLineTableCellRenderer extends JBPanel implements TableCellRenderer {
+public class MultiLineTableCellRenderer extends JPanel implements TableCellRenderer {
     private final JBLabel topLabel = new JBLabel();
     private final JBLabel bottomLabel = new JBLabel();
     private final List<Integer> columnList;
+    private final List<Integer> boldColumnList;
 
-    public MultiLineTableCellRenderer(List<Integer> columnList) {
+    public MultiLineTableCellRenderer(List<Integer> columnList, List<Integer> boldColumnList) {
         this.columnList = columnList;
+        this.boldColumnList = boldColumnList;
         // 设置垂直布局，实现上下分行
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setAlignmentX(Component.CENTER_ALIGNMENT);
         setAlignmentY(Component.CENTER_ALIGNMENT);
+        add(Box.createVerticalGlue());
         add(topLabel);
         add(bottomLabel);
+        add(Box.createVerticalGlue());
         // 关键：Label文本水平居中
         topLabel.setHorizontalAlignment(SwingConstants.CENTER);
         bottomLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        topLabel.setBorder(BorderFactory.createEmptyBorder(3,20,0,12));
-        bottomLabel.setBorder(BorderFactory.createEmptyBorder(3,20,3,12));
+        topLabel.setBorder(BorderFactory.createEmptyBorder(3, 20, 0, 12));
+        bottomLabel.setBorder(BorderFactory.createEmptyBorder(3, 20, 3, 12));
+        if(CollectionUtils.isNotEmpty(boldColumnList)){
+            topLabel.setFont(topLabel.getFont().deriveFont(15.0f));
+        }
     }
 
     @Override
@@ -49,9 +57,9 @@ public class MultiLineTableCellRenderer extends JBPanel implements TableCellRend
         } else {
             topLabel.setText(value == null ? "" : value.toString());
             bottomLabel.setText("");
-            topLabel.setBorder(BorderFactory.createEmptyBorder(10,20,10,10));
+            topLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 10));
         }
-        if(column > 1){
+        if (boldColumnList.contains(column)) {
             Font defaultFont = bottomLabel.getFont();
             bottomLabel.setFont(defaultFont.deriveFont(11.0f));
             bottomLabel.setForeground(JBColor.GRAY);
@@ -61,21 +69,30 @@ public class MultiLineTableCellRenderer extends JBPanel implements TableCellRend
     }
 
 
-    private void setColor(int column){
-        if(!columnList.contains(column)){
+    private void setColor(int column) {
+        if (!columnList.contains(column)) {
             return;
         }
         String text = topLabel.getText();
         if (StringUtils.isNotBlank(text)) {
-            topLabel.setForeground(getTextColor(NumberUtil.parseDouble(text, 0.0)));
+            JBColor textColor = getTextColor(NumberUtil.parseDouble(text, 0.0));
+            if (Objects.nonNull(textColor)) {
+                topLabel.setForeground(textColor);
+            }
         }
         String text2 = bottomLabel.getText();
         if (StringUtils.isNotBlank(text2)) {
-            bottomLabel.setForeground(getTextColor(NumberUtil.parseDouble(text2, 0.0)));
+            JBColor textColor = getTextColor(NumberUtil.parseDouble(text2, 0.0));
+            if (Objects.nonNull(textColor)) {
+                bottomLabel.setForeground(textColor);
+            }
         }
     }
 
     protected JBColor getTextColor(double offset) {
+        if (offset == 0) {
+            return null;
+        }
         return offset > 0 ? JBColor.RED : JBColor.GREEN;
     }
 }

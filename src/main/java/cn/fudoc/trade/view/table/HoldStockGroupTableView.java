@@ -10,22 +10,22 @@ import cn.fudoc.trade.view.dialog.HoldingsStockDialog;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
 import cn.fudoc.trade.view.render.ProfitRenderer;
-import cn.hutool.core.util.NumberUtil;
+import cn.fudoc.trade.view.table.profit.ProfitRankingPanel;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.ui.Splitter;
-import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
 
 /**
  * 持仓tab
@@ -49,19 +49,46 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
      */
     private final ProfitRenderer todayAllMoney = new ProfitRenderer("总市值");
 
+    /**
+     * 今日收益排行榜
+     */
+    private final ProfitRankingPanel rankingPanel = new ProfitRankingPanel();
+
     public HoldStockGroupTableView(String tabName) {
         this.tabName = tabName;
         addListener();
         int rowHeight = stockTable.getRowHeight();
         stockTable.setRowHeight(rowHeight * 2);
         for (String columnName : getColumnNames()) {
-            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4)));
+            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4),Lists.newArrayList(0,1,3,4)));
         }
         TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
         // 从视图中移除，模型仍保留
         stockTable.getColumnModel().removeColumn(idColumn);
         this.state = HoldingsStockState.getInstance();
         init(this.state.getStockCodes(tabName));
+        stockTable.setRowSorter(getDefaultTableModelTableRowSorter());
+    }
+
+    private @NotNull TableRowSorter<DefaultTableModel> getDefaultTableModelTableRowSorter() {
+        TableRowSorter<DefaultTableModel> tableRowSorter = new  TableRowSorter<>(tableModel);
+        tableRowSorter.setComparator(1, (o1, o2) -> {
+            String value1 = convertValue(o1, 1);
+            String value2 = convertValue(o2, 1);
+            return convertBigDecimal(value1).compareTo(convertBigDecimal(value2));
+        });
+        tableRowSorter.setComparator(2, (o1, o2) -> {
+            String value1 = convertValue(o1, 0);
+            String value2 = convertValue(o2, 0);
+            return convertBigDecimal(value1).compareTo(convertBigDecimal(value2));
+        });
+        tableRowSorter.setComparator(3, (o1, o2) -> convertBigDecimal(o1.toString()).compareTo(convertBigDecimal(o2.toString())));
+        tableRowSorter.setComparator(5, (o1, o2) -> {
+            String value1 = convertValue(o1, 0);
+            String value2 = convertValue(o2, 0);
+            return convertBigDecimal(value1).compareTo(convertBigDecimal(value2));
+        });
+        return tableRowSorter;
     }
 
 
@@ -85,6 +112,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         indexPanel.setPreferredSize(new Dimension(rootPanel.getWidth(), 50));
         indexPanel.setSize(new Dimension(rootPanel.getWidth(), 50));
         profitPanel.add(indexPanel, BorderLayout.NORTH);
+        profitPanel.add(rankingPanel, BorderLayout.CENTER);
         splitter.setSecondComponent(profitPanel);
         rootPanel.add(splitter, BorderLayout.CENTER);
 
@@ -105,6 +133,9 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
 
         //计算总市值
         todayAllMoney.setValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getCompanyValue).reduce(BigDecimal.ZERO, BigDecimal::add)), false);
+
+        tableDataList.sort(Comparator.comparing(HoldStockDataDto::getTodayProfit));
+        rankingPanel.initDataList(tableDataList);
     }
 
     @Override
@@ -182,6 +213,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
             }
             HoldStockDataDto holdStockDataDto = new HoldStockDataDto();
             holdStockDataDto.setStockCode(first.toString());
+            holdStockDataDto.setStockName(convertValue(vector.get(1), 0));
             holdStockDataDto.setCompanyValue(convertBigDecimal(convertValue(vector.get(1), 1)));
             holdStockDataDto.setAllProfit(convertBigDecimal(convertValue(vector.get(2), 0)));
             holdStockDataDto.setTodayProfit(convertBigDecimal(convertValue(vector.get(5), 0)));
@@ -190,15 +222,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         return dataList;
     }
 
-    private BigDecimal convertBigDecimal(String value) {
-        if (StringUtils.isBlank(value)) {
-            return BigDecimal.ZERO;
-        }
-        if (NumberUtil.isNumber(value)) {
-            return new BigDecimal(value);
-        }
-        return NumberUtil.toBigDecimal(value);
-    }
+
 
     private String convertValue(Object value, int index) {
         if (Objects.isNull(value)) {
