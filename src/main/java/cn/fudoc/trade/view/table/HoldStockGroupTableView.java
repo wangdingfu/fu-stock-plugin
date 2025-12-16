@@ -45,7 +45,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         int rowHeight = stockTable.getRowHeight();
         stockTable.setRowHeight(rowHeight * 2);
         for (String columnName : getColumnNames()) {
-            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList(0, 1, 3, 4)));
+            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList( 1, 3, 4)));
         }
         TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
         // 从视图中移除，模型仍保留

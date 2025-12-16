@@ -52,20 +52,13 @@ public class MarketAllStockPersistentState implements PersistentStateComponent<M
         if (StringUtils.isBlank(keyword)) {
             return new ArrayList<>();
         }
-        if (Objects.isNull(A)) {
-            A = new StockIndex(false);
-        }
-        if (Objects.isNull(HK)) {
-            HK = new StockIndex(true);
-        }
-        List<MatchResult> marketAMatchList = A.match(keyword);
-        List<MatchResult> marketHKMatchList = HK.match(keyword);
         List<MatchResult> matchList = Lists.newArrayList();
-        if (Objects.nonNull(marketAMatchList) && !marketAMatchList.isEmpty()) {
-            matchList.addAll(marketAMatchList);
+
+        if (Objects.nonNull(A)) {
+            matchList.addAll(A.match(keyword));
         }
-        if (Objects.nonNull(marketHKMatchList) && !marketHKMatchList.isEmpty()) {
-            matchList.addAll(marketHKMatchList);
+        if (Objects.nonNull(HK)) {
+            matchList.addAll(HK.match(keyword));
         }
         //取匹配度最高的10条返回
         return matchList.stream().sorted(Comparator.comparing(MatchResult::getSimilarity).reversed()).limit(10)

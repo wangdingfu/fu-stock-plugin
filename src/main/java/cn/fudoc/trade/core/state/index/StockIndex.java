@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -34,6 +35,9 @@ public class StockIndex {
 
     public StockIndex(boolean isHK) {
         this.isHK = isHK;
+        this.codeMap = new HashMap<>();
+        this.firstMap = new HashMap<>();
+        this.nameMap = new HashMap<>();
     }
 
     public StockIndex(List<StockInfo> stockInfoList, boolean isHK) {
@@ -69,9 +73,10 @@ public class StockIndex {
 
 
     public List<MatchResult> match(String keyword) {
-        if (StringUtils.isBlank(keyword)) {
-            return null;
+        if (StringUtils.isBlank(keyword) || MapUtils.isEmpty(codeMap)) {
+            return Lists.newArrayList();
         }
+
         List<MatchResult> matchResultList = new ArrayList<>();
         if (StringUtils.isNumeric(keyword)) {
             int length = isHK ? 5 : 6;
@@ -88,6 +93,9 @@ public class StockIndex {
                 }
             });
         } else if (isAlpha(keyword)) {
+            if(MapUtils.isEmpty(firstMap)) {
+                return Lists.newArrayList();
+            }
             //首字母匹配
             Set<String> codeSet = firstMap.get(keyword);
             if (CollectionUtils.isNotEmpty(codeSet)) {
@@ -103,6 +111,9 @@ public class StockIndex {
             });
             return matchResultList;
         } else {
+            if(MapUtils.isEmpty(nameMap)) {
+                return Lists.newArrayList();
+            }
             //名称匹配
             return match(keyword, nameMap);
         }

@@ -1,7 +1,6 @@
 package cn.fudoc.trade.view.render;
 
 import cn.fudoc.trade.util.NumberFormatUtil;
-import cn.hutool.core.util.NumberUtil;
 import com.intellij.ui.JBColor;
 
 import javax.swing.*;
@@ -22,21 +21,19 @@ public class StockColorTableCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (Objects.nonNull(value)) {
-            if (NumberUtil.isNumber(value.toString())) {
-                BigDecimal bigDecimal = NumberFormatUtil.convertBigDecimal(value);
-                value = NumberFormatUtil.format(bigDecimal);
-                JBColor textColor = getTextColor(bigDecimal);
-                if (Objects.nonNull(textColor)) {
-                    setForeground(textColor);
-                }
+            BigDecimal bigDecimal = NumberFormatUtil.convertBigDecimal(value);
+            value = NumberFormatUtil.format(bigDecimal);
+            JBColor textColor = getTextColor(bigDecimal);
+            if (Objects.nonNull(textColor)) {
+                setForeground(textColor);
             }
-
         }
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     }
 
+
     protected JBColor getTextColor(BigDecimal value) {
-        int diff = BigDecimal.ZERO.compareTo(value);
+        int diff = value.compareTo(BigDecimal.ZERO);
         if (diff == 0) {
             return null;
         }

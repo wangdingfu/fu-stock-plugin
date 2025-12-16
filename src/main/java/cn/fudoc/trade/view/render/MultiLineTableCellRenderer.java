@@ -3,7 +3,6 @@ package cn.fudoc.trade.view.render;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
