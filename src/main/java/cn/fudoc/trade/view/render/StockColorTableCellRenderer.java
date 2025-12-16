@@ -22,7 +22,7 @@ public class StockColorTableCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (Objects.nonNull(value)) {
             BigDecimal bigDecimal = NumberFormatUtil.convertBigDecimal(value);
-            value = NumberFormatUtil.formatRate(bigDecimal);
+            value = NumberFormatUtil.formatRate(bigDecimal,true);
             JBColor textColor = getTextColor(bigDecimal);
             if (Objects.nonNull(textColor)) {
                 setForeground(textColor);

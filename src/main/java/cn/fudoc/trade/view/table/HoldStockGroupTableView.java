@@ -45,7 +45,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         int rowHeight = stockTable.getRowHeight();
         stockTable.setRowHeight(rowHeight * 2);
         for (String columnName : getColumnNames()) {
-            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList( 1, 3, 4)));
+            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList(1, 3, 4)));
         }
         TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
         // 从视图中移除，模型仍保留
@@ -149,7 +149,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
 
         //今日收益计算 （当前价-上一日收盘价）*持仓数量
         BigDecimal yesterdayPrice = new BigDecimal(realStockInfo.getYesterdayPrice());
-        BigDecimal increaseRate = new BigDecimal(realStockInfo.getIncreaseRate()).divide(new BigDecimal("100"), 5, RoundingMode.CEILING);
+        BigDecimal increaseRate = new BigDecimal(realStockInfo.getIncreaseRate());
         BigDecimal todayProfit = currentPrice.subtract(yesterdayPrice).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
 
         //表格数据
@@ -161,7 +161,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         //持仓盈亏
         String PLRatePrefix = PLRate.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
         String PLPrefix = PL.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
-        vector.add(new String[]{PLPrefix + NumberFormatUtil.format(PL), PLRatePrefix + NumberFormatUtil.formatRate(PLRate)});
+        vector.add(new String[]{PLPrefix + NumberFormatUtil.format(PL), PLRatePrefix + NumberFormatUtil.formatRate(PLRate, false)});
         //持仓数量
         vector.add(count);
         //现价/成本
@@ -169,7 +169,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         //今日收益
         String todayProfitPrefix = todayProfit.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
         String profitRatePrefix = increaseRate.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
-        vector.add(new String[]{todayProfitPrefix + NumberFormatUtil.format(todayProfit), profitRatePrefix + NumberFormatUtil.formatRate(increaseRate)});
+        vector.add(new String[]{todayProfitPrefix + NumberFormatUtil.format(todayProfit), profitRatePrefix + NumberFormatUtil.formatRate(increaseRate, true)});
         return vector;
     }
 
