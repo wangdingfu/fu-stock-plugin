@@ -2,7 +2,6 @@ package cn.fudoc.trade.core.action;
 
 import cn.fudoc.trade.core.state.FuCommonState;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -19,7 +18,7 @@ public class HideShowAction extends AnAction {
     private final HideShowCallback hideShowCallback;
 
     public HideShowAction(HideShowCallback hideShowCallback) {
-        super(hideShowCallback.getShowText(), hideShowCallback.getShowText(), AllIcons.General.Pin);
+        super(hideShowCallback.getShowText(), hideShowCallback.getShowText(), AllIcons.General.Pin_tab);
         this.hideShowCallback = hideShowCallback;
         this.instance = FuCommonState.getInstance();
     }
@@ -28,11 +27,6 @@ public class HideShowAction extends AnAction {
     @Override
     public boolean isDumbAware() {
         return true;
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
     }
 
 

@@ -47,7 +47,8 @@ public class MultiLineTableCellRenderer extends JPanel implements TableCellRende
         }
 
         // 假设value是封装了上下两行数据的对象（如String[]）
-        if (value instanceof String[] content) {
+        if (value instanceof String[]) {
+            String[] content  = (String[]) value;
             topLabel.setText(content[0]);
             bottomLabel.setText(content[1]);
         } else {

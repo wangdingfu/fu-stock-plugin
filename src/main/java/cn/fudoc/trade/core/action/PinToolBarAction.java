@@ -1,7 +1,6 @@
 package cn.fudoc.trade.core.action;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import org.jetbrains.annotations.NotNull;
@@ -17,17 +16,12 @@ public class PinToolBarAction extends ToggleAction {
     private final AtomicBoolean pinStatus;
 
     public PinToolBarAction(AtomicBoolean pinStatus) {
-        super("Pin", "固定窗口", AllIcons.General.Pin);
+        super("Pin", "固定窗口", AllIcons.General.Pin_tab);
 
         this.pinStatus = pinStatus;
     }
 
 
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
-    }
 
     @Override
     public boolean isDumbAware() {

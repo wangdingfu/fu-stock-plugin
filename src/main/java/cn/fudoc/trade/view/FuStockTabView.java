@@ -101,9 +101,12 @@ public class FuStockTabView {
 
 
     private StockTableView createStockTabView(String tab, StockTabEnum stockTabEnum) {
-        return switch (stockTabEnum) {
-            case STOCK_INFO -> new StockGroupTableView(tab);
-            case STOCK_HOLD -> new HoldStockGroupTableView(tab);
-        };
+        switch (stockTabEnum) {
+            case STOCK_INFO:
+                return new StockGroupTableView(tab);
+            case STOCK_HOLD:
+                return new HoldStockGroupTableView(tab);
+        }
+        return null;
     }
 }

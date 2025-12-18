@@ -15,7 +15,8 @@ public class FuStockToolWindowFactory implements ToolWindowFactory, DumbAware {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         FuStockWindow fuStockWindow = new FuStockWindow(project);
         // 将面板添加到工具窗口
-        ContentFactory contentFactory = ContentFactory.getInstance();
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+
         Content content = contentFactory.createContent(fuStockWindow, "", false);
         toolWindow.getContentManager().addContent(content);
         project.getMessageBus().connect().subscribe(ToolWindowManagerListener.TOPIC, new ToolWindowManagerListener() {
@@ -28,10 +29,7 @@ public class FuStockToolWindowFactory implements ToolWindowFactory, DumbAware {
             }
 
             @Override
-            public void stateChanged(@NotNull ToolWindowManager toolWindowManager, @NotNull ToolWindowManagerEventType changeType) {
-                if (ToolWindowManagerEventType.HideToolWindow != changeType) {
-                    return;
-                }
+            public void stateChanged(@NotNull ToolWindowManager toolWindowManager) {
                 // 获取目标 ToolWindow（通过 id 匹配）
                 ToolWindow myToolWindow = toolWindowManager.getToolWindow("FuStock");
                 if (myToolWindow == null) return;

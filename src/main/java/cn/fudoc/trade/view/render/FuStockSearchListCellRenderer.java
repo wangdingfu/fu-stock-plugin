@@ -54,7 +54,7 @@ public class FuStockSearchListCellRenderer extends JPanel implements ListCellRen
         if (value != null) {
             iconLabel.setIcon(getIcon(value.getJys()));
             textLabel.setText(buildHtmlText(value,list,isSelected));
-            jButton.setIcon(value.isAdd() ? AllIcons.General.GreenCheckmark : AllIcons.General.Add);
+            jButton.setIcon(value.isAdd() ? FuIcons.FU_STOCK_SELECTED : AllIcons.General.Add);
         }
         Color selectBackground = isSelected ? list.getSelectionBackground() : list.getBackground();
         setBackground(selectBackground);

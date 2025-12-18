@@ -178,7 +178,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         List<HoldStockDataDto> dataList = new ArrayList<>();
         Vector<Vector> dataVector = tableModel.getDataVector();
         dataVector.forEach(vector -> {
-            Object first = vector.getFirst();
+            Object first = vector.get(0);
             if (Objects.isNull(first)) {
                 return;
             }
@@ -198,8 +198,11 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         if (Objects.isNull(value)) {
             return "";
         }
-        if (value instanceof String[] content && content.length > index) {
-            return content[index];
+        if (value instanceof String[]) {
+            String[] content = (String[]) value;
+            if (content.length > index) {
+                return content[index];
+            }
         }
         return "";
     }
@@ -215,7 +218,13 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
                     Object valueAt = tableModel.getValueAt(modelRow, 0);
                     Object valueAt1 = tableModel.getValueAt(modelRow, 1);
                     String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
-                    String name = (valueAt1 instanceof String[] values && values.length > 0) ? values[0] : "";
+                    String name = "";
+                    if(valueAt1 instanceof String[]){
+                        String[] values = (String[]) valueAt1;
+                        if(values.length > 0){
+                            name = values[0];
+                        }
+                    }
                     HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), tabName, code, name);
                     if (holdingsStockDialog.showAndGet()) {
                         HoldingsInfo holdingsInfo = holdingsStockDialog.getHoldingsInfo();

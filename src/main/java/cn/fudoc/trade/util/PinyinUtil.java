@@ -159,7 +159,7 @@ public class PinyinUtil {
         }
 
         // 初始化：第一个元素的所有首字母作为初始组合
-        result.addAll(sets.getFirst());
+        result.addAll(sets.get(0));
 
         // 迭代拼接后续元素的首字母
         for (int i = 1; i < sets.size(); i++) {

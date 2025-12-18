@@ -22,7 +22,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.BrowserHyperlinkListener;
-import com.intellij.util.ui.HTMLEditorKitBuilder;
 import com.intellij.util.ui.UIUtil;
 import icons.FuIcons;
 import org.jetbrains.annotations.NotNull;
@@ -96,6 +95,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         this.stockView = new FuStockTabView(project);
         contentPanel.add(this.stockView.getComponent(), BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
+
+        this.isAutoLoad.set(StockGroupPersistentState.getInstance().isAutoRefresh());
 
 //        //5、消息栏
 //        this.messagePane = initPanel();
@@ -190,10 +191,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         });
         //启动定时刷新股票
         actionGroup.add(new DumbAwareAction(STOCK_AUTO_LOAD_TITLE, "", AllIcons.Actions.Execute) {
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
 
             @Override
             public void update(@NotNull AnActionEvent e) {
@@ -216,10 +213,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         });
         //停止定时刷新股票
         actionGroup.addAction(new DumbAwareAction("停止刷新", "", AllIcons.Actions.Suspend) {
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
 
             @Override
             public void update(@NotNull AnActionEvent e) {
@@ -239,10 +232,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
         //手动刷新股票
         actionGroup.addAction(new DumbAwareAction("刷新", "", AllIcons.Actions.Refresh) {
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
 
 
             @Override
@@ -314,14 +303,5 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     }
 
 
-    private JEditorPane initPanel() {
-        JEditorPane messagePanel = new JEditorPane();
-        messagePanel.setContentType("text/html");
-        messagePanel.setEditable(false);
-        messagePanel.setEditorKit(HTMLEditorKitBuilder.simple());
-        messagePanel.addHyperlinkListener(BrowserHyperlinkListener.INSTANCE);
-        UIUtil.doNotScrollToCaret(messagePanel);
-        return messagePanel;
-    }
 
 }

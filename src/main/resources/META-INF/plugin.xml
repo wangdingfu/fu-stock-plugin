@@ -28,8 +28,7 @@
         <applicationService serviceImplementation="cn.fudoc.trade.core.state.StockGroupState"/>
         <applicationService serviceInterface="cn.fudoc.trade.api.TencentApiService" serviceImplementation="cn.fudoc.trade.api.impl.TencentApiServiceImpl"/>
         <applicationService serviceInterface="cn.fudoc.trade.api.ZTApiService" serviceImplementation="cn.fudoc.trade.api.impl.ZTApiServiceImpl"/>
-
-        <postStartupActivity implementation="cn.fudoc.trade.core.startup.FuStockStartupActivity" />
+        <postStartupActivity implementation="cn.fudoc.trade.core.startup.FuStockStartupActivity"/>
     </extensions>
 
 

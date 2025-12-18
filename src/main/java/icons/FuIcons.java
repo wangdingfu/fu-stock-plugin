@@ -17,4 +17,5 @@ public interface FuIcons {
     Icon FU_UNSHARE = IconLoader.getIcon("icon/unshare.svg", FuIcons.class);
     Icon FU_STOCK_INFO_GROUP = IconLoader.getIcon("icon/stock_info.svg", FuIcons.class);
     Icon FU_STOCK_HOLD_GROUP = IconLoader.getIcon("icon/stock_hold.svg", FuIcons.class);
+    Icon FU_STOCK_SELECTED = IconLoader.getIcon("icon/greenCheckmark.svg", FuIcons.class);
 }

@@ -266,7 +266,7 @@ public class FuStockSearchPopupView {
                     HoldingsStockState.getInstance().add(this.stockTableView.getTabName(), stock.getStockCode(), holdingsInfo.getCost(), holdingsInfo.getCount());
                 }
             }
-            this.stockTableView.addStock(realStockInfos.getFirst());
+            this.stockTableView.addStock(realStockInfos.get(0));
         } else {
             //移除股票
             this.stockTableView.removeStock(stock.getStockCode());
