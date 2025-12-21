@@ -5,6 +5,7 @@ import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.common.enumtype.UpdateTipTagEnum;
+import cn.fudoc.trade.core.state.FuCommonState;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
 import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.timer.ScheduledTaskManager;
@@ -72,6 +73,10 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 股票分组持久化
      */
     private final StockGroupState stockGroupState = StockGroupState.getInstance();
+    /**
+     * 公共持久化数据
+     */
+    private final FuCommonState fuCommonState = FuCommonState.getInstance();
 
     /**
      * 窗体由四部分组成
@@ -116,6 +121,9 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
         //加载持久化的分组
         stockGroupState.getStockTabEnumMap().forEach(stockView::add);
+
+        //是否自动刷新
+        isAutoLoad.set(fuCommonState.is("fu-stock-auto-refresh"));
 
         //默认选中我的自选
         stockView.selectMySelected(FuTradeConstants.MY_SELECTED_GROUP);
@@ -184,8 +192,11 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 if (Objects.isNull(stockTableView)) {
                     return;
                 }
-                FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stockTableView);
-                fuStockSearchPopupView.showPopup(project);
+                SwingUtilities.invokeLater(()->{
+                    FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stockTableView);
+                    fuStockSearchPopupView.showPopup(project);
+                });
+
             }
         });
         //启动定时刷新股票

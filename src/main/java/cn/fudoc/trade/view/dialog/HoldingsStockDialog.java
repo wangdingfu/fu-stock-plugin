@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view.dialog;
 
+import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.hutool.core.util.NumberUtil;
@@ -16,8 +17,11 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-// 分组弹框
+
 public class HoldingsStockDialog extends DialogWrapper {
 
     private final JLabel stockCodeLabel;
@@ -43,87 +47,93 @@ public class HoldingsStockDialog extends DialogWrapper {
         init();
     }
 
-    // 构建弹框内容面板（核心布局）
+    // 构建内容面板（BoxLayout 基础布局，无兼容问题）
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        // 使用 GridBagLayout 实现组件对齐布局
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(5); // 组件间距
-        gbc.fill = GridBagConstraints.HORIZONTAL; // 水平填充
-        gbc.weightx = 1.0; // 横向权重（占满剩余空间）
-        // 1. 分组名称标签 + 输入框
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0; // 标签不占额外空间
-        panel.add(new JBLabel("股票代码："), gbc);
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(JBUI.Borders.empty(20, 30));
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0; // 输入框占满横向空间
-        stockCodeLabel.setPreferredSize(new Dimension(200, 28)); // 输入框宽度
-        panel.add(stockCodeLabel, gbc);
+        // 股票代码行
+        JPanel codePanel = createRowPanel("股票代码：", stockCodeLabel);
+        mainPanel.add(codePanel);
+        mainPanel.add(Box.createVerticalStrut(15));
 
-        // 2. 分组类型标签 + 下拉框
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0;
-        panel.add(new JBLabel("股票名称："), gbc);
+        // 股票名称行
+        JPanel namePanel = createRowPanel("股票名称：", stockNameLabel);
+        mainPanel.add(namePanel);
+        mainPanel.add(Box.createVerticalStrut(15));
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        stockNameLabel.setPreferredSize(new Dimension(200, 28)); // 下拉框宽度
-        panel.add(stockNameLabel, gbc);
+        // 成本价行
+        JPanel costPanel = createRowPanel("成本价：", costField);
+        mainPanel.add(costPanel);
+        mainPanel.add(Box.createVerticalStrut(15));
 
-        // 1. 分组名称标签 + 输入框
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0; // 标签不占额外空间
-        panel.add(new JBLabel("成本价："), gbc);
+        // 持仓数量行
+        JPanel countPanel = createRowPanel("持仓数量：", countField);
+        mainPanel.add(countPanel);
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0; // 输入框占满横向空间
-        costField.setPreferredSize(new Dimension(200, 28)); // 输入框宽度
-        panel.add(costField, gbc);
+        return mainPanel;
+    }
 
-        // 2. 分组类型标签 + 下拉框
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weightx = 0;
-        panel.add(new JBLabel("持仓数量："), gbc);
+    /**
+     * 创建单行面板（标签 + 组件）
+     */
+    private JPanel createRowPanel(String labelText, JComponent component) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT); // 左对齐
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        countField.setPreferredSize(new Dimension(200, 28)); // 下拉框宽度
-        panel.add(countField, gbc);
+        // 固定宽度标签
+        JBLabel label = new JBLabel(labelText);
+        label.setPreferredSize(new Dimension(80, 30));
+        label.setMinimumSize(new Dimension(80, 30));
+        label.setMaximumSize(new Dimension(80, 30));
+        label.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // 组件占满剩余空间
+        component.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        component.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        panel.add(label);
+        panel.add(Box.createHorizontalStrut(10));
+        panel.add(component);
+
         return panel;
     }
 
-    // 输入校验（必填项检查）
+    // 输入校验（保持不变）
     @Override
     protected ValidationInfo doValidate() {
         String costValue = costField.getText().trim();
         String countValue = countField.getText().trim();
+
         if (StringUtils.isBlank(costValue)) {
-            // 校验失败：返回错误提示和关联组件（输入框会被高亮）
-            return new ValidationInfo("成本价不能为空", costField);
+            return new ValidationInfo(FuTradeConstants.HOLD_COST_NOTNULL, costField);
         }
         if (StringUtils.isBlank(countValue)) {
-            // 校验失败：返回错误提示和关联组件（输入框会被高亮）
-            return new ValidationInfo("持仓数量不能为空", countField);
+            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_NOTNULL, countField);
         }
         if (!NumberUtil.isNumber(costValue)) {
-            // 校验失败：返回错误提示和关联组件（输入框会被高亮）
-            return new ValidationInfo("成本价必须是数字", costField);
+            return new ValidationInfo(FuTradeConstants.HOLD_COST_IS_NUMBER, costField);
         }
         if (!NumberUtil.isInteger(countValue)) {
-            // 校验失败：返回错误提示和关联组件（输入框会被高亮）
-            return new ValidationInfo("持仓数量必须是数字", countField);
+            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_IS_NUMBER, countField);
         }
-        // 校验通过：返回 null
-        return super.doValidate();
+
+        try {
+            int count = Integer.parseInt(countValue);
+            if (count <= 0) {
+                return new ValidationInfo(FuTradeConstants.HOLD_COUNT_GT_ZERO, countField);
+            }
+        } catch (Exception e) {
+            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_FORMAT_ERROR, countField);
+        }
+        return null;
     }
 
+    // 获取持仓信息（确保 EDT 线程调用）
     public HoldingsInfo getHoldingsInfo() {
         HoldingsInfo holdingsInfo = new HoldingsInfo();
         holdingsInfo.setCost(costField.getText().trim());
@@ -131,11 +141,9 @@ public class HoldingsStockDialog extends DialogWrapper {
         return holdingsInfo;
     }
 
-
-    // 启用“确认”和“取消”按钮（默认启用，可自定义按钮文本）
+    // 自定义按钮（保持不变）
     @Override
     protected Action @NotNull [] createActions() {
-        // 自定义确认按钮文本（默认是“OK”，改为“确定”更符合中文习惯）
         getOKAction().putValue(Action.NAME, "确定");
         getCancelAction().putValue(Action.NAME, "取消");
         return new Action[]{getOKAction(), getCancelAction()};
