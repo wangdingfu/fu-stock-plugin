@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * 持仓tab
+ * 持仓 tab
  */
 public class HoldStockGroupTableView extends AbstractStockTableView {
 
@@ -43,7 +43,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         this.tabName = tabName;
         addListener();
         int rowHeight = stockTable.getRowHeight();
-        stockTable.setRowHeight(rowHeight * 2);
+        stockTable.setRowHeight(rowHeight * 2 + 20);
         for (String columnName : getColumnNames()) {
             stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList(1, 3, 4)));
         }
@@ -81,6 +81,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     public JPanel getComponent() {
         JPanel rootPanel = new JPanel(new BorderLayout());
         JPanel tableComponent = getTableComponent();
+        tableComponent.add(createTableHintLabel(), BorderLayout.NORTH);
         Splitter splitter = new Splitter(true);
         splitter.setFirstComponent(tableComponent);
 
@@ -91,7 +92,15 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         rootPanel.add(tipLabel, BorderLayout.PAGE_END);
         return rootPanel;
     }
-
+    /**
+     * 创建表格上方的引导文字标签
+     */
+    public static JLabel createTableHintLabel() {
+        JLabel hintLabel = new JLabel("💡 提示：双击单元格可编辑持仓成本");
+        hintLabel.setForeground(new Color(60, 120, 216)); // IDEA 风格的蓝色
+        hintLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+        return hintLabel;
+    }
 
     @Override
     protected void tableDataChanged() {
@@ -134,25 +143,32 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
         Vector<Object> vector = new Vector<>();
         HoldingsInfo holdingsInfo = state.getHoldingsInfo(tabName, realStockInfo.getStockCode());
-        //持仓成本价
-        BigDecimal cost = Objects.isNull(holdingsInfo) ? BigDecimal.ZERO : new BigDecimal(holdingsInfo.getCost());
-        //持仓数量
-        int count = Objects.isNull(holdingsInfo) ? 0 : holdingsInfo.getCount();
-        BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
-        BigDecimal countDecimal = new BigDecimal(count);
-        //市值=持仓*当前价
-        BigDecimal companyValue = countDecimal.multiply(currentPrice).setScale(4, RoundingMode.CEILING);
-        //盈亏=持仓*(当前价-成本价)
-        BigDecimal PL = currentPrice.subtract(cost).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
-        //盈亏比=(成本价-当前价)/成本价
-        BigDecimal PLRate = currentPrice.subtract(cost).divide(cost, 4, RoundingMode.CEILING);
+        BigDecimal cost = BigDecimal.ZERO,
+                companyValue = BigDecimal.ZERO,
+                PL = BigDecimal.ZERO,
+                PLRate = BigDecimal.ZERO,
+                todayProfit = BigDecimal.ZERO,
+                increaseRate = BigDecimal.ZERO;
+        int count = 0;
+        if (Objects.nonNull(holdingsInfo)) {
+            //持仓成本价
+            cost = new BigDecimal(holdingsInfo.getCost());
+            //持仓数量
+            count = holdingsInfo.getCount();
+            BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
+            BigDecimal countDecimal = new BigDecimal(count);
+            //市值=持仓*当前价
+            companyValue = countDecimal.multiply(currentPrice).setScale(4, RoundingMode.CEILING);
+            //盈亏=持仓*(当前价-成本价)
+            PL = currentPrice.subtract(cost).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
+            //盈亏比=(成本价-当前价)/成本价
+            PLRate = cost.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : currentPrice.subtract(cost).divide(cost, 4, RoundingMode.CEILING);
 
-        //今日收益计算 （当前价-上一日收盘价）*持仓数量
-        BigDecimal yesterdayPrice = new BigDecimal(realStockInfo.getYesterdayPrice());
-        BigDecimal increaseRate = new BigDecimal(realStockInfo.getIncreaseRate());
-        BigDecimal todayProfit = currentPrice.subtract(yesterdayPrice).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
-
-        //表格数据
+            //今日收益计算 （当前价-上一日收盘价）*持仓数量
+            BigDecimal yesterdayPrice = new BigDecimal(realStockInfo.getYesterdayPrice());
+            increaseRate = new BigDecimal(realStockInfo.getIncreaseRate());
+            todayProfit = currentPrice.subtract(yesterdayPrice).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
+        }
 
         //股票代码
         vector.add(realStockInfo.getStockCode());

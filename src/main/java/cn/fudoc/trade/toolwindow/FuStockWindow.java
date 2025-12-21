@@ -5,6 +5,7 @@ import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.common.enumtype.UpdateTipTagEnum;
+import cn.fudoc.trade.core.state.FuCommonState;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
 import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.timer.ScheduledTaskManager;
@@ -71,6 +72,10 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 股票分组持久化
      */
     private final StockGroupState stockGroupState = StockGroupState.getInstance();
+    /**
+     * 公共持久化数据
+     */
+    private final FuCommonState fuCommonState = FuCommonState.getInstance();
 
     /**
      * 窗体由四部分组成
@@ -96,8 +101,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         contentPanel.add(this.stockView.getComponent(), BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
 
-        this.isAutoLoad.set(StockGroupPersistentState.getInstance().isAutoRefresh());
-
 //        //5、消息栏
 //        this.messagePane = initPanel();
 //        rootPanel.add(ScrollPaneFactory.createScrollPane(this.messagePane), BorderLayout.SOUTH);
@@ -117,6 +120,12 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
         //加载持久化的分组
         stockGroupState.getStockTabEnumMap().forEach(stockView::add);
+
+        //是否自动刷新
+        isAutoLoad.set(fuCommonState.is(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH));
+        if (isAutoLoad.get()) {
+            startTimeTask();
+        }
 
         //默认选中我的自选
         stockView.selectMySelected(FuTradeConstants.MY_SELECTED_GROUP);
@@ -185,8 +194,11 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 if (Objects.isNull(stockTableView)) {
                     return;
                 }
-                FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stockTableView);
-                fuStockSearchPopupView.showPopup(project);
+                SwingUtilities.invokeLater(() -> {
+                    FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stockTableView);
+                    fuStockSearchPopupView.showPopup(project);
+                });
+
             }
         });
         //启动定时刷新股票
@@ -207,8 +219,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                     FuNotification.notifyWarning(STOCK_AUTO_LOAD_TIME_TITLE, project);
                 }
                 isAutoLoad.set(true);
-                StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
-                instance.setAutoRefresh(isAutoLoad.get());
+                //是否自动刷新 持久化
+                fuCommonState.set(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH, true);
             }
         });
         //停止定时刷新股票
@@ -225,8 +237,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 stopTask();
                 isAutoLoad.set(false);
                 updateTag(UpdateTipTagEnum.CLOSE_AUTO_REFRESH.getTag());
-                StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
-                instance.setAutoRefresh(isAutoLoad.get());
+                //是否自动刷新 持久化
+                fuCommonState.set(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH, false);
             }
         });
 
@@ -286,20 +298,21 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
     private boolean isCanStart() {
         //判断当前时间是否开盘时间  不是则不提交任务 自动刷新时间段定位9:15 ~ 11:30 13:00~15:00
-        Date now = new Date();
-        int hour = DateUtil.hour(now, true);
-        if (hour < 9 || hour > 15 || hour == 12) {
-            return false;
-        }
-        int minute = DateUtil.minute(now);
-        if (hour == 9 && minute < 15) {
-            return false;
-        }
-        if (hour == 11 && minute > 30) {
-            return false;
-        }
-        //TODO 节假日判断
-        return !DateUtil.isWeekend(now);
+//        Date now = new Date();
+//        int hour = DateUtil.hour(now, true);
+//        if (hour < 9 || hour > 15 || hour == 12) {
+//            return false;
+//        }
+//        int minute = DateUtil.minute(now);
+//        if (hour == 9 && minute < 15) {
+//            return false;
+//        }
+//        if (hour == 11 && minute > 30) {
+//            return false;
+//        }
+//        //TODO 节假日判断
+//        return !DateUtil.isWeekend(now);
+        return true;
     }
 
 
