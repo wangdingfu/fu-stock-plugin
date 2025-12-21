@@ -81,6 +81,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     public JPanel getComponent() {
         JPanel rootPanel = new JPanel(new BorderLayout());
         JPanel tableComponent = getTableComponent();
+        tableComponent.add(createTableHintLabel(), BorderLayout.NORTH);
         Splitter splitter = new Splitter(true);
         splitter.setFirstComponent(tableComponent);
 
@@ -91,7 +92,15 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         rootPanel.add(tipLabel, BorderLayout.PAGE_END);
         return rootPanel;
     }
-
+    /**
+     * 创建表格上方的引导文字标签
+     */
+    public static JLabel createTableHintLabel() {
+        JLabel hintLabel = new JLabel("💡 提示：双击单元格可编辑持仓成本");
+        hintLabel.setForeground(new Color(60, 120, 216)); // IDEA 风格的蓝色
+        hintLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+        return hintLabel;
+    }
 
     @Override
     protected void tableDataChanged() {
@@ -153,7 +162,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
             //盈亏=持仓*(当前价-成本价)
             PL = currentPrice.subtract(cost).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
             //盈亏比=(成本价-当前价)/成本价
-            PLRate = currentPrice.subtract(cost).divide(cost, 4, RoundingMode.CEILING);
+            PLRate = cost.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : currentPrice.subtract(cost).divide(cost, 4, RoundingMode.CEILING);
 
             //今日收益计算 （当前价-上一日收盘价）*持仓数量
             BigDecimal yesterdayPrice = new BigDecimal(realStockInfo.getYesterdayPrice());

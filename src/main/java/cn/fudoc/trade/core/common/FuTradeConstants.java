@@ -17,4 +17,8 @@ public interface FuTradeConstants {
     String HOLD_COUNT_IS_NUMBER = FuBundle.message("stock.hold.count.isNumber");
     String HOLD_COUNT_GT_ZERO = FuBundle.message("stock.hold.count.gtZero");
     String HOLD_COUNT_FORMAT_ERROR = FuBundle.message("stock.hold.count.formatError");
+
+    interface CommonStateKey{
+        String STOCK_AUTO_REFRESH = "fu-stock-auto-refresh";
+    }
 }

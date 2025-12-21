@@ -123,7 +123,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         stockGroupState.getStockTabEnumMap().forEach(stockView::add);
 
         //是否自动刷新
-        isAutoLoad.set(fuCommonState.is("fu-stock-auto-refresh"));
+        isAutoLoad.set(fuCommonState.is(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH));
 
         //默认选中我的自选
         stockView.selectMySelected(FuTradeConstants.MY_SELECTED_GROUP);
@@ -192,7 +192,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 if (Objects.isNull(stockTableView)) {
                     return;
                 }
-                SwingUtilities.invokeLater(()->{
+                SwingUtilities.invokeLater(() -> {
                     FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stockTableView);
                     fuStockSearchPopupView.showPopup(project);
                 });
@@ -221,8 +221,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                     FuNotification.notifyWarning(STOCK_AUTO_LOAD_TIME_TITLE, project);
                 }
                 isAutoLoad.set(true);
-                StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
-                instance.setAutoRefresh(isAutoLoad.get());
+                //是否自动刷新 持久化
+                fuCommonState.set(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH, true);
             }
         });
         //停止定时刷新股票
@@ -243,8 +243,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 stopTask();
                 isAutoLoad.set(false);
                 updateTag(UpdateTipTagEnum.CLOSE_AUTO_REFRESH.getTag());
-                StockGroupPersistentState instance = StockGroupPersistentState.getInstance();
-                instance.setAutoRefresh(isAutoLoad.get());
+                //是否自动刷新 持久化
+                fuCommonState.set(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH, false);
             }
         });
 

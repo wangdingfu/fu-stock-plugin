@@ -83,17 +83,18 @@ public class HoldingsStockDialog extends DialogWrapper {
     private JPanel createRowPanel(String labelText, JComponent component) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT); // 左对齐
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // 固定宽度标签
         JBLabel label = new JBLabel(labelText);
-        label.setPreferredSize(new Dimension(80, 30));
-        label.setMinimumSize(new Dimension(80, 30));
-        label.setMaximumSize(new Dimension(80, 30));
+        label.setPreferredSize(new Dimension(100, 30));
+        label.setMinimumSize(new Dimension(100, 30));
+        label.setMaximumSize(new Dimension(100, 30));
         label.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         // 组件占满剩余空间
-        component.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        component.setPreferredSize(new Dimension(150, 30));
+        component.setMinimumSize(new Dimension(150, 30));
         component.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         panel.add(label);
