@@ -2,7 +2,7 @@
 # fu-stock-plugin
 
 [![JetBrains Plugins](https://plugins.jetbrains.com/files/29372/913770/icon/default.svg)](https://plugins.jetbrains.com/plugin/29372-fustock)
-[![Version](http://phpstorm.espend.de/badge/19269/version)](https://plugins.jetbrains.com/plugin/19269-fustock/versions)
+[![Version](http://phpstorm.espend.de/badge/19269/version)](https://plugins.jetbrains.com/plugin/29372-fustock/versions)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/29372-fustock.svg)](https://plugins.jetbrains.com/plugin/29372-fustock)
 [![License](https://img.shields.io/badge/license-MIT-red.svg)]()
 
