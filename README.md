@@ -13,7 +13,7 @@
 快速开始
 ----
 ![img.png](img/holdings.png)
-
+![img.png](img/watch-list.png)
 #### 安装插件
 ![img.png](/img/install.png)
 
