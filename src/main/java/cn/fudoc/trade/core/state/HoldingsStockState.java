@@ -65,6 +65,20 @@ public class HoldingsStockState implements PersistentStateComponent<HoldingsStoc
      *
      * @param group 持仓分组
      * @param code  持仓股票代码
+     */
+    public void add(String group, String code, HoldingsInfo holdingsInfo) {
+        if (StringUtils.isBlank(group) || StringUtils.isBlank(code) || Objects.isNull(holdingsInfo)) {
+            return;
+        }
+        Map<String, HoldingsInfo> codeMap = holdings.computeIfAbsent(group, k -> new HashMap<>());
+        codeMap.put(code, holdingsInfo);
+    }
+
+    /**
+     * 新增持仓
+     *
+     * @param group 持仓分组
+     * @param code  持仓股票代码
      * @param cost  成本价
      * @param count 持仓数量
      */

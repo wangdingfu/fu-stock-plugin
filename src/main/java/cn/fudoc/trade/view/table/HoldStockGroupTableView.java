@@ -234,8 +234,6 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
                     String name = (valueAt1 instanceof String[] values && values.length > 0) ? values[0] : "";
                     HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), tabName, code, name);
                     if (holdingsStockDialog.showAndGet()) {
-                        HoldingsInfo holdingsInfo = holdingsStockDialog.getHoldingsInfo();
-                        state.add(tabName, code, holdingsInfo.getCost(), holdingsInfo.getCount());
                         reloadAllStock();
                     }
                 }

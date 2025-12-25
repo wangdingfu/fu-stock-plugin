@@ -13,7 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
-// 分组弹框
+/**
+ * 添加股票分组弹框
+ */
 public class GroupAddDialog extends DialogWrapper {
     // 输入组件
     private final JBTextField groupNameField = new JBTextField();

@@ -1,145 +1,111 @@
 package cn.fudoc.trade.view.dialog;
 
-import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
-import cn.hutool.core.util.NumberUtil;
+import cn.fudoc.trade.view.dialog.tab.*;
+import cn.fudoc.trade.view.dto.StockInfoDTO;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.tabs.JBTabs;
+import com.intellij.ui.tabs.JBTabsFactory;
+import com.intellij.ui.tabs.TabInfo;
+import com.intellij.ui.tabs.TabsListener;
 import com.intellij.util.ui.JBUI;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * 设置持仓信息窗口
+ */
 public class HoldingsStockDialog extends DialogWrapper {
 
-    private final JLabel stockCodeLabel;
-    private final JLabel stockNameLabel;
-    // 输入组件
-    private final JBTextField costField = new JBTextField();
-    private final JBTextField countField = new JBTextField();
 
-    // 构造器：接收父窗口（null 则以 IDE 为父窗口）
-    public HoldingsStockDialog(@Nullable Project project, String group, String stockCode, String stockName) {
+    private final JBTabs tabs;
+
+    /**
+     * 当前选中 tab
+     */
+    private HoldingsTabView currentTab;
+
+    /**
+     * 股票信息
+     */
+    private final StockInfoDTO stockInfoDTO;
+
+    /**
+     * 持仓信息 tab
+     */
+    private final Map<String, HoldingsTabView> holdingsTabViewMap = new ConcurrentHashMap<>();
+
+    /**
+     * 持仓持久化信息
+     */
+    private HoldingsInfo holdingsInfo;
+
+    public HoldingsStockDialog(Project project, String group, String stockCode, String stockName) {
         super(project, true);
-        this.stockCodeLabel = new JBLabel(stockCode);
-        this.stockNameLabel = new JBLabel(stockName);
-        HoldingsInfo holdingsInfo = HoldingsStockState.getInstance().getHoldingsInfo(group, stockCode);
-        if (Objects.nonNull(holdingsInfo)) {
-            costField.setText(holdingsInfo.getCost());
-            Integer count = holdingsInfo.getCount();
-            countField.setText(Objects.isNull(count) ? "" : count.toString());
-        }
+        this.stockInfoDTO = new StockInfoDTO(group, stockCode, stockName);
+        this.tabs = JBTabsFactory.createTabs(project);
+        this.holdingsInfo = HoldingsStockState.getInstance().getHoldingsInfo(this.stockInfoDTO.group(), this.stockInfoDTO.stockCode());
+
         // 弹框标题
         setTitle("设置持仓信息");
         // 初始化 DialogWrapper（必须调用）
         init();
+        //维护持仓成本 tab
+        TabInfo tabInfo = addTab(new HoldingsCostTabView(this.stockInfoDTO, this.holdingsInfo));
+        addTab(new HoldingsBuyTabView(this.stockInfoDTO, this.holdingsInfo));
+        addTab(new HoldingsSellTabView(this.stockInfoDTO, this.holdingsInfo));
+        addTab(new HoldingsTradeLogTabView(this.stockInfoDTO, this.holdingsInfo));
+
+        registerListener();
+
+        //默认选中持仓成本 tab
+        this.tabs.select(tabInfo, true);
+
     }
 
-    // 构建内容面板（BoxLayout 基础布局，无兼容问题）
-    @Nullable
+    @Override
+    protected void doOKAction() {
+        super.doOKAction();
+        //保存数据
+        if (Objects.isNull(currentTab)) {
+            return;
+        }
+        if (Objects.isNull(this.holdingsInfo)) {
+            this.holdingsInfo = new HoldingsInfo();
+            HoldingsStockState.getInstance().add(this.stockInfoDTO.group(), this.stockInfoDTO.stockCode(), this.holdingsInfo);
+        }
+        this.currentTab.submit(this.holdingsInfo);
+    }
+
+
     @Override
     protected JComponent createCenterPanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(JBUI.Borders.empty(20, 30));
-
-        // 股票代码行
-        JPanel codePanel = createRowPanel("股票代码：", stockCodeLabel);
-        mainPanel.add(codePanel);
-        mainPanel.add(Box.createVerticalStrut(15));
-
-        // 股票名称行
-        JPanel namePanel = createRowPanel("股票名称：", stockNameLabel);
-        mainPanel.add(namePanel);
-        mainPanel.add(Box.createVerticalStrut(15));
-
-        // 成本价行
-        JPanel costPanel = createRowPanel("成本价：", costField);
-        mainPanel.add(costPanel);
-        mainPanel.add(Box.createVerticalStrut(15));
-
-        // 持仓数量行
-        JPanel countPanel = createRowPanel("持仓数量：", countField);
-        mainPanel.add(countPanel);
-
-        return mainPanel;
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.add(tabs.getComponent());
+        rootPanel.setFont(JBUI.Fonts.label(11));
+        return rootPanel;
     }
 
-    /**
-     * 创建单行面板（标签 + 组件）
-     */
-    private JPanel createRowPanel(String labelText, JComponent component) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // 固定宽度标签
-        JBLabel label = new JBLabel(labelText);
-        label.setPreferredSize(new Dimension(100, 30));
-        label.setMinimumSize(new Dimension(100, 30));
-        label.setMaximumSize(new Dimension(100, 30));
-        label.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        // 组件占满剩余空间
-        component.setPreferredSize(new Dimension(150, 30));
-        component.setMinimumSize(new Dimension(150, 30));
-        component.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        panel.add(label);
-        panel.add(Box.createHorizontalStrut(10));
-        panel.add(component);
-
-        return panel;
-    }
 
     // 输入校验（保持不变）
     @Override
     protected ValidationInfo doValidate() {
-        String costValue = costField.getText().trim();
-        String countValue = countField.getText().trim();
-
-        if (StringUtils.isBlank(costValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COST_NOTNULL, costField);
+        TabInfo selectedInfo = tabs.getSelectedInfo();
+        if (Objects.isNull(selectedInfo)) {
+            return null;
         }
-        if (StringUtils.isBlank(countValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_NOTNULL, countField);
-        }
-        if (!NumberUtil.isNumber(costValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COST_IS_NUMBER, costField);
-        }
-        if (!NumberUtil.isInteger(countValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_IS_NUMBER, countField);
-        }
-
-        try {
-            int count = Integer.parseInt(countValue);
-            if (count <= 0) {
-                return new ValidationInfo(FuTradeConstants.HOLD_COUNT_GT_ZERO, countField);
-            }
-        } catch (Exception e) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_FORMAT_ERROR, countField);
+        if (selectedInfo.getComponent() instanceof HoldingsTabView holdingsTabView) {
+            return holdingsTabView.doValidate();
         }
         return null;
-    }
-
-    // 获取持仓信息（确保 EDT 线程调用）
-    public HoldingsInfo getHoldingsInfo() {
-        HoldingsInfo holdingsInfo = new HoldingsInfo();
-        holdingsInfo.setCost(costField.getText().trim());
-        holdingsInfo.setCount(NumberUtil.parseInt(countField.getText().trim()));
-        return holdingsInfo;
     }
 
     // 自定义按钮（保持不变）
@@ -148,5 +114,31 @@ public class HoldingsStockDialog extends DialogWrapper {
         getOKAction().putValue(Action.NAME, "确定");
         getCancelAction().putValue(Action.NAME, "取消");
         return new Action[]{getOKAction(), getCancelAction()};
+    }
+
+
+    /**
+     * 注册 tab 监听器
+     */
+    protected void registerListener() {
+        tabs.addListener(new TabsListener() {
+            @Override
+            public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
+                //切换新窗口时 判断当前是否开启自动刷新 开启时才刷新股票数据
+                if (Objects.nonNull(newSelection)) {
+                    currentTab = holdingsTabViewMap.get(newSelection.getText());
+                }
+            }
+
+        });
+    }
+
+
+    private TabInfo addTab(HoldingsTabView holdingsTabView) {
+        TabInfo tabInfo = new TabInfo(holdingsTabView.getPanel());
+        tabInfo.setText(holdingsTabView.getTabName());
+        this.tabs.addTab(tabInfo);
+        holdingsTabViewMap.put(holdingsTabView.getTabName(), holdingsTabView);
+        return tabInfo;
     }
 }
