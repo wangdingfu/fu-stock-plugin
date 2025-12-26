@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 
 import javax.swing.*;
+import java.math.BigDecimal;
 
 /**
  * 持仓卖出 tab
@@ -43,7 +44,7 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView{
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-
+        holdingsInfo.add(2, Integer.parseInt(countField.getText()), new BigDecimal(priceField.getText()));
     }
 
     @Override
@@ -51,10 +52,6 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView{
         return null;
     }
 
-    @Override
-    protected void initData(HoldingsInfo holdingsInfo) {
-
-    }
 
 
 }

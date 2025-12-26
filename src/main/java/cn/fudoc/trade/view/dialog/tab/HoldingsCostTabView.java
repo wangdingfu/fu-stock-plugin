@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 
@@ -47,7 +48,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         if (Objects.isNull(holdingsInfo)) {
             return;
         }
-        costField.setText(holdingsInfo.getCost());
+        costField.setText(holdingsInfo.getCost().toString());
         Integer count = holdingsInfo.getCount();
         countField.setText(Objects.isNull(count) ? "" : count.toString());
 
@@ -62,26 +63,23 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         costPanel.add(Box.createHorizontalStrut(5));
         costPanel.add(actualCostLabel);
         mainPanel.add(costPanel);
-//        mainPanel.add(Box.createVerticalStrut(5));
-//        //提示信息
-//        mainPanel.add(actualCostLabel);
         mainPanel.add(Box.createVerticalStrut(15));
         // 持仓数量行
         JPanel countPanel = createRowPanel("持仓数量：", countField);
         countPanel.add(Box.createHorizontalStrut(5));
         countPanel.add(actualCountLabel);
         mainPanel.add(countPanel);
-//        mainPanel.add(Box.createVerticalStrut(5));
-//        mainPanel.add(actualCountLabel);
         return mainPanel;
     }
 
 
-
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-
+        holdingsInfo.setCost(new BigDecimal(costField.getText().trim()));
+        holdingsInfo.setCount(Integer.parseInt(countField.getText().trim()));
+        holdingsInfo.add(0, Integer.parseInt(countField.getText()), new BigDecimal(costField.getText()));
     }
+
 
     @Override
     public ValidationInfo doValidate() {
@@ -113,7 +111,6 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     }
 
 
-
     /**
      * 为两个输入框添加文本变更监听
      */
@@ -133,16 +130,19 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     }
 
     private void updateActualCostTipInfo() {
-        String actualCost = costField.getText();
-        String text = "实际成本: " + actualCost;
-        actualCostLabel.setText(text);
+        String costStr = costField.getText().trim();
+        if(StringUtils.isNoneBlank(costStr) && NumberUtil.isNumber(costStr)){
+            actualCostLabel.setText("实际成本: " + holdingsInfo.calculateCost(new BigDecimal(costStr)));
+        }
     }
 
     private void updateActualCountTipInfo() {
-        String actualCost = countField.getText();
-        String text = "实际数量: " + actualCost;
-        actualCountLabel.setText(text);
+        String countStr = countField.getText().trim();
+        if(StringUtils.isNoneBlank(countStr)){
+            actualCountLabel.setText("实际数量: " + holdingsInfo.calculateCount(Integer.parseInt(countStr)));
+        }
     }
+
 
     @Override
     public void callback(Integer type, DocumentEvent event) {

@@ -1,23 +1,30 @@
 package cn.fudoc.trade.view.dialog.tab;
 
+import cn.fudoc.trade.core.common.enumtype.TradeTypeEnum;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.core.state.pojo.TradeInfoLog;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
+import cn.hutool.core.date.DatePattern;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.util.Objects;
+import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * 交易记录 tab 视图
  */
-public class HoldingsTradeLogTabView extends AbstractHoldingsTabView{
+public class HoldingsTradeLogTabView extends AbstractHoldingsTabView {
     protected final JBTable stockTable;
     protected final DefaultTableModel tableModel;
-    private static final String[] columnNames = {"股票代码","股票名称","交易类型", "交易数量", "交易价格", "交易时间"};
+    private static final String[] columnNames = {"ID", "交易类型", "交易数量", "交易价格", "交易时间"};
 
     public HoldingsTradeLogTabView(StockInfoDTO stockInfoDTO, HoldingsInfo holdingsInfo) {
         super(stockInfoDTO, holdingsInfo);
@@ -29,9 +36,21 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView{
             }
         };
         stockTable = new JBTable(tableModel);
+        TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
+        // 从视图中移除，模型仍保留
+        stockTable.getColumnModel().removeColumn(idColumn);
+
+        initData();
     }
 
 
+    private void initData() {
+        List<TradeInfoLog> tradeList = holdingsInfo.getTradeList();
+        if (CollectionUtils.isEmpty(tradeList)) {
+            return;
+        }
+        tradeList.forEach(f -> tableModel.addRow(toTableData(f)));
+    }
 
     @Override
     public String getTabName() {
@@ -42,14 +61,25 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView{
     public JPanel getPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
         mainPanel.add(getTableComponent());
         return mainPanel;
     }
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
+        List<TradeInfoLog> tradeList = holdingsInfo.getTradeList();
 
+    }
+
+
+    protected Vector<Object> toTableData(TradeInfoLog tradeInfoLog) {
+        Vector<Object> vector = new Vector<>();
+        vector.add(tradeInfoLog.getId());
+        vector.add(TradeTypeEnum.getName(tradeInfoLog.getType()));
+        vector.add(tradeInfoLog.getCount());
+        vector.add(tradeInfoLog.getPrice());
+        vector.add(DatePattern.NORM_DATETIME_FORMAT.format(new Date(tradeInfoLog.getTime())));
+        return vector;
     }
 
 
@@ -59,7 +89,7 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView{
     }
 
 
-    protected JPanel getTableComponent(){
+    protected JPanel getTableComponent() {
         //  创建右键菜单
         JPopupMenu popupMenu = createPopupMenu();
         stockTable.setComponentPopupMenu(popupMenu);
@@ -92,11 +122,7 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView{
         }
         for (int i = selectedRows.length - 1; i >= 0; i--) {
             int modelRow = stockTable.convertRowIndexToModel(selectedRows[i]);
-            Object valueAt = tableModel.getValueAt(modelRow, 0);
             tableModel.removeRow(modelRow);
-            //持久化移除
-            String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
-
         }
     }
 

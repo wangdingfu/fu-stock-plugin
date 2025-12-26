@@ -13,6 +13,10 @@ import java.math.BigDecimal;
 public class TradeInfoLog {
 
     /**
+     * 交易记录 id
+     */
+    private Long id;
+    /**
      * 交易类型 0:初始化持仓成本 1:买入 2:卖出
      */
     private Integer type;
