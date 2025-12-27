@@ -3,7 +3,7 @@ package cn.fudoc.trade.view.table;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
-import cn.fudoc.trade.util.NumberFormatUtil;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.render.StockColorTableCellRenderer;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,9 +35,9 @@ public class StockGroupTableView extends AbstractStockTableView {
 
     private @NotNull TableRowSorter<DefaultTableModel> getDefaultTableModelTableRowSorter() {
         TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
-        tableRowSorter.setComparator(2, Comparator.comparing(NumberFormatUtil::convertBigDecimal));
-        tableRowSorter.setComparator(3, Comparator.comparing(NumberFormatUtil::convertBigDecimal));
-        tableRowSorter.setComparator(4, Comparator.comparing(NumberFormatUtil::convertBigDecimal));
+        tableRowSorter.setComparator(2, Comparator.comparing(FuNumberUtil::toBigDecimal));
+        tableRowSorter.setComparator(3, Comparator.comparing(FuNumberUtil::toBigDecimal));
+        tableRowSorter.setComparator(4, Comparator.comparing(FuNumberUtil::toBigDecimal));
         return tableRowSorter;
     }
 

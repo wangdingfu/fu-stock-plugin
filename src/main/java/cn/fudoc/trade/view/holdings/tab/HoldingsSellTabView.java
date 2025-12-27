@@ -36,7 +36,7 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView {
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-        holdingsInfo.add(2, Integer.parseInt(countField.getText()), priceField.getText());
+        holdingsInfo.add(2, Integer.parseInt(countField.getText()), priceField.getText(),"");
     }
 
     @Override

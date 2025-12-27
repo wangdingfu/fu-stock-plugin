@@ -1,12 +1,12 @@
 package cn.fudoc.trade.core.state.pojo;
 
 import cn.hutool.core.util.IdUtil;
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,15 +43,16 @@ public class HoldingsInfo {
      * @param count 交易数量
      * @param price 交易价格
      */
-    public void add(Integer type, Integer count, String price) {
+    public void add(Integer type, Integer count, String price, String handlingFee) {
         if (tradeList == null) {
-            tradeList = Lists.newArrayList();
+            tradeList = new ArrayList<>();
         }
         TradeInfoLog tradeInfoLog = new TradeInfoLog();
         tradeInfoLog.setId(IdUtil.getSnowflakeNextId());
         tradeInfoLog.setCount(count);
         tradeInfoLog.setPrice(price);
         tradeInfoLog.setType(type);
+        tradeInfoLog.setHandlingFee(handlingFee);
         tradeInfoLog.setTime(System.currentTimeMillis());
         tradeList.add(tradeInfoLog);
     }

@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 
 import javax.swing.*;
-import java.math.BigDecimal;
 
 /**
  * 持仓买入 tab
@@ -38,7 +37,7 @@ public class HoldingsBuyTabView extends AbstractHoldingsTabView {
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-        holdingsInfo.add(1, Integer.parseInt(countField.getText()), priceField.getText());
+        holdingsInfo.add(1, Integer.parseInt(countField.getText()), priceField.getText(),"");
     }
 
     @Override

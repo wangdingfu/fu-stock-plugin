@@ -8,7 +8,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-public class NumberFormatUtil {
+public class FuNumberUtil {
 
     private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
 
@@ -26,7 +26,7 @@ public class NumberFormatUtil {
     }
 
 
-    public static BigDecimal convertBigDecimal(Object value) {
+    public static BigDecimal toBigDecimal(Object value) {
         if (Objects.isNull(value)) {
             return BigDecimal.ZERO;
         }
@@ -41,6 +41,22 @@ public class NumberFormatUtil {
             return NumberUtil.toBigDecimal(strValue);
         }catch (Exception e){
             return BigDecimal.ZERO;
+        }
+    }
+
+
+    public static Integer toInteger(Object value) {
+        if (Objects.isNull(value)) {
+            return 0;
+        }
+        String strValue = value.toString().trim();
+        if (StringUtils.isBlank(strValue)) {
+            return 0;
+        }
+        try {
+            return NumberUtil.isInteger(strValue) ? Integer.parseInt(strValue) : 0;
+        }catch (Exception e){
+            return 0;
         }
     }
 }

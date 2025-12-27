@@ -3,8 +3,6 @@ package cn.fudoc.trade.core.state.pojo;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 /**
  * 交易记录
  */
@@ -28,6 +26,11 @@ public class TradeInfoLog {
      * 交易数量
      */
     private Integer count;
+
+    /**
+     * 交易手续费
+     */
+    private String handlingFee;
     /**
      * 交易时间
      */

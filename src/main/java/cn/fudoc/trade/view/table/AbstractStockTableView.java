@@ -117,7 +117,7 @@ public abstract class AbstractStockTableView implements StockTableView {
     }
 
     /**
-     * 当前tab下展示的组件
+     * 当前tab 下展示的组件
      */
     @Override
     public JPanel getComponent() {

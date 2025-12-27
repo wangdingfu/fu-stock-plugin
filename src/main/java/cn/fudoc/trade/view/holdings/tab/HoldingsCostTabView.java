@@ -5,7 +5,9 @@ import cn.fudoc.trade.core.listener.DocumentCallback;
 import cn.fudoc.trade.core.listener.TextFieldDocumentListener;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
+import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
+import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
@@ -56,7 +58,6 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     }
 
 
-
     @Override
     protected void createPanel(JPanel mainPanel) {
         // 成本价行
@@ -76,7 +77,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     public void submit(HoldingsInfo holdingsInfo) {
         holdingsInfo.setCost(costField.getText().trim());
         holdingsInfo.setCount(Integer.parseInt(countField.getText().trim()));
-        holdingsInfo.add(0, Integer.parseInt(countField.getText()), costField.getText());
+        holdingsInfo.add(0, Integer.parseInt(countField.getText()), costField.getText(), "0");
     }
 
 
@@ -128,27 +129,19 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         return jLabel;
     }
 
-    private void updateActualCostTipInfo() {
-        String costStr = costField.getText().trim();
-        if(StringUtils.isNoneBlank(costStr) && NumberUtil.isNumber(costStr)){
-            actualCostLabel.setText("实际成本: " + holdingsInfo.calculateCost(costStr));
-        }
-    }
 
-    private void updateActualCountTipInfo() {
+    private void updateTipInfo() {
         String countStr = countField.getText().trim();
-        if(StringUtils.isNoneBlank(countStr)){
-            actualCountLabel.setText("实际数量: " + holdingsInfo.calculateCount(Integer.parseInt(countStr)));
-        }
+        String costStr = costField.getText().trim();
+        Integer count = NumberUtil.isInteger(countStr) ? Integer.parseInt(countStr) : 0;
+        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(costStr, count, holdingsInfo.getTradeList());
+        actualCountLabel.setText("实际数量: " + calculate.getTotal());
+        actualCostLabel.setText("实际成本: " + calculate.getCurrentCost());
     }
 
 
     @Override
     public void callback(Integer type, DocumentEvent event) {
-        if (type == 1) {
-            updateActualCostTipInfo();
-        } else {
-            updateActualCountTipInfo();
-        }
+        updateTipInfo();
     }
 }

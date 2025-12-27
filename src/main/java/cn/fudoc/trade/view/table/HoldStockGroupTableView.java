@@ -4,15 +4,17 @@ import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
-import cn.fudoc.trade.util.NumberFormatUtil;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.view.TodayProfitView;
+import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.holdings.HoldingsStockDialog;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
+import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
+import cn.hutool.core.util.NumberUtil;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.ui.Splitter;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -33,7 +35,7 @@ import java.util.List;
 public class HoldStockGroupTableView extends AbstractStockTableView {
 
     private final String tabName;
-    private static final String[] columnNames = {"代码", "名称 / 市值", "持仓盈亏", "持仓数量", "现价 / 成本", "今日收益",};
+    private static final String[] columnNames = {"代码", "名称 / 市值", "持仓盈亏", "持仓 / 可用", "现价 / 成本", "今日收益",};
     private final HoldingsStockState state;
 
 
@@ -61,18 +63,22 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         tableRowSorter.setComparator(1, (o1, o2) -> {
             String value1 = convertValue(o1, 1);
             String value2 = convertValue(o2, 1);
-            return NumberFormatUtil.convertBigDecimal(value1).compareTo(NumberFormatUtil.convertBigDecimal(value2));
+            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
         });
         tableRowSorter.setComparator(2, (o1, o2) -> {
             String value1 = convertValue(o1, 0);
             String value2 = convertValue(o2, 0);
-            return NumberFormatUtil.convertBigDecimal(value1).compareTo(NumberFormatUtil.convertBigDecimal(value2));
+            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
         });
-        tableRowSorter.setComparator(3, Comparator.comparing(o -> NumberFormatUtil.convertBigDecimal(o.toString())));
+        tableRowSorter.setComparator(3, (o1, o2) -> {
+            String value1 = convertValue(o1, 0);
+            String value2 = convertValue(o2, 0);
+            return FuNumberUtil.toInteger(value1).compareTo(FuNumberUtil.toInteger(value2));
+        });
         tableRowSorter.setComparator(5, (o1, o2) -> {
             String value1 = convertValue(o1, 0);
             String value2 = convertValue(o2, 0);
-            return NumberFormatUtil.convertBigDecimal(value1).compareTo(NumberFormatUtil.convertBigDecimal(value2));
+            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
         });
         return tableRowSorter;
     }
@@ -93,6 +99,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         rootPanel.add(tipLabel, BorderLayout.PAGE_END);
         return rootPanel;
     }
+
     /**
      * 创建表格上方的引导文字标签
      */
@@ -107,13 +114,13 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     protected void tableDataChanged() {
         List<HoldStockDataDto> tableDataList = getTableDataList();
         //计算今日收益
-        todayProfitView.setTodayProfit(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getTodayProfit).reduce(BigDecimal.ZERO, BigDecimal::add)));
+        todayProfitView.setTodayProfit(FuNumberUtil.format(tableDataList.stream().map(HoldStockDataDto::getTodayProfit).reduce(BigDecimal.ZERO, BigDecimal::add)));
 
         //计算持仓收益
-        todayProfitView.setHoldProfit(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getAllProfit).reduce(BigDecimal.ZERO, BigDecimal::add)));
+        todayProfitView.setHoldProfit(FuNumberUtil.format(tableDataList.stream().map(HoldStockDataDto::getAllProfit).reduce(BigDecimal.ZERO, BigDecimal::add)));
 
         //计算总市值
-        todayProfitView.setCompanyValue(NumberFormatUtil.format(tableDataList.stream().map(HoldStockDataDto::getCompanyValue).reduce(BigDecimal.ZERO, BigDecimal::add)));
+        todayProfitView.setCompanyValue(FuNumberUtil.format(tableDataList.stream().map(HoldStockDataDto::getCompanyValue).reduce(BigDecimal.ZERO, BigDecimal::add)));
 
         tableDataList.sort(Comparator.comparing(HoldStockDataDto::getTodayProfit).reversed());
         todayProfitView.initData(tableDataList);
@@ -150,43 +157,46 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
                 PLRate = BigDecimal.ZERO,
                 todayProfit = BigDecimal.ZERO,
                 increaseRate = BigDecimal.ZERO;
-        int count = 0;
+        int count = 0, total = 0;
         if (Objects.nonNull(holdingsInfo)) {
+            HoldingsTodayInfo holdingsTodayInfo = CalculateCostHelper.calculate(holdingsInfo);
             //持仓成本价
-            cost = NumberFormatUtil.convertBigDecimal(holdingsInfo.getCost());
+            cost = holdingsTodayInfo.getCurrentCost();
             //持仓数量
-            count = holdingsInfo.getCount();
+            total = holdingsTodayInfo.getTotal();
+            //可用数量
+            count = holdingsTodayInfo.getCount();
             BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
-            BigDecimal countDecimal = new BigDecimal(count);
+            BigDecimal totalDecimal = new BigDecimal(total);
             //市值=持仓*当前价
-            companyValue = countDecimal.multiply(currentPrice).setScale(4, RoundingMode.CEILING);
+            companyValue = totalDecimal.multiply(currentPrice).setScale(4, RoundingMode.CEILING);
             //盈亏=持仓*(当前价-成本价)
-            PL = currentPrice.subtract(cost).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
+            PL = currentPrice.subtract(cost).multiply(totalDecimal).setScale(4, RoundingMode.CEILING);
             //盈亏比=(成本价-当前价)/成本价
             PLRate = cost.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : currentPrice.subtract(cost).divide(cost, 4, RoundingMode.CEILING);
 
-            //今日收益计算 （当前价-上一日收盘价）*持仓数量
-            BigDecimal yesterdayPrice = new BigDecimal(realStockInfo.getYesterdayPrice());
+            //今日收益计算
             increaseRate = new BigDecimal(realStockInfo.getIncreaseRate());
-            todayProfit = currentPrice.subtract(yesterdayPrice).multiply(countDecimal).setScale(4, RoundingMode.CEILING);
+            BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
+            todayProfit = CalculateCostHelper.calculateProfit(currentPrice,yesterdayPrice,holdingsInfo);
         }
 
         //股票代码
         vector.add(realStockInfo.getStockCode());
         //名称/市值
-        vector.add(new String[]{realStockInfo.getStockName(), NumberFormatUtil.format(companyValue)});
+        vector.add(new String[]{realStockInfo.getStockName(), FuNumberUtil.format(companyValue)});
         //持仓盈亏
         String PLRatePrefix = PLRate.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
         String PLPrefix = PL.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
-        vector.add(new String[]{PLPrefix + NumberFormatUtil.format(PL), PLRatePrefix + NumberFormatUtil.formatRate(PLRate, false)});
+        vector.add(new String[]{PLPrefix + FuNumberUtil.format(PL), PLRatePrefix + FuNumberUtil.formatRate(PLRate, false)});
         //持仓数量
-        vector.add(count);
+        vector.add(new String[]{total + "", count + ""});
         //现价/成本
         vector.add(new String[]{realStockInfo.getCurrentPrice(), cost.setScale(3, RoundingMode.CEILING).toString()});
         //今日收益
         String todayProfitPrefix = todayProfit.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
         String profitRatePrefix = increaseRate.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
-        vector.add(new String[]{todayProfitPrefix + NumberFormatUtil.format(todayProfit), profitRatePrefix + NumberFormatUtil.formatRate(increaseRate, true)});
+        vector.add(new String[]{todayProfitPrefix + FuNumberUtil.format(todayProfit), profitRatePrefix + FuNumberUtil.formatRate(increaseRate, true)});
         return vector;
     }
 
@@ -202,9 +212,9 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
             HoldStockDataDto holdStockDataDto = new HoldStockDataDto();
             holdStockDataDto.setStockCode(first.toString());
             holdStockDataDto.setStockName(convertValue(vector.get(1), 0));
-            holdStockDataDto.setCompanyValue(NumberFormatUtil.convertBigDecimal(convertValue(vector.get(1), 1)));
-            holdStockDataDto.setAllProfit(NumberFormatUtil.convertBigDecimal(convertValue(vector.get(2), 0)));
-            holdStockDataDto.setTodayProfit(NumberFormatUtil.convertBigDecimal(convertValue(vector.get(5), 0)));
+            holdStockDataDto.setCompanyValue(FuNumberUtil.toBigDecimal(convertValue(vector.get(1), 1)));
+            holdStockDataDto.setAllProfit(FuNumberUtil.toBigDecimal(convertValue(vector.get(2), 0)));
+            holdStockDataDto.setTodayProfit(FuNumberUtil.toBigDecimal(convertValue(vector.get(5), 0)));
             dataList.add(holdStockDataDto);
         });
         return dataList;

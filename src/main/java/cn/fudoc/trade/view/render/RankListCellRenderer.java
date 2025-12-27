@@ -1,6 +1,6 @@
 package cn.fudoc.trade.view.render;
 
-import cn.fudoc.trade.util.NumberFormatUtil;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
@@ -56,7 +56,7 @@ public class RankListCellRenderer extends JPanel implements ListCellRenderer<Hol
             rankLabel.setText(index + 1 + "");
             codeLabel.setText(value.getStockCode());
             nameLabel.setText(value.getStockName());
-            profitLabel.setText(NumberFormatUtil.format(value.getTodayProfit()));
+            profitLabel.setText(FuNumberUtil.format(value.getTodayProfit()));
             JBColor textColor = getTextColor(value.getTodayProfit());
             if(Objects.nonNull(textColor)){
                 profitLabel.setForeground(textColor);

@@ -2,12 +2,11 @@ package cn.fudoc.trade.view.settings.tab;
 
 import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
-import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
-import cn.fudoc.trade.util.NumberFormatUtil;
+import cn.fudoc.trade.util.FuNumberUtil;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.OnOffButton;
@@ -90,11 +89,11 @@ public class RateSettingsTab implements SettingTab {
             instance.addRate(selectedItem, rate);
         }
         rate.setMin5(onOffButton.isSelected());
-        rate.setCommissionRate(NumberFormatUtil.convertBigDecimal(commissionRateField.getText().trim()));
-        rate.setStampDutyRate(NumberFormatUtil.convertBigDecimal(stampDutyRateField.getText().trim()));
-        rate.setTransferRate(NumberFormatUtil.convertBigDecimal(transferRateField.getText().trim()));
-        rate.setOtherRate(NumberFormatUtil.convertBigDecimal(otherRateField.getText().trim()));
-        rate.setOtherFee(NumberFormatUtil.convertBigDecimal(otherFeeField.getText().trim()));
+        rate.setCommissionRate(FuNumberUtil.toBigDecimal(commissionRateField.getText().trim()));
+        rate.setStampDutyRate(FuNumberUtil.toBigDecimal(stampDutyRateField.getText().trim()));
+        rate.setTransferRate(FuNumberUtil.toBigDecimal(transferRateField.getText().trim()));
+        rate.setOtherRate(FuNumberUtil.toBigDecimal(otherRateField.getText().trim()));
+        rate.setOtherFee(FuNumberUtil.toBigDecimal(otherFeeField.getText().trim()));
     }
 
 

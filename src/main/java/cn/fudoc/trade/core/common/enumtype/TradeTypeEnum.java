@@ -14,6 +14,8 @@ public enum TradeTypeEnum {
     COST(0,"初始化成本" ),
     BUY(1,"买入" ),
     SELL(2,"卖出" ),
+    DIVIDEND(3,"分红" ),
+    TAX(4,"股息红利税补缴" ),
 
     ;
 
