@@ -1,9 +1,9 @@
-package cn.fudoc.trade.view.dialog;
+package cn.fudoc.trade.view.holdings;
 
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
-import cn.fudoc.trade.view.dialog.tab.*;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
+import cn.fudoc.trade.view.holdings.tab.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -68,12 +68,11 @@ public class HoldingsStockDialog extends DialogWrapper {
 
         //默认选中持仓成本 tab
         this.tabs.select(tabInfo, true);
-
+        this.currentTab = holdingsTabViewMap.get(tabInfo.getText());
     }
 
     @Override
     protected void doOKAction() {
-        super.doOKAction();
         //保存数据
         if (Objects.isNull(currentTab)) {
             return;
@@ -83,6 +82,7 @@ public class HoldingsStockDialog extends DialogWrapper {
             HoldingsStockState.getInstance().add(this.stockInfoDTO.group(), this.stockInfoDTO.stockCode(), this.holdingsInfo);
         }
         this.currentTab.submit(this.holdingsInfo);
+        super.doOKAction();
     }
 
 

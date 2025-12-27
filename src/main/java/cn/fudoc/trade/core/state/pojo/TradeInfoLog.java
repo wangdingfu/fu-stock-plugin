@@ -23,7 +23,7 @@ public class TradeInfoLog {
     /**
      * 交易价格
      */
-    private BigDecimal price;
+    private String price;
     /**
      * 交易数量
      */

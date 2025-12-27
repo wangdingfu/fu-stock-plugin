@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view.dialog.tab;
+package cn.fudoc.trade.view.holdings.tab;
 
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import com.intellij.openapi.ui.ValidationInfo;

@@ -34,9 +34,13 @@ public class NumberFormatUtil {
         if (StringUtils.isBlank(strValue)) {
             return BigDecimal.ZERO;
         }
-        if (NumberUtil.isNumber(strValue)) {
-            return new BigDecimal(strValue);
+        try {
+            if (NumberUtil.isNumber(strValue)) {
+                return new BigDecimal(strValue);
+            }
+            return NumberUtil.toBigDecimal(strValue);
+        }catch (Exception e){
+            return BigDecimal.ZERO;
         }
-        return NumberUtil.toBigDecimal(strValue);
     }
 }

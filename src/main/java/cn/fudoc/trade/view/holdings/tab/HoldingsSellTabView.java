@@ -1,6 +1,7 @@
-package cn.fudoc.trade.view.dialog.tab;
+package cn.fudoc.trade.view.holdings.tab;
 
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.util.FormPanelUtil;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
 /**
  * 持仓卖出 tab
  */
-public class HoldingsSellTabView extends AbstractHoldingsTabView{
+public class HoldingsSellTabView extends AbstractHoldingsTabView {
 
 
     // 输入组件
@@ -28,30 +29,20 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView{
     }
 
     @Override
-    protected JPanel createPanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        // 成本价行
-        JPanel costPanel = createRowPanel("卖出价：", priceField);
-        mainPanel.add(costPanel);
-        mainPanel.add(Box.createVerticalStrut(15));
-        // 持仓数量行
-        JPanel countPanel = createRowPanel("卖出数量：", countField);
-        mainPanel.add(countPanel);
-        return mainPanel;
+    protected void createPanel(JPanel mainPanel) {
+        FormPanelUtil.addRow(mainPanel, "卖出价：", priceField);
+        FormPanelUtil.addRow(mainPanel, "卖出数量：", countField);
     }
-
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-        holdingsInfo.add(2, Integer.parseInt(countField.getText()), new BigDecimal(priceField.getText()));
+        holdingsInfo.add(2, Integer.parseInt(countField.getText()), priceField.getText());
     }
 
     @Override
     public ValidationInfo doValidate() {
         return null;
     }
-
 
 
 }

@@ -1,0 +1,120 @@
+package cn.fudoc.trade.view.settings.tab;
+
+import cn.fudoc.trade.core.common.FuNotification;
+import cn.fudoc.trade.core.common.FuTradeConstants;
+import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.state.FuStockSettingState;
+import cn.fudoc.trade.core.state.HoldingsStockState;
+import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
+import cn.fudoc.trade.util.FormPanelUtil;
+import cn.fudoc.trade.util.NumberFormatUtil;
+import com.intellij.openapi.ui.ComboBox;
+import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.components.OnOffButton;
+import com.intellij.util.ui.JBUI;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.*;
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+public class RateSettingsTab implements SettingTab {
+
+    private final ComboBox<String> holdingsGroupField;
+    private final OnOffButton onOffButton = new OnOffButton();
+    private final JBTextField commissionRateField = new JBTextField();
+    private final JBTextField stampDutyRateField = new JBTextField();
+    private final JBTextField transferRateField = new JBTextField();
+    private final JBTextField otherRateField = new JBTextField();
+    private final JBTextField otherFeeField = new JBTextField();
+
+
+    public RateSettingsTab() {
+        HoldingsStockState instance = HoldingsStockState.getInstance();
+        Set<String> groupSet = new HashSet<>(instance.getHoldings().keySet());
+        groupSet.add(FuTradeConstants.MY_POSITIONS_GROUP);
+        holdingsGroupField = new ComboBox<>(groupSet.toArray(new String[]{}));
+        initData(FuStockSettingState.getInstance());
+    }
+
+
+    @Override
+    public String getTabName() {
+        return "交易费率";
+    }
+
+    @Override
+    public JPanel createPanel() {
+        //持仓tab列表 下拉框
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(JBUI.Borders.empty(20, 30));
+        FormPanelUtil.addRow(mainPanel, "应用的持仓分组", holdingsGroupField);
+
+        //0、是否每笔最低5元 默认开启
+        FormPanelUtil.addRow(mainPanel, "是否每笔最低5元", onOffButton, false);
+
+
+        //1、券商佣金费率 默认0.0025
+        FormPanelUtil.addRow(mainPanel, "券商佣金费率", commissionRateField);
+
+        //2、印花税费率 默认0.0005
+        FormPanelUtil.addRow(mainPanel, "印花税费率", stampDutyRateField);
+
+        //3、过户费费率 默认0
+        FormPanelUtil.addRow(mainPanel, "过户费费率", transferRateField);
+
+        //4、其他费率 默认0
+        FormPanelUtil.addRow(mainPanel, "其他费率", otherRateField);
+
+        //5、其他费用 默认0
+        FormPanelUtil.addRow(mainPanel, "其他费用", otherFeeField);
+
+        return mainPanel;
+    }
+
+    @Override
+    public void submit() {
+        String selectedItem = (String) holdingsGroupField.getSelectedItem();
+        if (StringUtils.isBlank(selectedItem)) {
+            //提示未选中持仓分组
+            FuNotification.notifyWarning("请先选择需要应用的持仓分组才能设置费率");
+            return;
+        }
+        FuStockSettingState instance = FuStockSettingState.getInstance();
+        TradeRateInfo rate = instance.getRate(selectedItem);
+        if (Objects.isNull(rate)) {
+            rate = new TradeRateInfo();
+            instance.addRate(selectedItem, rate);
+        }
+        rate.setMin5(onOffButton.isSelected());
+        rate.setCommissionRate(NumberFormatUtil.convertBigDecimal(commissionRateField.getText().trim()));
+        rate.setStampDutyRate(NumberFormatUtil.convertBigDecimal(stampDutyRateField.getText().trim()));
+        rate.setTransferRate(NumberFormatUtil.convertBigDecimal(transferRateField.getText().trim()));
+        rate.setOtherRate(NumberFormatUtil.convertBigDecimal(otherRateField.getText().trim()));
+        rate.setOtherFee(NumberFormatUtil.convertBigDecimal(otherFeeField.getText().trim()));
+    }
+
+
+    private void initData(FuStockSettingState instance) {
+        holdingsGroupField.setSelectedItem(FuTradeConstants.MY_POSITIONS_GROUP);
+        TradeRateInfo rate = instance.getRate(FuTradeConstants.MY_POSITIONS_GROUP);
+        if (Objects.isNull(rate)) {
+            rate = new TradeRateInfo();
+            rate.setMin5(true);
+            rate.setCommissionRate(new BigDecimal("0.00025"));
+            rate.setStampDutyRate(new BigDecimal("0.0005"));
+            rate.setTransferRate(new BigDecimal("0"));
+            rate.setOtherRate(new BigDecimal("0"));
+            rate.setOtherFee(new BigDecimal("0"));
+        }
+        onOffButton.setSelected(rate.isMin5());
+        commissionRateField.setText(rate.getCommissionRate() + "");
+        stampDutyRateField.setText(rate.getStampDutyRate() + "");
+        transferRateField.setText(rate.getTransferRate() + "");
+        otherRateField.setText(rate.getOtherRate() + "");
+        otherFeeField.setText(rate.getOtherFee() + "");
+    }
+}

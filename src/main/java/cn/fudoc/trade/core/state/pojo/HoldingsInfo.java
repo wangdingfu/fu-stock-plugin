@@ -1,5 +1,6 @@
 package cn.fudoc.trade.core.state.pojo;
 
+import cn.hutool.core.util.IdUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class HoldingsInfo {
     /**
      * 成本价
      */
-    private BigDecimal cost;
+    private String cost;
     /**
      * 持仓数量
      */
@@ -42,11 +43,12 @@ public class HoldingsInfo {
      * @param count 交易数量
      * @param price 交易价格
      */
-    public void add(Integer type, Integer count, BigDecimal price) {
+    public void add(Integer type, Integer count, String price) {
         if (tradeList == null) {
             tradeList = Lists.newArrayList();
         }
         TradeInfoLog tradeInfoLog = new TradeInfoLog();
+        tradeInfoLog.setId(IdUtil.getSnowflakeNextId());
         tradeInfoLog.setCount(count);
         tradeInfoLog.setPrice(price);
         tradeInfoLog.setType(type);
@@ -65,9 +67,9 @@ public class HoldingsInfo {
     /**
      * 计算实际持仓成本
      */
-    public BigDecimal calculateCost(BigDecimal cost) {
+    public BigDecimal calculateCost(String cost) {
         //TODO 计算持仓成本
-        return cost;
+        return new BigDecimal(cost);
     }
 
     /**

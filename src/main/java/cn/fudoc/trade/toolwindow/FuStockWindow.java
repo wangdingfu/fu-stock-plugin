@@ -6,14 +6,14 @@ import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.common.enumtype.UpdateTipTagEnum;
 import cn.fudoc.trade.core.state.FuCommonState;
-import cn.fudoc.trade.core.state.StockGroupPersistentState;
 import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.timer.ScheduledTaskManager;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.FuIndexView;
 import cn.fudoc.trade.view.FuStockTabView;
-import cn.fudoc.trade.view.dialog.GroupAddDialog;
+import cn.fudoc.trade.view.GroupAddDialog;
 import cn.fudoc.trade.view.FuStockSearchPopupView;
+import cn.fudoc.trade.view.settings.FuStockSettingDialog;
 import cn.fudoc.trade.view.table.StockTableView;
 import cn.hutool.core.date.DateUtil;
 import com.intellij.find.editorHeaderActions.Utils;
@@ -269,6 +269,20 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 //                System.out.println(isShow);
 //            }
 //        }));
+
+        //基础信息设置
+        actionGroup.addAction(new DumbAwareAction("设置", "", AllIcons.General.Settings) {
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                FuStockSettingDialog fuStockSettingDialog = new FuStockSettingDialog(e.getProject());
+                fuStockSettingDialog.showAndGet();
+            }
+        });
         return actionGroup;
     }
 

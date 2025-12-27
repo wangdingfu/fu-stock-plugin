@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -83,7 +84,7 @@ public class HoldingsStockState implements PersistentStateComponent<HoldingsStoc
      * @param count 持仓数量
      */
     public void add(String group, String code, String cost, Integer count) {
-        if (StringUtils.isBlank(group) || StringUtils.isBlank(code) || StringUtils.isBlank(code) || Objects.isNull(count)) {
+        if (StringUtils.isBlank(group) || StringUtils.isBlank(code) || StringUtils.isBlank(cost) || Objects.isNull(count)) {
             return;
         }
         Map<String, HoldingsInfo> codeMap = holdings.computeIfAbsent(group, k -> new HashMap<>());

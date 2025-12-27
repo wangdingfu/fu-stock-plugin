@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view.dialog;
+package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import com.intellij.openapi.project.Project;

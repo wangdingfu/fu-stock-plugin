@@ -1,9 +1,10 @@
-package cn.fudoc.trade.view.dialog.tab;
+package cn.fudoc.trade.view.holdings.tab;
 
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.listener.DocumentCallback;
 import cn.fudoc.trade.core.listener.TextFieldDocumentListener;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.util.FormPanelUtil;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -48,36 +49,34 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         if (Objects.isNull(holdingsInfo)) {
             return;
         }
-        costField.setText(holdingsInfo.getCost().toString());
+        costField.setText(holdingsInfo.getCost());
         Integer count = holdingsInfo.getCount();
         countField.setText(Objects.isNull(count) ? "" : count.toString());
 
     }
 
+
+
     @Override
-    protected JPanel createPanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    protected void createPanel(JPanel mainPanel) {
         // 成本价行
-        JPanel costPanel = createRowPanel("成本价：", costField);
+        JPanel costPanel = FormPanelUtil.createRowPanel("成本价：", costField);
         costPanel.add(Box.createHorizontalStrut(5));
         costPanel.add(actualCostLabel);
         mainPanel.add(costPanel);
         mainPanel.add(Box.createVerticalStrut(15));
         // 持仓数量行
-        JPanel countPanel = createRowPanel("持仓数量：", countField);
+        JPanel countPanel = FormPanelUtil.createRowPanel("持仓数量：", countField);
         countPanel.add(Box.createHorizontalStrut(5));
         countPanel.add(actualCountLabel);
         mainPanel.add(countPanel);
-        return mainPanel;
     }
-
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-        holdingsInfo.setCost(new BigDecimal(costField.getText().trim()));
+        holdingsInfo.setCost(costField.getText().trim());
         holdingsInfo.setCount(Integer.parseInt(countField.getText().trim()));
-        holdingsInfo.add(0, Integer.parseInt(countField.getText()), new BigDecimal(costField.getText()));
+        holdingsInfo.add(0, Integer.parseInt(countField.getText()), costField.getText());
     }
 
 
@@ -132,7 +131,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     private void updateActualCostTipInfo() {
         String costStr = costField.getText().trim();
         if(StringUtils.isNoneBlank(costStr) && NumberUtil.isNumber(costStr)){
-            actualCostLabel.setText("实际成本: " + holdingsInfo.calculateCost(new BigDecimal(costStr)));
+            actualCostLabel.setText("实际成本: " + holdingsInfo.calculateCost(costStr));
         }
     }
 

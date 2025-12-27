@@ -7,11 +7,12 @@ import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.NumberFormatUtil;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.view.TodayProfitView;
-import cn.fudoc.trade.view.dialog.HoldingsStockDialog;
+import cn.fudoc.trade.view.holdings.HoldingsStockDialog;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.ui.Splitter;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -152,7 +153,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         int count = 0;
         if (Objects.nonNull(holdingsInfo)) {
             //持仓成本价
-            cost = new BigDecimal(holdingsInfo.getCost());
+            cost = NumberFormatUtil.convertBigDecimal(holdingsInfo.getCost());
             //持仓数量
             count = holdingsInfo.getCount();
             BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
