@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view.holdings.tab;
 
+import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
@@ -25,7 +26,7 @@ public class HoldingsTaxTabView extends AbstractHoldingsTabView {
 
     @Override
     public String getTabName() {
-        return "股息红利税补缴";
+        return FuTradeConstants.TabName.HOLDINGS_TAX_TAB;
     }
 
     @Override

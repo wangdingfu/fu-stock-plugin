@@ -3,7 +3,7 @@ package cn.fudoc.trade.view.settings.tab;
 import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.state.FuStockSettingState;
-import cn.fudoc.trade.core.state.HoldingsStockState;
+import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
 import com.intellij.openapi.ui.ComboBox;
@@ -13,7 +13,6 @@ import com.intellij.util.ui.JBUI;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,10 +28,9 @@ public class RateSettingsTab implements SettingTab {
 
 
     public RateSettingsTab() {
-        HoldingsStockState instance = HoldingsStockState.getInstance();
-        Set<String> groupSet = new HashSet<>(instance.getHoldings().keySet());
-        groupSet.add(FuTradeConstants.MY_POSITIONS_GROUP);
-        holdingsGroupField = new ComboBox<>(groupSet.toArray(new String[]{}));
+        Set<String> groups = StockGroupState.getInstance().holdingsGroups();
+        groups.add(FuTradeConstants.MY_POSITIONS_GROUP);
+        holdingsGroupField = new ComboBox<>(groups.toArray(new String[]{}));
         initData(FuStockSettingState.getInstance());
     }
 

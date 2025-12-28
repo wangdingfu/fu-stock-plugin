@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view.holdings.tab;
 
+import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.listener.DocumentCallback;
 import cn.fudoc.trade.core.listener.TextFieldDocumentListener;
 import cn.fudoc.trade.core.state.FuStockSettingState;
@@ -44,7 +45,7 @@ public class HoldingsDividendTabView extends AbstractHoldingsTabView implements 
 
     @Override
     public String getTabName() {
-        return "分红";
+        return FuTradeConstants.TabName.HOLDINGS_SELL_TAB;
     }
 
     @Override

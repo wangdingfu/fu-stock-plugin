@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view.holdings.tab;
 
+import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.TradeTypeEnum;
 import cn.fudoc.trade.core.helper.TableHelper;
 import cn.fudoc.trade.core.helper.TableListener;
@@ -50,7 +51,7 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView implements 
 
     @Override
     public String getTabName() {
-        return "今日交易记录";
+        return FuTradeConstants.TabName.HOLDINGS_LOG_TAB;
     }
 
     @Override

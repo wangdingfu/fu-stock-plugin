@@ -44,7 +44,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
 
     @Override
     public String getTabName() {
-        return "成本信息";
+        return FuTradeConstants.TabName.HOLDINGS_COST_TAB;
     }
 
     @Override

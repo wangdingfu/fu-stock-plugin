@@ -21,4 +21,14 @@ public interface FuTradeConstants {
     interface CommonStateKey{
         String STOCK_AUTO_REFRESH = "fu-stock-auto-refresh";
     }
+
+
+    interface TabName{
+        String HOLDINGS_COST_TAB = "成本信息";
+        String HOLDINGS_BUY_TAB = "买入";
+        String HOLDINGS_SELL_TAB = "卖出";
+        String HOLDINGS_DIVIDEND_TAB = "分红";
+        String HOLDINGS_TAX_TAB = "股息红利税补缴";
+        String HOLDINGS_LOG_TAB = "今日交易记录";
+    }
 }

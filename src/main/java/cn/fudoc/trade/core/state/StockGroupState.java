@@ -33,7 +33,18 @@ public class StockGroupState implements PersistentStateComponent<StockGroupState
         stockTabEnumMap.put(group, stockTabEnum);
     }
 
-
+    /**
+     * 持仓分组集合
+     */
+    public Set<String> holdingsGroups() {
+        Set<String> groups = new HashSet<>();
+        stockTabEnumMap.forEach((key, value) -> {
+            if (StockTabEnum.STOCK_HOLD.equals(value)) {
+                groups.add(key);
+            }
+        });
+        return groups;
+    }
 
 
     public static StockGroupState getInstance() {

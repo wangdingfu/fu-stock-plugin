@@ -1,24 +1,23 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.view.TodayProfitView;
+import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.holdings.HoldingsStockDialog;
-import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
-import cn.hutool.core.util.NumberUtil;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.ui.Splitter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -91,7 +90,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     @Override
     public JPanel getComponent() {
         JPanel rootPanel = new JPanel(new BorderLayout());
-        JPanel tableComponent = getTableComponent();
+        JPanel tableComponent = tableHelper.createTablePanel();
         tableComponent.add(createTableHintLabel(), BorderLayout.NORTH);
         Splitter splitter = new Splitter(true);
         splitter.setFirstComponent(tableComponent);
@@ -182,7 +181,7 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
             //今日收益计算
             increaseRate = new BigDecimal(realStockInfo.getIncreaseRate());
             BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
-            todayProfit = CalculateCostHelper.calculateProfit(currentPrice,yesterdayPrice,holdingsInfo);
+            todayProfit = CalculateCostHelper.calculateProfit(currentPrice, yesterdayPrice, holdingsInfo);
         }
 
         //股票代码
@@ -240,17 +239,9 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         super.stockTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                //双击进入设置持仓信息页面
                 if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-                    int selectedRow = stockTable.getSelectedRow();
-                    int modelRow = stockTable.convertRowIndexToModel(selectedRow);
-                    Object valueAt = tableModel.getValueAt(modelRow, 0);
-                    Object valueAt1 = tableModel.getValueAt(modelRow, 1);
-                    String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
-                    String name = (valueAt1 instanceof String[] values && values.length > 0) ? values[0] : "";
-                    HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), tabName, code, name);
-                    if (holdingsStockDialog.showAndGet()) {
-                        reloadAllStock();
-                    }
+                    openDialog(FuTradeConstants.TabName.HOLDINGS_COST_TAB);
                 }
             }
 
@@ -274,5 +265,22 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
 
             }
         });
+        super.tableHelper.addMenu(FuTradeConstants.TabName.HOLDINGS_BUY_TAB, e -> openDialog(FuTradeConstants.TabName.HOLDINGS_BUY_TAB));
+        super.tableHelper.addMenu(FuTradeConstants.TabName.HOLDINGS_SELL_TAB, e -> openDialog(FuTradeConstants.TabName.HOLDINGS_SELL_TAB));
+        super.tableHelper.addMenu(FuTradeConstants.TabName.HOLDINGS_LOG_TAB, e -> openDialog(FuTradeConstants.TabName.HOLDINGS_LOG_TAB));
+    }
+
+
+    private void openDialog(String openTab) {
+        int selectedRow = stockTable.getSelectedRow();
+        int modelRow = stockTable.convertRowIndexToModel(selectedRow);
+        Object valueAt = tableModel.getValueAt(modelRow, 0);
+        Object valueAt1 = tableModel.getValueAt(modelRow, 1);
+        String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
+        String name = (valueAt1 instanceof String[] values && values.length > 0) ? values[0] : "";
+        HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), tabName, code, name, openTab);
+        if (holdingsStockDialog.showAndGet()) {
+            reloadAllStock();
+        }
     }
 }

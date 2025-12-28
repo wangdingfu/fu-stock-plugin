@@ -32,8 +32,9 @@ public class TableHelper {
      * @param actionListener 触发事件
      */
     public void addMenu(String menuTitle, ActionListener actionListener) {
-        JMenuItem deleteItem = new JMenuItem(menuTitle);
-        deleteItem.addActionListener(actionListener);
+        JMenuItem jMenuItem = new JMenuItem(menuTitle);
+        jMenuItem.addActionListener(actionListener);
+        tableMenu.add(jMenuItem);
     }
 
 
@@ -51,6 +52,7 @@ public class TableHelper {
             tableModel.removeRow(modelRow);
         }
     }
+
 
 
     public JPanel createTablePanel() {

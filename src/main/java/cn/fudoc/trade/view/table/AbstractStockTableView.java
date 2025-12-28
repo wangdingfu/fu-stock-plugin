@@ -2,6 +2,8 @@ package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.core.helper.TableHelper;
+import cn.fudoc.trade.core.helper.TableListener;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.application.ApplicationManager;
@@ -18,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
-public abstract class AbstractStockTableView implements StockTableView {
+public abstract class AbstractStockTableView implements StockTableView, TableListener {
 
     /**
      * 当前tab股票集合
@@ -31,6 +33,8 @@ public abstract class AbstractStockTableView implements StockTableView {
     protected final JLabel tipLabel;
 
     protected String lastUpdateTime;
+
+    protected final TableHelper tableHelper;
 
     protected TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
 
@@ -55,7 +59,7 @@ public abstract class AbstractStockTableView implements StockTableView {
     /**
      * 表格数据发生变更
      */
-    protected void tableDataChanged(){
+    protected void tableDataChanged() {
 
     }
 
@@ -70,6 +74,7 @@ public abstract class AbstractStockTableView implements StockTableView {
         };
         stockTable = new JBTable(tableModel);
         tipLabel = new JLabel();
+        tableHelper = new TableHelper(this.stockTable, this.tableModel, this);
     }
 
 
@@ -121,23 +126,12 @@ public abstract class AbstractStockTableView implements StockTableView {
      */
     @Override
     public JPanel getComponent() {
-        JPanel rootPanel = getTableComponent();
+        JPanel rootPanel = tableHelper.createTablePanel();
         tipLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         rootPanel.add(tipLabel, BorderLayout.PAGE_END);
         return rootPanel;
     }
 
-
-    protected JPanel getTableComponent(){
-        //  创建右键菜单
-        JPopupMenu popupMenu = createPopupMenu();
-        stockTable.setComponentPopupMenu(popupMenu);
-        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(stockTable);
-        stockTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        JPanel rootPanel = new JPanel(new BorderLayout());
-        rootPanel.add(decorator.createPanel(), BorderLayout.CENTER);
-        return rootPanel;
-    }
 
 
     @Override
@@ -172,36 +166,14 @@ public abstract class AbstractStockTableView implements StockTableView {
     }
 
 
-    // 创建右键菜单（包含“删除”选项）
-    protected JPopupMenu createPopupMenu() {
-        JPopupMenu menu = new JPopupMenu();
 
-        // 添加“删除”菜单项
-        JMenuItem deleteItem = new JMenuItem("删除");
-        deleteItem.addActionListener(e -> deleteSelectedRow()); // 绑定删除逻辑
-        menu.add(deleteItem);
-        return menu;
-    }
-
-
-    /**
-     * 删除选中行的核心逻辑
-     */
-    private void deleteSelectedRow() {
-        int[] selectedRows = stockTable.getSelectedRows();
-        if (selectedRows == null || selectedRows.length == 0) {
-            return;
-        }
-        for (int i = selectedRows.length - 1; i >= 0; i--) {
-            int modelRow = stockTable.convertRowIndexToModel(selectedRows[i]);
-            Object valueAt = tableModel.getValueAt(modelRow, 0);
-            tableModel.removeRow(modelRow);
-            //持久化移除
-            String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
-            removeStockFromState(code);
-            stockCodeSet.remove(code);
-        }
+    @Override
+    public void removeRow(int modelRow) {
+        //持久化移除
+        Object valueAt = tableModel.getValueAt(modelRow, 0);
+        String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
+        removeStockFromState(code);
+        stockCodeSet.remove(code);
         tableDataChanged();
     }
-
 }

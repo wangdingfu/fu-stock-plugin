@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view.holdings.tab;
 
+import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
@@ -29,7 +30,7 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView {
 
     @Override
     public String getTabName() {
-        return "卖出";
+        return FuTradeConstants.TabName.HOLDINGS_SELL_TAB;
     }
 
     @Override

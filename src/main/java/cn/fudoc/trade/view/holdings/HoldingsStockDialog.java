@@ -1,5 +1,7 @@
 package cn.fudoc.trade.view.holdings;
 
+import cn.fudoc.trade.core.common.FuTradeConstants;
+import cn.fudoc.trade.core.common.Pair;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
@@ -12,6 +14,7 @@ import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.util.ui.JBUI;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -41,7 +44,8 @@ public class HoldingsStockDialog extends DialogWrapper {
     /**
      * 持仓信息 tab
      */
-    private final Map<String, HoldingsTabView> holdingsTabViewMap = new ConcurrentHashMap<>();
+    private final Map<String, Pair<HoldingsTabView, TabInfo>> holdingsTabViewMap = new ConcurrentHashMap<>();
+
 
     /**
      * 持仓持久化信息
@@ -49,6 +53,10 @@ public class HoldingsStockDialog extends DialogWrapper {
     private HoldingsInfo holdingsInfo;
 
     public HoldingsStockDialog(Project project, String group, String stockCode, String stockName) {
+        this(project, group, stockCode, stockName, "成本信息");
+    }
+
+    public HoldingsStockDialog(Project project, String group, String stockCode, String stockName, String selectTab) {
         super(project, true);
         this.stockInfoDTO = new StockInfoDTO(group, stockCode, stockName);
         this.tabs = JBTabsFactory.createTabs(project);
@@ -59,18 +67,16 @@ public class HoldingsStockDialog extends DialogWrapper {
         // 初始化 DialogWrapper（必须调用）
         init();
         //维护持仓成本 tab
-        TabInfo tabInfo = addTab(new HoldingsCostTabView(this.stockInfoDTO, this.holdingsInfo));
+        addTab(new HoldingsCostTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsBuyTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsSellTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsDividendTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsTaxTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsTradeLogTabView(this.stockInfoDTO, this.holdingsInfo));
         registerListener();
-
-        //默认选中持仓成本 tab
-        this.tabs.select(tabInfo, true);
-        this.currentTab = holdingsTabViewMap.get(tabInfo.getText());
+        selectTab(selectTab);
     }
+
 
     @Override
     protected void doOKAction() {
@@ -118,6 +124,18 @@ public class HoldingsStockDialog extends DialogWrapper {
     }
 
 
+    public void selectTab(String tabName) {
+        if(StringUtils.isBlank(tabName)){
+            tabName = FuTradeConstants.TabName.HOLDINGS_COST_TAB;
+        }
+        Pair<HoldingsTabView, TabInfo> tabInfoPair = holdingsTabViewMap.get(tabName);
+        if (Objects.isNull(tabInfoPair)) {
+            return;
+        }
+        this.tabs.select(tabInfoPair.right(), true);
+        this.currentTab = tabInfoPair.left();
+    }
+
     /**
      * 注册 tab 监听器
      */
@@ -127,7 +145,11 @@ public class HoldingsStockDialog extends DialogWrapper {
             public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
                 //切换新窗口时 判断当前是否开启自动刷新 开启时才刷新股票数据
                 if (Objects.nonNull(newSelection)) {
-                    currentTab = holdingsTabViewMap.get(newSelection.getText());
+                    Pair<HoldingsTabView, TabInfo> pair = holdingsTabViewMap.get(newSelection.getText());
+                    if (Objects.isNull(pair)) {
+                        return;
+                    }
+                    currentTab = pair.left();
                 }
             }
 
@@ -135,11 +157,10 @@ public class HoldingsStockDialog extends DialogWrapper {
     }
 
 
-    private TabInfo addTab(HoldingsTabView holdingsTabView) {
+    private void addTab(HoldingsTabView holdingsTabView) {
         TabInfo tabInfo = new TabInfo(holdingsTabView.getPanel());
         tabInfo.setText(holdingsTabView.getTabName());
         this.tabs.addTab(tabInfo);
-        holdingsTabViewMap.put(holdingsTabView.getTabName(), holdingsTabView);
-        return tabInfo;
+        holdingsTabViewMap.put(holdingsTabView.getTabName(), new Pair<>(holdingsTabView, tabInfo));
     }
 }
