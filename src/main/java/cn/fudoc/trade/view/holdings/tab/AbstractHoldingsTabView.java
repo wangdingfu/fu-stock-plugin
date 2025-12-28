@@ -7,6 +7,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
+import java.math.BigDecimal;
 
 /**
  * 维护持仓信息抽象类
@@ -14,6 +15,7 @@ import javax.swing.*;
 public abstract class AbstractHoldingsTabView implements HoldingsTabView {
     protected final JLabel stockCodeLabel;
     protected final JLabel stockNameLabel;
+    protected final StockInfoDTO stockInfoDTO;
     protected final HoldingsInfo holdingsInfo;
 
     /**
@@ -35,7 +37,10 @@ public abstract class AbstractHoldingsTabView implements HoldingsTabView {
         this.stockCodeLabel = new JBLabel(stockInfoDTO.stockCode());
         this.stockNameLabel = new JBLabel(stockInfoDTO.stockName());
         this.holdingsInfo = holdingsInfo;
+        this.stockInfoDTO = stockInfoDTO;
     }
+
+
 
 
     @Override

@@ -1,7 +1,9 @@
 package cn.fudoc.trade.view.holdings.helper;
 
+import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeInfoLog;
+import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.hutool.core.date.DateUtil;
@@ -11,6 +13,7 @@ import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 计算持仓成本
@@ -123,11 +126,11 @@ public class CalculateCostHelper {
             Integer tradeCount = tradeInfoLog.getCount();
             if (type == 1) {
                 //买入动作
-                tradeProfit = multiply(currentPrice.subtract(tradePrice),tradeCount).subtract(handlingFee);
+                tradeProfit = multiply(currentPrice.subtract(tradePrice), tradeCount).subtract(handlingFee);
             } else if (type == 2) {
                 //卖出动作 计算当前成本
-                tradeProfit = multiply(currentPrice.subtract(yesterdayPrice),tradeCount).subtract(handlingFee);
-            }else {
+                tradeProfit = multiply(currentPrice.subtract(yesterdayPrice), tradeCount).subtract(handlingFee);
+            } else {
                 //其他情况暂不考虑
                 continue;
             }
@@ -137,8 +140,58 @@ public class CalculateCostHelper {
     }
 
 
-    private static BigDecimal multiply(BigDecimal cost, Integer count) {
-        return cost.multiply(new BigDecimal(count));
+    /**
+     * 计算交易手续费 仅针对买入 卖出时计算
+     *
+     * @param type       类型 1:买入 2:卖出
+     * @param rate       手续费配置信息
+     * @param tradePrice 交易价格
+     * @param tradeCount 交易数量
+     * @return 本次交易收取的手续费
+     */
+    public static BigDecimal calculateHandlingFee(Integer type, TradeRateInfo rate, BigDecimal tradePrice, Integer tradeCount) {
+        if (Objects.isNull(type) || Objects.isNull(rate) || (type != 1 && type != 2)) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal totalAmount = multiply(tradePrice, tradeCount);
+        BigDecimal handlingFee = BigDecimal.ZERO;
+        BigDecimal commissionRate = FuNumberUtil.toBigDecimal(rate.getCommissionRate());
+        BigDecimal commissionFee = totalAmount.multiply(commissionRate);
+        if (rate.isMin5() && FuNumberUtil.DECIMAL_5.compareTo(commissionFee) >= 0) {
+            //最低收取5元
+            commissionFee = FuNumberUtil.DECIMAL_5;
+        }
+        //券商佣金
+        handlingFee = handlingFee.add(commissionFee);
+
+        //印花税 卖出时才计算
+        if (type == 2) {
+            BigDecimal stampDutyRate = FuNumberUtil.toBigDecimal(rate.getStampDutyRate());
+            handlingFee = handlingFee.add(totalAmount.multiply(stampDutyRate));
+        }
+
+        //过户费
+        BigDecimal transferRate = FuNumberUtil.toBigDecimal(rate.getTransferRate());
+        handlingFee = handlingFee.add(totalAmount.multiply(transferRate));
+
+        //其他费率
+        BigDecimal otherRate = FuNumberUtil.toBigDecimal(rate.getOtherRate());
+        handlingFee = handlingFee.add(totalAmount.multiply(otherRate));
+
+        //其他费用
+        BigDecimal otherFee = FuNumberUtil.toBigDecimal(rate.getOtherFee());
+        handlingFee = handlingFee.add(otherFee);
+
+        //本次交易手续费
+        return handlingFee;
+    }
+
+
+    private static BigDecimal multiply(BigDecimal price, Integer count) {
+        if(Objects.isNull(count)){
+            count = 0;
+        }
+        return price.multiply(new BigDecimal(count));
     }
 
 }

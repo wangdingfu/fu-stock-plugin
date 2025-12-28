@@ -1,8 +1,6 @@
 package cn.fudoc.trade.core.state;
 
-import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
-import com.google.common.collect.Sets;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -10,7 +8,6 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +15,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 
 /**
@@ -39,12 +35,32 @@ public class FuStockSettingState implements PersistentStateComponent<FuStockSett
     private Map<String, TradeRateInfo> rateInfoMap = new HashMap<>();
 
 
-    public void addRate(String group,TradeRateInfo tradeRateInfo){
-        rateInfoMap.put(group,tradeRateInfo);
+    public void addRate(String group, TradeRateInfo tradeRateInfo) {
+        rateInfoMap.put(group, tradeRateInfo);
     }
 
-    public TradeRateInfo getRate(String group){
+    public TradeRateInfo getRate(String group) {
         return rateInfoMap.get(group);
+    }
+
+    public TradeRateInfo getRateAndCreate(String group) {
+        TradeRateInfo rate = getRate(group);
+        if (Objects.isNull(rate)) {
+            rate = createDefaultTradeRateInfo();
+            rateInfoMap.put(group, rate);
+        }
+        return rate;
+    }
+
+    public TradeRateInfo createDefaultTradeRateInfo() {
+        TradeRateInfo rate = new TradeRateInfo();
+        rate.setMin5(true);
+        rate.setCommissionRate("0.00025");
+        rate.setStampDutyRate("0.0005");
+        rate.setTransferRate("0");
+        rate.setOtherRate("0");
+        rate.setOtherFee("0");
+        return rate;
     }
 
     public static FuStockSettingState getInstance() {

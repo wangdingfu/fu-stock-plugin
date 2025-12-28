@@ -34,17 +34,27 @@ public class FormPanelUtil {
         label.setMinimumSize(new Dimension(100, 30));
         label.setMaximumSize(new Dimension(100, 30));
         label.setAlignmentY(Component.CENTER_ALIGNMENT);
+        label.setHorizontalAlignment(SwingConstants.LEFT);
 
-        // 组件占满剩余空间
+        // 组件尺寸配置
+        component.setAlignmentY(Component.CENTER_ALIGNMENT);
         if(setComponentSize){
             component.setPreferredSize(new Dimension(150, 30));
             component.setMinimumSize(new Dimension(150, 30));
+            component.setMaximumSize(new Dimension(150, 30)); // 严格固定尺寸
         }
-        component.setAlignmentY(Component.CENTER_ALIGNMENT);
+        // 针对输入框的特殊处理：按字符数固定宽度
+        if (component instanceof JTextField textField) {
+            if (textField.getColumns() <= 0) {
+                textField.setColumns(12); // 固定12个字符宽度，适配成本价输入（如7.630 带小数）
+            }
+        }
 
+        // 组装面板：标签 + 间距 + 组件 + 水平胶水（核心修复）
         panel.add(label);
         panel.add(Box.createHorizontalStrut(10));
         panel.add(component);
+        panel.add(Box.createHorizontalGlue()); // 承接剩余空间，防止组件被撑大
 
         return panel;
     }

@@ -1,8 +1,12 @@
 package cn.fudoc.trade.view.holdings.tab;
 
+import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
+import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 
@@ -36,7 +40,12 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView {
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-        holdingsInfo.add(2, Integer.parseInt(countField.getText()), priceField.getText(),"");
+        //计算手续费
+        TradeRateInfo rate = FuStockSettingState.getInstance().getRate(stockInfoDTO.group());
+        Integer count = FuNumberUtil.toInteger(countField.getText().trim());
+        BigDecimal price = FuNumberUtil.toBigDecimal(priceField.getText().trim());
+        BigDecimal handlingFee = CalculateCostHelper.calculateHandlingFee(2, rate, price, count);
+        holdingsInfo.add(2, count, price.toString(), handlingFee.toString());
     }
 
     @Override

@@ -62,8 +62,9 @@ public class HoldingsStockDialog extends DialogWrapper {
         TabInfo tabInfo = addTab(new HoldingsCostTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsBuyTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsSellTabView(this.stockInfoDTO, this.holdingsInfo));
+        addTab(new HoldingsDividendTabView(this.stockInfoDTO, this.holdingsInfo));
+        addTab(new HoldingsTaxTabView(this.stockInfoDTO, this.holdingsInfo));
         addTab(new HoldingsTradeLogTabView(this.stockInfoDTO, this.holdingsInfo));
-
         registerListener();
 
         //默认选中持仓成本 tab

@@ -11,6 +11,8 @@ import java.util.Objects;
 public class FuNumberUtil {
 
     private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
+    public static final BigDecimal DECIMAL_10000 = new BigDecimal(10000);
+    public static final BigDecimal DECIMAL_5 = new BigDecimal(5);
 
     public static String format(BigDecimal value) {
         DecimalFormat decimalFormat = new DecimalFormat(",###.##");

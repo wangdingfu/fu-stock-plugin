@@ -6,7 +6,6 @@ import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
-import cn.fudoc.trade.util.FuNumberUtil;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.OnOffButton;
@@ -14,7 +13,6 @@ import com.intellij.util.ui.JBUI;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -89,11 +87,11 @@ public class RateSettingsTab implements SettingTab {
             instance.addRate(selectedItem, rate);
         }
         rate.setMin5(onOffButton.isSelected());
-        rate.setCommissionRate(FuNumberUtil.toBigDecimal(commissionRateField.getText().trim()));
-        rate.setStampDutyRate(FuNumberUtil.toBigDecimal(stampDutyRateField.getText().trim()));
-        rate.setTransferRate(FuNumberUtil.toBigDecimal(transferRateField.getText().trim()));
-        rate.setOtherRate(FuNumberUtil.toBigDecimal(otherRateField.getText().trim()));
-        rate.setOtherFee(FuNumberUtil.toBigDecimal(otherFeeField.getText().trim()));
+        rate.setCommissionRate(commissionRateField.getText().trim());
+        rate.setStampDutyRate(stampDutyRateField.getText().trim());
+        rate.setTransferRate(transferRateField.getText().trim());
+        rate.setOtherRate(otherRateField.getText().trim());
+        rate.setOtherFee(otherFeeField.getText().trim());
     }
 
 
@@ -101,19 +99,13 @@ public class RateSettingsTab implements SettingTab {
         holdingsGroupField.setSelectedItem(FuTradeConstants.MY_POSITIONS_GROUP);
         TradeRateInfo rate = instance.getRate(FuTradeConstants.MY_POSITIONS_GROUP);
         if (Objects.isNull(rate)) {
-            rate = new TradeRateInfo();
-            rate.setMin5(true);
-            rate.setCommissionRate(new BigDecimal("0.00025"));
-            rate.setStampDutyRate(new BigDecimal("0.0005"));
-            rate.setTransferRate(new BigDecimal("0"));
-            rate.setOtherRate(new BigDecimal("0"));
-            rate.setOtherFee(new BigDecimal("0"));
+            rate = instance.createDefaultTradeRateInfo();
         }
         onOffButton.setSelected(rate.isMin5());
-        commissionRateField.setText(rate.getCommissionRate() + "");
-        stampDutyRateField.setText(rate.getStampDutyRate() + "");
-        transferRateField.setText(rate.getTransferRate() + "");
-        otherRateField.setText(rate.getOtherRate() + "");
-        otherFeeField.setText(rate.getOtherFee() + "");
+        commissionRateField.setText(rate.getCommissionRate());
+        stampDutyRateField.setText(rate.getStampDutyRate());
+        transferRateField.setText(rate.getTransferRate() );
+        otherRateField.setText(rate.getOtherRate() );
+        otherFeeField.setText(rate.getOtherFee() );
     }
 }
