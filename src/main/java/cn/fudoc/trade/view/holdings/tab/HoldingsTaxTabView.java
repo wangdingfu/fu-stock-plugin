@@ -1,6 +1,8 @@
 package cn.fudoc.trade.view.holdings.tab;
 
 import cn.fudoc.trade.core.common.FuTradeConstants;
+import cn.fudoc.trade.core.common.Pair;
+import cn.fudoc.trade.core.exception.ValidException;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
@@ -41,6 +43,11 @@ public class HoldingsTaxTabView extends AbstractHoldingsTabView {
 
     @Override
     public ValidationInfo doValidate() {
+        try {
+            validNumber("补缴税额", amountField);
+        } catch (ValidException e) {
+            return e.getValidationInfo();
+        }
         return null;
     }
 

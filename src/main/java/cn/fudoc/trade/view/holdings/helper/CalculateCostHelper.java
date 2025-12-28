@@ -1,24 +1,22 @@
 package cn.fudoc.trade.view.holdings.helper;
 
-import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeInfoLog;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.hutool.core.date.DateUtil;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 计算持仓成本
  */
 public class CalculateCostHelper {
+
     /**
      * 计算持仓成本
      *
@@ -26,6 +24,9 @@ public class CalculateCostHelper {
      * @return 计算出来的当前持仓信息
      */
     public static HoldingsTodayInfo calculate(HoldingsInfo holdingsInfo) {
+        //计算持仓成本前 刷新当天持仓信息
+        refreshTodayHoldingsInfo(holdingsInfo);
+        //计算当前最新成本
         return calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), holdingsInfo.getTradeList());
     }
 
@@ -69,6 +70,7 @@ public class CalculateCostHelper {
                 //卖出动作 计算当前成本
                 totalAmount = multiply(currentCost, currentCount).subtract(multiply(tradePrice, tradeCount).subtract(handlingFee));
                 currentCount -= tradeCount;
+                count -= tradeCount;
             } else if (type == 3) {
                 //分红
                 totalAmount = multiply(currentCost, currentCount).subtract(multiply(tradePrice, tradeCount));
@@ -187,8 +189,43 @@ public class CalculateCostHelper {
     }
 
 
+
+    /**
+     * 刷新当天持仓信息 每天第一次加载时刷新
+     */
+    public static void refreshTodayHoldingsInfo(HoldingsInfo holdingsInfo) {
+        List<TradeInfoLog> tradeList = holdingsInfo.getTradeList();
+        if (CollectionUtils.isEmpty(tradeList)) {
+            //没有交易记录 无需处理
+            return;
+        }
+        long todayBeginDay = DateUtil.beginOfDay(new Date()).getTime();
+        Long refreshTime = holdingsInfo.getRefreshTime();
+        if (Objects.nonNull(refreshTime) && refreshTime > todayBeginDay) {
+            //当天已经刷新过 无需再次刷新
+            return;
+        }
+        List<TradeInfoLog> logList = holdingsInfo.getLogList();
+        //当天之前的交易信息
+        List<TradeInfoLog> beforeTradeList = tradeList.stream().filter(f -> f.getTime() < todayBeginDay).toList();
+        //计算上一交易日的持仓成本 并将上一交易日的持仓成本设置到当前持仓成本信息中
+        HoldingsTodayInfo holdingsTodayInfo = calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), beforeTradeList);
+        holdingsInfo.setCost(holdingsTodayInfo.getCurrentCost().toString());
+        holdingsInfo.setCount(holdingsTodayInfo.getTotal());
+
+        //将上一交易日的交易记录移动到日志表中
+        if(Objects.isNull(logList)){
+            logList = new ArrayList<>();
+            holdingsInfo.setLogList(logList);
+        }
+        logList.addAll(beforeTradeList);
+        tradeList.removeIf(f -> f.getTime() < todayBeginDay);
+        //记录本次刷新时间 防止当天重复刷新
+        holdingsInfo.setRefreshTime(System.currentTimeMillis());
+    }
+
     private static BigDecimal multiply(BigDecimal price, Integer count) {
-        if(Objects.isNull(count)){
+        if (Objects.isNull(count)) {
             count = 0;
         }
         return price.multiply(new BigDecimal(count));

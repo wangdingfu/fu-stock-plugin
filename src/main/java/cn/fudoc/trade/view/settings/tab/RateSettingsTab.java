@@ -1,12 +1,16 @@
 package cn.fudoc.trade.view.settings.tab;
 
+import cn.fudoc.trade.core.common.FuBundle;
 import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
+import cn.fudoc.trade.core.exception.ValidException;
 import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.OnOffButton;
 import com.intellij.util.ui.JBUI;
@@ -71,6 +75,29 @@ public class RateSettingsTab implements SettingTab {
     }
 
     @Override
+    public ValidationInfo doValidate() {
+        try {
+            validRateField("券商佣金费率", commissionRateField);
+            validRateField("印花税费率", stampDutyRateField);
+            validRateField("过户费费率", transferRateField);
+            validRateField("其他费率", otherRateField);
+            validRateField("券商其他费用佣金费率", otherFeeField);
+        } catch (ValidException e) {
+            return e.getValidationInfo();
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+
+    private void validRateField(String title, JBTextField field) {
+        String rateStr = field.getText().trim();
+        if (StringUtils.isNoneBlank(rateStr) && !NumberUtil.isDouble(rateStr) && !NumberUtil.isInteger(rateStr)) {
+            throw new ValidException(new ValidationInfo(FuBundle.message("stock.setting.rate.formatError", title), field));
+        }
+    }
+
+    @Override
     public void submit() {
         String selectedItem = (String) holdingsGroupField.getSelectedItem();
         if (StringUtils.isBlank(selectedItem)) {
@@ -102,8 +129,8 @@ public class RateSettingsTab implements SettingTab {
         onOffButton.setSelected(rate.isMin5());
         commissionRateField.setText(rate.getCommissionRate());
         stampDutyRateField.setText(rate.getStampDutyRate());
-        transferRateField.setText(rate.getTransferRate() );
-        otherRateField.setText(rate.getOtherRate() );
-        otherFeeField.setText(rate.getOtherFee() );
+        transferRateField.setText(rate.getTransferRate());
+        otherRateField.setText(rate.getOtherRate());
+        otherFeeField.setText(rate.getOtherFee());
     }
 }

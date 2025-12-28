@@ -41,6 +41,13 @@ public class HoldingsBuyTabView extends AbstractHoldingsTabView {
     }
 
     @Override
+    public ValidationInfo doValidate() {
+        validNumber("买入价", priceField);
+        validInteger("买入数量", countField);
+        return null;
+    }
+
+    @Override
     public void submit(HoldingsInfo holdingsInfo) {
         //计算手续费
         TradeRateInfo rate = FuStockSettingState.getInstance().getRateAndCreate(stockInfoDTO.group());
@@ -50,9 +57,5 @@ public class HoldingsBuyTabView extends AbstractHoldingsTabView {
         holdingsInfo.add(1, count, price.toString(), handlingFee.toString());
     }
 
-    @Override
-    public ValidationInfo doValidate() {
-        return null;
-    }
 
 }

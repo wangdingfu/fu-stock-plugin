@@ -1,7 +1,9 @@
 package cn.fudoc.trade.view.holdings;
 
+import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.Pair;
+import cn.fudoc.trade.core.exception.ValidException;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
@@ -109,8 +111,15 @@ public class HoldingsStockDialog extends DialogWrapper {
         if (Objects.isNull(selectedInfo)) {
             return null;
         }
-        if (selectedInfo.getComponent() instanceof HoldingsTabView holdingsTabView) {
-            return holdingsTabView.doValidate();
+        Pair<HoldingsTabView, TabInfo> tabInfoPair = holdingsTabViewMap.get(selectedInfo.getText());
+        if (Objects.nonNull(tabInfoPair)) {
+            try {
+                return tabInfoPair.left().doValidate();
+            } catch (ValidException e) {
+                return e.getValidationInfo();
+            } catch (Exception e) {
+                FuNotification.notifyWarning("保存" + selectedInfo.getText() + "信息异常");
+            }
         }
         return null;
     }
@@ -125,7 +134,7 @@ public class HoldingsStockDialog extends DialogWrapper {
 
 
     public void selectTab(String tabName) {
-        if(StringUtils.isBlank(tabName)){
+        if (StringUtils.isBlank(tabName)) {
             tabName = FuTradeConstants.TabName.HOLDINGS_COST_TAB;
         }
         Pair<HoldingsTabView, TabInfo> tabInfoPair = holdingsTabViewMap.get(tabName);

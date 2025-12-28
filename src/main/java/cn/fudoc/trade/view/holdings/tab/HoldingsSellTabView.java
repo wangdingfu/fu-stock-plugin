@@ -42,7 +42,7 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView {
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
         //计算手续费
-        TradeRateInfo rate = FuStockSettingState.getInstance().getRate(stockInfoDTO.group());
+        TradeRateInfo rate = FuStockSettingState.getInstance().getRateAndCreate(stockInfoDTO.group());
         Integer count = FuNumberUtil.toInteger(countField.getText().trim());
         BigDecimal price = FuNumberUtil.toBigDecimal(priceField.getText().trim());
         BigDecimal handlingFee = CalculateCostHelper.calculateHandlingFee(2, rate, price, count);
@@ -51,6 +51,8 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView {
 
     @Override
     public ValidationInfo doValidate() {
+        validNumber("卖出价", priceField);
+        validInteger("卖出数量", countField);
         return null;
     }
 

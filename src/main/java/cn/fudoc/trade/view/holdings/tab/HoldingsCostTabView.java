@@ -12,12 +12,10 @@ import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 
@@ -33,11 +31,13 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
 
     private final JLabel actualCostLabel;
     private final JLabel actualCountLabel;
+    private final JLabel tipLabel;
 
     public HoldingsCostTabView(StockInfoDTO stockInfoDTO, HoldingsInfo holdingsInfo) {
         super(stockInfoDTO, holdingsInfo);
         this.actualCostLabel = createTipLabelStyle();
         this.actualCountLabel = createTipLabelStyle();
+        this.tipLabel = createTipLabelStyle();
         addTextFieldListeners();
         initData(holdingsInfo);
     }
@@ -56,6 +56,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         Integer count = holdingsInfo.getCount();
         countField.setText(Objects.isNull(count) ? "" : count.toString());
 
+        tipLabel.setText("💡 提示：维护的成本价和持仓数量将被视为上一交易日结束后的持仓成本和数量，今日交易需新增买入或卖出操作。");
     }
 
 
@@ -72,6 +73,10 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         countPanel.add(Box.createHorizontalStrut(5));
         countPanel.add(actualCountLabel);
         mainPanel.add(countPanel);
+        mainPanel.add(Box.createVerticalStrut(15));
+
+        //提示信息
+        mainPanel.add(this.tipLabel);
     }
 
     @Override
@@ -84,30 +89,8 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
 
     @Override
     public ValidationInfo doValidate() {
-        String costValue = costField.getText().trim();
-        String countValue = countField.getText().trim();
-
-        if (StringUtils.isBlank(costValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COST_NOTNULL, costField);
-        }
-        if (StringUtils.isBlank(countValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_NOTNULL, countField);
-        }
-        if (!NumberUtil.isNumber(costValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COST_IS_NUMBER, costField);
-        }
-        if (!NumberUtil.isInteger(countValue)) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_IS_NUMBER, countField);
-        }
-
-        try {
-            int count = Integer.parseInt(countValue);
-            if (count <= 0) {
-                return new ValidationInfo(FuTradeConstants.HOLD_COUNT_GT_ZERO, countField);
-            }
-        } catch (Exception e) {
-            return new ValidationInfo(FuTradeConstants.HOLD_COUNT_FORMAT_ERROR, countField);
-        }
+        validInteger("持仓数量", countField);
+        validNumber("成本价", costField);
         return null;
     }
 

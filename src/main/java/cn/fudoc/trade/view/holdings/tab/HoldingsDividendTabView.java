@@ -45,7 +45,7 @@ public class HoldingsDividendTabView extends AbstractHoldingsTabView implements 
 
     @Override
     public String getTabName() {
-        return FuTradeConstants.TabName.HOLDINGS_SELL_TAB;
+        return FuTradeConstants.TabName.HOLDINGS_DIVIDEND_TAB;
     }
 
     @Override
@@ -67,6 +67,8 @@ public class HoldingsDividendTabView extends AbstractHoldingsTabView implements 
 
     @Override
     public ValidationInfo doValidate() {
+        validNumber("每股分红金额", priceField);
+        validInteger("分红总股数", countField);
         return null;
     }
 

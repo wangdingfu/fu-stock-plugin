@@ -13,7 +13,7 @@ import java.util.Comparator;
 import java.util.Vector;
 
 /**
- * 自选tab
+ * 自选 tab
  */
 public class StockGroupTableView extends AbstractStockTableView {
 

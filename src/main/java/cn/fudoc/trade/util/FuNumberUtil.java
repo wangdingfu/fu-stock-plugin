@@ -24,6 +24,10 @@ public class FuNumberUtil {
         return decimalFormat.format(value);
     }
 
+    public static String formatCost(String value) {
+        return formatCost(toBigDecimal(value));
+    }
+
     public static String formatRate(BigDecimal value, boolean flag) {
         DecimalFormat decimalFormat = new DecimalFormat("#.##%");
         if (flag) {
@@ -46,7 +50,7 @@ public class FuNumberUtil {
                 return new BigDecimal(strValue);
             }
             return NumberUtil.toBigDecimal(strValue);
-        }catch (Exception e){
+        } catch (Exception e) {
             return BigDecimal.ZERO;
         }
     }
@@ -62,7 +66,7 @@ public class FuNumberUtil {
         }
         try {
             return NumberUtil.isInteger(strValue) ? Integer.parseInt(strValue) : 0;
-        }catch (Exception e){
+        } catch (Exception e) {
             return 0;
         }
     }

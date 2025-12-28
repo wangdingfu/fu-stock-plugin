@@ -6,6 +6,7 @@ import cn.fudoc.trade.core.helper.TableHelper;
 import cn.fudoc.trade.core.helper.TableListener;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeInfoLog;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.NumberUtil;
@@ -16,6 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -104,8 +106,8 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView implements 
         vector.add(TradeTypeEnum.getName(tradeInfoLog.getType()));
         Integer count = tradeInfoLog.getCount();
         vector.add(Objects.isNull(count) ? "" : count);
-        vector.add(tradeInfoLog.getPrice());
-        vector.add(tradeInfoLog.getHandlingFee());
+        vector.add(FuNumberUtil.formatCost(tradeInfoLog.getPrice()));
+        vector.add(FuNumberUtil.formatCost(tradeInfoLog.getHandlingFee()));
         vector.add(DatePattern.NORM_DATETIME_FORMAT.format(new Date(tradeInfoLog.getTime())));
         return vector;
     }

@@ -1,10 +1,10 @@
 package cn.fudoc.trade.view.settings;
 
-import cn.fudoc.trade.view.holdings.tab.HoldingsTabView;
 import cn.fudoc.trade.view.settings.tab.RateSettingsTab;
 import cn.fudoc.trade.view.settings.tab.SettingTab;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.tabs.JBTabs;
 import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
@@ -13,8 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 基础信息设置页面
@@ -28,7 +26,6 @@ public class FuStockSettingDialog extends DialogWrapper {
      */
     private final RateSettingsTab rateSettingsTab = new RateSettingsTab();
 
-    private final Map<String, TabInfo> tabMap = new HashMap<>();
 
     public FuStockSettingDialog(Project project) {
         super(project, true);
@@ -55,8 +52,13 @@ public class FuStockSettingDialog extends DialogWrapper {
     private void addTab(SettingTab settingTab) {
         TabInfo tabInfo = new TabInfo(settingTab.createPanel());
         tabInfo.setText(settingTab.getTabName());
-        tabMap.put(settingTab.getTabName(), tabInfo);
         this.tabs.addTab(tabInfo);
+    }
+
+
+    @Override
+    protected @Nullable ValidationInfo doValidate() {
+        return rateSettingsTab.doValidate();
     }
 
     @Override

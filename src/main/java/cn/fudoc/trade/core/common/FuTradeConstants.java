@@ -11,12 +11,7 @@ public interface FuTradeConstants {
 
     String ADD_STOCK = FuBundle.message("add.stock.title");
 
-    String HOLD_COST_NOTNULL = FuBundle.message("stock.hold.cost.notNull");
-    String HOLD_COUNT_NOTNULL = FuBundle.message("stock.hold.count.notNull");
-    String HOLD_COST_IS_NUMBER = FuBundle.message("stock.hold.cost.isNumber");
-    String HOLD_COUNT_IS_NUMBER = FuBundle.message("stock.hold.count.isNumber");
-    String HOLD_COUNT_GT_ZERO = FuBundle.message("stock.hold.count.gtZero");
-    String HOLD_COUNT_FORMAT_ERROR = FuBundle.message("stock.hold.count.formatError");
+    String STOCK_VALID_FORMAT_ERROR = "stock.valid.formatError";
 
     interface CommonStateKey{
         String STOCK_AUTO_REFRESH = "fu-stock-auto-refresh";
