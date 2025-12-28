@@ -88,7 +88,7 @@ public class CalculateCostHelper {
             }
             currentCost = totalAmount.divide(new BigDecimal(currentCount), 24, RoundingMode.CEILING);
         }
-        return new HoldingsTodayInfo(currentCost, currentCount, currentCount);
+        return new HoldingsTodayInfo(currentCost, currentCount, count);
     }
 
 

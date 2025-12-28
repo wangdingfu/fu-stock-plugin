@@ -19,6 +19,11 @@ public class FuNumberUtil {
         return decimalFormat.format(value);
     }
 
+    public static String formatCost(BigDecimal value) {
+        DecimalFormat decimalFormat = new DecimalFormat(",###.###");
+        return decimalFormat.format(value);
+    }
+
     public static String formatRate(BigDecimal value, boolean flag) {
         DecimalFormat decimalFormat = new DecimalFormat("#.##%");
         if (flag) {

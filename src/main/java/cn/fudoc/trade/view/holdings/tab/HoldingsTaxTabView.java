@@ -35,7 +35,7 @@ public class HoldingsTaxTabView extends AbstractHoldingsTabView {
 
     @Override
     public void submit(HoldingsInfo holdingsInfo) {
-        holdingsInfo.add(4, 0, "", amountField.getText().trim());
+        holdingsInfo.add(4, null, "", amountField.getText().trim());
     }
 
     @Override

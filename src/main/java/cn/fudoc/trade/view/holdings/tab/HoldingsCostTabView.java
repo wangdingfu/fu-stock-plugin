@@ -5,6 +5,7 @@ import cn.fudoc.trade.core.listener.DocumentCallback;
 import cn.fudoc.trade.core.listener.TextFieldDocumentListener;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
 import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
@@ -136,7 +137,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         Integer count = NumberUtil.isInteger(countStr) ? Integer.parseInt(countStr) : 0;
         HoldingsTodayInfo calculate = CalculateCostHelper.calculate(costStr, count, holdingsInfo.getTradeList());
         actualCountLabel.setText("实际数量: " + calculate.getTotal());
-        actualCostLabel.setText("实际成本: " + calculate.getCurrentCost());
+        actualCostLabel.setText("实际成本: " + FuNumberUtil.formatCost(calculate.getCurrentCost()));
     }
 
 

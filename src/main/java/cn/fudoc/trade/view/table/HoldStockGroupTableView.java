@@ -18,6 +18,7 @@ import com.intellij.openapi.ui.Splitter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -46,9 +47,12 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         this.tabName = tabName;
         addListener();
         int rowHeight = stockTable.getRowHeight();
-        stockTable.setRowHeight(rowHeight * 2 + 20);
+        stockTable.setRowHeight(rowHeight * 2 + 10);
+        MultiLineTableCellRenderer cellRenderer = new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList(1, 2, 3, 4));
+        cellRenderer.setAlignmentX(SwingConstants.CENTER);
+        cellRenderer.setAlignmentY(SwingConstants.CENTER);
         for (String columnName : getColumnNames()) {
-            stockTable.getColumn(columnName).setCellRenderer(new MultiLineTableCellRenderer(Lists.newArrayList(1, 4), Lists.newArrayList(1, 3, 4)));
+            stockTable.getColumn(columnName).setCellRenderer(cellRenderer);
         }
         TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
         // 从视图中移除，模型仍保留
