@@ -31,13 +31,15 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
 
     private final JLabel actualCostLabel;
     private final JLabel actualCountLabel;
-    private final JLabel tipLabel;
+    private final JLabel tip1Label;
+    private final JLabel tip2Label;
 
     public HoldingsCostTabView(StockInfoDTO stockInfoDTO, HoldingsInfo holdingsInfo) {
         super(stockInfoDTO, holdingsInfo);
         this.actualCostLabel = createTipLabelStyle();
         this.actualCountLabel = createTipLabelStyle();
-        this.tipLabel = createTipLabelStyle();
+        this.tip1Label = createTipLabelStyle();
+        this.tip2Label = createTipLabelStyle();
         addTextFieldListeners();
         initData(holdingsInfo);
     }
@@ -52,18 +54,20 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         if (Objects.isNull(holdingsInfo)) {
             return;
         }
-        costField.setText(holdingsInfo.getCost());
+
+        costField.setText(FuNumberUtil.formatCost(holdingsInfo.getCost()));
         Integer count = holdingsInfo.getCount();
         countField.setText(Objects.isNull(count) ? "" : count.toString());
 
-        tipLabel.setText("💡 提示：维护的成本价和持仓数量将被视为上一交易日结束后的持仓成本和数量，今日交易需新增买入或卖出操作。");
+        tip1Label.setText("💡 提示1：维护的成本价和持仓数量将被视为上一交易日结束后的持仓成本和数量");
+        tip2Label.setText("💡 提示2：实际成本和数量会根据当前维护的成本和今日交易实时计算得出");
     }
 
 
     @Override
     protected void createPanel(JPanel mainPanel) {
         // 成本价行
-        JPanel costPanel = FormPanelUtil.createRowPanel("成本价：", costField);
+        JPanel costPanel = FormPanelUtil.createRowPanel("持仓成本：", costField);
         costPanel.add(Box.createHorizontalStrut(5));
         costPanel.add(actualCostLabel);
         mainPanel.add(costPanel);
@@ -76,7 +80,8 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         mainPanel.add(Box.createVerticalStrut(15));
 
         //提示信息
-        mainPanel.add(this.tipLabel);
+        mainPanel.add(this.tip1Label);
+        mainPanel.add(this.tip2Label);
     }
 
     @Override
@@ -90,7 +95,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     @Override
     public ValidationInfo doValidate() {
         validInteger("持仓数量", countField);
-        validNumber("成本价", costField);
+        validNumber("持仓成本", costField);
         return null;
     }
 

@@ -1,6 +1,7 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.HoldingsStockState;
@@ -273,6 +274,10 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
 
     private void openDialog(String openTab) {
         int selectedRow = stockTable.getSelectedRow();
+        if(selectedRow == -1){
+            FuNotification.notifyWarning("请先选中行在右键");
+            return;
+        }
         int modelRow = stockTable.convertRowIndexToModel(selectedRow);
         Object valueAt = tableModel.getValueAt(modelRow, 0);
         Object valueAt1 = tableModel.getValueAt(modelRow, 1);

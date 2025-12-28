@@ -92,9 +92,9 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView implements 
         Vector<Vector> dataVector = tableModel.getDataVector();
         Set<Long> idSet = new HashSet<>();
         for (Vector vector : dataVector) {
-            Object o = vector.get(0);
+            Object o = vector.getFirst();
             if (Objects.nonNull(o) && NumberUtil.isLong(o.toString())) {
-                idSet.add(NumberUtil.binaryToLong(o.toString()));
+                idSet.add(Long.parseLong(o.toString()));
             }
         }
         return idSet;
@@ -106,8 +106,8 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView implements 
         vector.add(TradeTypeEnum.getName(tradeInfoLog.getType()));
         Integer count = tradeInfoLog.getCount();
         vector.add(Objects.isNull(count) ? "" : count);
-        vector.add(FuNumberUtil.formatCost(tradeInfoLog.getPrice()));
-        vector.add(FuNumberUtil.formatCost(tradeInfoLog.getHandlingFee()));
+        vector.add(FuNumberUtil.formatFee(tradeInfoLog.getPrice()));
+        vector.add(FuNumberUtil.formatFee(tradeInfoLog.getHandlingFee()));
         vector.add(DatePattern.NORM_DATETIME_FORMAT.format(new Date(tradeInfoLog.getTime())));
         return vector;
     }

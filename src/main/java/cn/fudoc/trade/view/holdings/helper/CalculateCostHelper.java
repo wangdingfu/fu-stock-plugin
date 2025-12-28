@@ -6,6 +6,7 @@ import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.hutool.core.date.DateUtil;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -27,7 +28,15 @@ public class CalculateCostHelper {
         //计算持仓成本前 刷新当天持仓信息
         refreshTodayHoldingsInfo(holdingsInfo);
         //计算当前最新成本
-        return calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), holdingsInfo.getTradeList());
+        return calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), holdingsInfo.getTradeList(), true);
+    }
+
+    /**
+     * 计算当前实时持仓成本
+     *
+     */
+    public static HoldingsTodayInfo calculate(String cost, Integer count, List<TradeInfoLog> tradeList) {
+        return calculate(cost, count, tradeList, true);
     }
 
     /**
@@ -38,13 +47,15 @@ public class CalculateCostHelper {
      * @param tradeList 今日交易记录
      * @return 今日实时持仓成本
      */
-    public static HoldingsTodayInfo calculate(String cost, Integer count, List<TradeInfoLog> tradeList) {
+    public static HoldingsTodayInfo calculate(String cost, Integer count, List<TradeInfoLog> tradeList, boolean isToday) {
         BigDecimal currentCost = FuNumberUtil.toBigDecimal(cost);
         Integer currentCount = count;
         BigDecimal currentProfit = BigDecimal.ZERO;
         if (tradeList == null || tradeList.isEmpty()) {
             return new HoldingsTodayInfo(currentCost, currentCount, currentCount);
         }
+        //idea持久化序列后的list集合类型不是ArrayList 无法排序
+        tradeList = Lists.newArrayList(tradeList);
         tradeList.sort(Comparator.comparing(TradeInfoLog::getTime));
         long todayBeginDay = DateUtil.beginOfDay(new Date()).getTime();
         for (TradeInfoLog tradeInfoLog : tradeList) {
@@ -53,7 +64,7 @@ public class CalculateCostHelper {
                 //只有买入 和 卖出交易记录 才用于计算当前成本 其他类型不考虑
                 continue;
             }
-            if (todayBeginDay >= tradeInfoLog.getTime()) {
+            if (isToday && todayBeginDay >= tradeInfoLog.getTime()) {
                 //不是当日交易记录 不考虑
                 continue;
             }
@@ -189,7 +200,6 @@ public class CalculateCostHelper {
     }
 
 
-
     /**
      * 刷新当天持仓信息 每天第一次加载时刷新
      */
@@ -209,12 +219,12 @@ public class CalculateCostHelper {
         //当天之前的交易信息
         List<TradeInfoLog> beforeTradeList = tradeList.stream().filter(f -> f.getTime() < todayBeginDay).toList();
         //计算上一交易日的持仓成本 并将上一交易日的持仓成本设置到当前持仓成本信息中
-        HoldingsTodayInfo holdingsTodayInfo = calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), beforeTradeList);
+        HoldingsTodayInfo holdingsTodayInfo = calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), beforeTradeList, false);
         holdingsInfo.setCost(holdingsTodayInfo.getCurrentCost().toString());
         holdingsInfo.setCount(holdingsTodayInfo.getTotal());
 
         //将上一交易日的交易记录移动到日志表中
-        if(Objects.isNull(logList)){
+        if (Objects.isNull(logList)) {
             logList = new ArrayList<>();
             holdingsInfo.setLogList(logList);
         }
