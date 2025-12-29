@@ -63,10 +63,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      */
     private final ScheduledTaskManager scheduledTaskManager = new ScheduledTaskManager();
     /**
-     * 上一次实时加载时间
-     */
-    private Long lastReloadTime = 0L;
-    /**
      * 股票信息是否实时刷新
      */
     private final AtomicBoolean isAutoLoad = new AtomicBoolean(false);
@@ -141,7 +137,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 窗口展示时触发事件
      */
     public void showWindow() {
-        if (isAutoLoad.get() && System.currentTimeMillis() - lastReloadTime > 3000) {
+        if (isAutoLoad.get()) {
             //代表是启用自动刷新  但实际未自动刷新
             startTimeTask();
         }
@@ -294,15 +290,12 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     }
 
 
+    /**
+     * 启动实时刷新任务
+     */
     private boolean startTimeTask() {
-        if (isCanStart(new Date())) {
-            scheduledTaskManager.startTask(() -> reloadStock(true));
-            lastReloadTime = System.currentTimeMillis();
-            return true;
-        }
-        //开启侧边栏时 即使超出开盘时间 也默认刷新一次
-        reloadStock(true);
-        return false;
+        scheduledTaskManager.startTask(() -> reloadStock(true));
+        return isCanStart(new Date());
     }
 
 
@@ -320,6 +313,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
             Date refreshTime = refreshTimeMap.get(selected.getTabName());
             if (Objects.nonNull(refreshTime) && !isCanStart(refreshTime)) {
                 //上一次刷新时间不在盘中 则不需要刷新
+                scheduledTaskManager.stopTask();
                 return;
             }
         }
