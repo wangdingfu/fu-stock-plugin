@@ -31,7 +31,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider {
@@ -77,6 +79,11 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 公共持久化数据
      */
     private final FuCommonState fuCommonState = FuCommonState.getInstance();
+
+    /**
+     * 股票刷新时间
+     */
+    private final Map<String, Date> refreshTimeMap = new ConcurrentHashMap<>();
 
     /**
      * 窗体由四部分组成
@@ -258,7 +265,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                reloadStock();
+                reloadStock(false);
                 updateTag(UpdateTipTagEnum.MANUAL_REFRESH.getTag());
             }
         });
@@ -288,11 +295,13 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
 
     private boolean startTimeTask() {
-        if (isCanStart()) {
-            scheduledTaskManager.startTask(this::reloadStock);
+        if (isCanStart(new Date())) {
+            scheduledTaskManager.startTask(() -> reloadStock(true));
             lastReloadTime = System.currentTimeMillis();
             return true;
         }
+        //开启侧边栏时 即使超出开盘时间 也默认刷新一次
+        reloadStock(true);
         return false;
     }
 
@@ -300,15 +309,23 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     /**
      * 重新加载股票信息
      */
-    private void reloadStock() {
-        //指数栏单独加载
-        indexView.reload();
-
-        //股票信息合并加载
-        StockTableView stockSelected = this.stockView.getSelected();
-        if (Objects.nonNull(stockSelected)) {
-            stockSelected.reloadAllStock();
+    private void reloadStock(boolean isAutoLoad) {
+        StockTableView selected = this.stockView.getSelected();
+        if (Objects.isNull(selected)) {
+            return;
         }
+
+        if (isAutoLoad) {
+            //自动加载才判断 手动刷新无需判断
+            Date refreshTime = refreshTimeMap.get(selected.getTabName());
+            if (Objects.isNull(refreshTime) || !isCanStart(refreshTime)) {
+                //上一次刷新时间不在盘中 则不需要刷新
+                return;
+            }
+        }
+        //刷新股票
+        selected.reloadAllStock();
+        refreshTimeMap.put(selected.getTabName(), new Date());
     }
 
 
@@ -319,23 +336,24 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         }
     }
 
-
-    private boolean isCanStart() {
+    private boolean isCanStart(Date date) {
         //判断当前时间是否开盘时间  不是则不提交任务 自动刷新时间段定位9:15 ~ 11:30 13:00~15:00
-        Date now = new Date();
-        int hour = DateUtil.hour(now, true);
+        int hour = DateUtil.hour(date, true);
         if (hour < 9 || hour > 15 || hour == 12) {
             return false;
         }
-        int minute = DateUtil.minute(now);
-        if (hour == 9 && minute < 15) {
+        int minute = DateUtil.minute(date);
+        if (hour == 9 && minute <= 15) {
             return false;
         }
         if (hour == 11 && minute > 30) {
             return false;
         }
+        if (hour == 15 && minute > 0) {
+            return false;
+        }
         //TODO 节假日判断
-        return !DateUtil.isWeekend(now);
+        return !DateUtil.isWeekend(date);
     }
 
 
