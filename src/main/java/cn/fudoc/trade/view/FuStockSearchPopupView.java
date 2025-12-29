@@ -260,13 +260,7 @@ public class FuStockSearchPopupView {
             }
             //issue #11 MAC弹框问题修复
             if (StockTabEnum.STOCK_HOLD.equals(this.stockTableView.getTabEnum())) {
-                if (SystemInfo.isWindows) {
-                    //如果是加入持仓 则需要输入成本价和持仓数量
-                    HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), this.stockTableView.getTabName(), stock.getStockCode(), stock.getName());
-                    holdingsStockDialog.showAndGet();
-                } else {
-                    HoldingsStockState.getInstance().add(this.stockTableView.getTabName(), stock.getStockCode(), "0", 0);
-                }
+                HoldingsStockState.getInstance().add(this.stockTableView.getTabName(), stock.getStockCode(), "0", 0);
             }
             this.stockTableView.addStock(realStockInfos.getFirst());
         } else {

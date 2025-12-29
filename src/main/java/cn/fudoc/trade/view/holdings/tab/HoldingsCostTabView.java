@@ -12,6 +12,7 @@ import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
+import icons.FuIcons;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -40,6 +41,8 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         this.actualCountLabel = createTipLabelStyle();
         this.tip1Label = createTipLabelStyle();
         this.tip2Label = createTipLabelStyle();
+        this.tip1Label.setIcon(FuIcons.FU_TIP);
+        this.tip2Label.setIcon(FuIcons.FU_TIP);
         addTextFieldListeners();
         initData(holdingsInfo);
     }
@@ -59,8 +62,8 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         Integer count = holdingsInfo.getCount();
         countField.setText(Objects.isNull(count) ? "" : count.toString());
 
-        tip1Label.setText("💡 提示1：维护的成本价和持仓数量将被视为上一交易日结束后的持仓成本和数量");
-        tip2Label.setText("💡 提示2：实际成本和数量会根据当前维护的成本和今日交易实时计算得出");
+        tip1Label.setText("提示1：维护的成本价和持仓数量将被视为上一交易日结束后的持仓成本和数量");
+        tip2Label.setText("提示2：实际成本和数量会根据当前维护的成本和今日交易实时计算得出");
     }
 
 

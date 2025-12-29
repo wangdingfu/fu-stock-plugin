@@ -74,7 +74,6 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView implements 
     }
 
 
-
     @Override
     public ValidationInfo doValidate() {
         //没有输入内容 无需校验
@@ -113,9 +112,10 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView implements 
     }
 
 
-
-
     private void initData() {
+        if (Objects.isNull(holdingsInfo)) {
+            return;
+        }
         List<TradeInfoLog> tradeList = holdingsInfo.getTradeList();
         if (CollectionUtils.isEmpty(tradeList)) {
             return;

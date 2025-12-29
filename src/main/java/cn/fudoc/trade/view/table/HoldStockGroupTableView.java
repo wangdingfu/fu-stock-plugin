@@ -15,7 +15,9 @@ import cn.fudoc.trade.view.holdings.HoldingsStockDialog;
 import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
 import com.google.common.collect.Lists;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ui.Splitter;
+import icons.FuIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -108,7 +110,8 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
      * 创建表格上方的引导文字标签
      */
     public static JLabel createTableHintLabel() {
-        JLabel hintLabel = new JLabel("💡 提示：双击单元格可编辑持仓成本");
+        JLabel hintLabel = new JLabel("提示：双击单元格可编辑持仓成本");
+        hintLabel.setIcon(FuIcons.FU_TIP);
         hintLabel.setForeground(new Color(60, 120, 216)); // IDEA 风格的蓝色
         hintLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
         return hintLabel;
