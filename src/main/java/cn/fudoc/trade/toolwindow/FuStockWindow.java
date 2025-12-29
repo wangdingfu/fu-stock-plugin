@@ -313,7 +313,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
             Date refreshTime = refreshTimeMap.get(selected.getTabName());
             if (Objects.nonNull(refreshTime) && !isCanStart(refreshTime)) {
                 //上一次刷新时间不在盘中 则不需要刷新
-                scheduledTaskManager.stopTask();
                 return;
             }
         }
