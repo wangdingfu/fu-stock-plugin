@@ -318,7 +318,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         if (isAutoLoad) {
             //自动加载才判断 手动刷新无需判断
             Date refreshTime = refreshTimeMap.get(selected.getTabName());
-            if (Objects.isNull(refreshTime) || !isCanStart(refreshTime)) {
+            if (Objects.nonNull(refreshTime) && !isCanStart(refreshTime)) {
                 //上一次刷新时间不在盘中 则不需要刷新
                 return;
             }
