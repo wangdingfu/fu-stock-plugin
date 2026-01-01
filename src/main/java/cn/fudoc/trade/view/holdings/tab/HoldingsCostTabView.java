@@ -12,11 +12,9 @@ import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
-import icons.FuIcons;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import java.awt.*;
 import java.util.Objects;
 
 
@@ -37,12 +35,10 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
 
     public HoldingsCostTabView(StockInfoDTO stockInfoDTO, HoldingsInfo holdingsInfo) {
         super(stockInfoDTO, holdingsInfo);
-        this.actualCostLabel = createTipLabelStyle();
-        this.actualCountLabel = createTipLabelStyle();
-        this.tip1Label = createTipLabelStyle();
-        this.tip2Label = createTipLabelStyle();
-        this.tip1Label.setIcon(FuIcons.FU_TIP);
-        this.tip2Label.setIcon(FuIcons.FU_TIP);
+        this.actualCostLabel = createTipLabelStyle(false);
+        this.actualCountLabel = createTipLabelStyle(false);
+        this.tip1Label = createTipLabelStyle(true);
+        this.tip2Label = createTipLabelStyle(true);
         addTextFieldListeners();
         initData(holdingsInfo);
     }
@@ -70,13 +66,13 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     @Override
     protected void createPanel(JPanel mainPanel) {
         // 成本价行
-        JPanel costPanel = FormPanelUtil.createRowPanel("持仓成本：", costField);
+        JPanel costPanel = FormPanelUtil.createRowPanel("持仓成本：", costField,true);
         costPanel.add(Box.createHorizontalStrut(5));
         costPanel.add(actualCostLabel);
         mainPanel.add(costPanel);
         mainPanel.add(Box.createVerticalStrut(15));
         // 持仓数量行
-        JPanel countPanel = FormPanelUtil.createRowPanel("持仓数量：", countField);
+        JPanel countPanel = FormPanelUtil.createRowPanel("持仓数量：", countField,true);
         countPanel.add(Box.createHorizontalStrut(5));
         countPanel.add(actualCountLabel);
         mainPanel.add(countPanel);
@@ -84,6 +80,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
 
         //提示信息
         mainPanel.add(this.tip1Label);
+        mainPanel.add(Box.createHorizontalStrut(5));
         mainPanel.add(this.tip2Label);
     }
 
@@ -112,14 +109,6 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         countField.getDocument().addDocumentListener(new TextFieldDocumentListener(2, this));
     }
 
-
-    public JLabel createTipLabelStyle() {
-        JLabel jLabel = new JLabel();
-        jLabel.setPreferredSize(new Dimension(250, 20));
-        jLabel.setForeground(new Color(60, 120, 216)); // IDEA 风格的蓝色
-        jLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
-        return jLabel;
-    }
 
 
     private void updateTipInfo() {

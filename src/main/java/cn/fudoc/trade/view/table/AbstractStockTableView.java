@@ -23,7 +23,7 @@ import java.util.List;
 public abstract class AbstractStockTableView implements StockTableView, TableListener {
 
     /**
-     * 当前tab股票集合
+     * 当前tab 股票集合
      */
     protected final Set<String> stockCodeSet = new HashSet<>();
 
@@ -171,6 +171,7 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
     public void removeRow(int modelRow) {
         //持久化移除
         Object valueAt = tableModel.getValueAt(modelRow, 0);
+        tableModel.removeRow(modelRow);
         String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
         removeStockFromState(code);
         stockCodeSet.remove(code);

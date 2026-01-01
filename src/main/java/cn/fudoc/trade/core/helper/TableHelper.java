@@ -49,7 +49,6 @@ public class TableHelper {
         for (int i = selectedRows.length - 1; i >= 0; i--) {
             int modelRow = stockTable.convertRowIndexToModel(selectedRows[i]);
             tableListener.removeRow(modelRow);
-            tableModel.removeRow(modelRow);
         }
     }
 

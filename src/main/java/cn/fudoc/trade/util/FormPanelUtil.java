@@ -13,13 +13,20 @@ public class FormPanelUtil {
     }
 
     public static void addRow(JPanel mainPanel, String labelText, JComponent component,boolean setComponentSize) {
-        mainPanel.add(createRowPanel(labelText, component,setComponentSize));
+        JPanel rowPanel = createRowPanel(labelText, component, setComponentSize);
+        rowPanel.add(Box.createHorizontalGlue());
+        mainPanel.add(rowPanel);
         mainPanel.add(Box.createVerticalStrut(15));
     }
 
     public static JPanel createRowPanel(String labelText, JComponent component){
-        return createRowPanel(labelText,component,true);
+        JPanel rowPanel = createRowPanel(labelText, component, true);
+        rowPanel.add(Box.createHorizontalGlue());
+        return rowPanel;
     }
+
+
+
     /**
      * 创建单行面板（标签 + 组件）
      */
@@ -54,8 +61,25 @@ public class FormPanelUtil {
         panel.add(label);
         panel.add(Box.createHorizontalStrut(10));
         panel.add(component);
-        panel.add(Box.createHorizontalGlue()); // 承接剩余空间，防止组件被撑大
 
+        return panel;
+    }
+
+    /**
+     * 创建单行面板（标签 + 组件）
+     */
+    public static JPanel createRowPanel(JComponent component) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        component.setAlignmentY(Component.CENTER_ALIGNMENT);
+        // 针对输入框的特殊处理：按字符数固定宽度
+        if (component instanceof JTextField textField) {
+            if (textField.getColumns() <= 0) {
+                textField.setColumns(12);
+            }
+        }
+        panel.add(component);
         return panel;
     }
 }

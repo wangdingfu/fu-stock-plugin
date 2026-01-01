@@ -8,6 +8,7 @@ public interface FuTradeConstants {
 
     String MY_SELECTED_GROUP = "我的自选";
     String MY_POSITIONS_GROUP = "我的持仓";
+    String LINK_RATE_LABEL = "点我设置交易费率";
 
     String ADD_STOCK = FuBundle.message("add.stock.title");
 

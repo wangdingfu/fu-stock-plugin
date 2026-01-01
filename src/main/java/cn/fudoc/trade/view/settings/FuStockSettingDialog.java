@@ -24,13 +24,16 @@ public class FuStockSettingDialog extends DialogWrapper {
     /**
      * 交易费率维护页面
      */
-    private final RateSettingsTab rateSettingsTab = new RateSettingsTab();
-
+    private RateSettingsTab rateSettingsTab ;
 
     public FuStockSettingDialog(Project project) {
+        this(project,null);
+    }
+
+    public FuStockSettingDialog(Project project, String holdingsGroup) {
         super(project, true);
         this.tabs = JBTabsFactory.createTabs(project);
-        initTab();
+        initTab(holdingsGroup);
         // 弹框标题
         setTitle("基础设置");
         // 初始化 DialogWrapper（必须调用）
@@ -44,7 +47,9 @@ public class FuStockSettingDialog extends DialogWrapper {
         super.doOKAction();
     }
 
-    private void initTab() {
+    private void initTab(String holdingsGroup) {
+        this.rateSettingsTab = new RateSettingsTab(holdingsGroup);
+
         addTab(rateSettingsTab);
     }
 

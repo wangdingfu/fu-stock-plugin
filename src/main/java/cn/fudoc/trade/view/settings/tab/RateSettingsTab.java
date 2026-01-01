@@ -9,6 +9,7 @@ import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
 import cn.hutool.core.util.NumberUtil;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
@@ -17,6 +18,8 @@ import com.intellij.util.ui.JBUI;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,11 +34,23 @@ public class RateSettingsTab implements SettingTab {
     private final JBTextField otherFeeField = new JBTextField();
 
 
-    public RateSettingsTab() {
-        Set<String> groups = StockGroupState.getInstance().holdingsGroups();
-        groups.add(FuTradeConstants.MY_POSITIONS_GROUP);
+    public RateSettingsTab(String holdingsGroup) {
+        Set<String> groups;
+        if (StringUtils.isBlank(holdingsGroup)) {
+            groups = StockGroupState.getInstance().holdingsGroups();
+            groups.add(FuTradeConstants.MY_POSITIONS_GROUP);
+        } else {
+            groups = Sets.newHashSet(holdingsGroup);
+        }
+        FuStockSettingState instance = FuStockSettingState.getInstance();
         holdingsGroupField = new ComboBox<>(groups.toArray(new String[]{}));
-        initData(FuStockSettingState.getInstance());
+        holdingsGroupField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initData(instance);
+            }
+        });
+        initData(instance);
     }
 
 
@@ -121,8 +136,11 @@ public class RateSettingsTab implements SettingTab {
 
 
     private void initData(FuStockSettingState instance) {
-        holdingsGroupField.setSelectedItem(FuTradeConstants.MY_POSITIONS_GROUP);
-        TradeRateInfo rate = instance.getRate(FuTradeConstants.MY_POSITIONS_GROUP);
+        String selectedItem = (String) holdingsGroupField.getSelectedItem();
+        if (StringUtils.isBlank(selectedItem)) {
+            selectedItem = FuTradeConstants.MY_POSITIONS_GROUP;
+        }
+        TradeRateInfo rate = instance.getRate(selectedItem);
         if (Objects.isNull(rate)) {
             rate = instance.createDefaultTradeRateInfo();
         }
