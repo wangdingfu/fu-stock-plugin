@@ -1,23 +1,17 @@
 package cn.fudoc.trade.view.holdings.tab;
 
 import cn.fudoc.trade.core.common.FuTradeConstants;
-import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
 import cn.fudoc.trade.util.FuNumberUtil;
-import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
 import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
-import cn.fudoc.trade.view.settings.FuStockSettingDialog;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.util.Objects;
-
-import static java.util.Objects.isNull;
 
 /**
  * 持仓买入 tab

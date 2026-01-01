@@ -89,7 +89,9 @@ public abstract class AbstractHoldingsTabView implements HoldingsTabView {
     protected void addTipRate(JPanel mainPanel) {
         TradeRateInfo rate = FuStockSettingState.getInstance().getRate(stockInfoDTO.group());
         JLabel tipLabel;
+        HyperlinkLabel linkLabel = new HyperlinkLabel(FuTradeConstants.LINK_RATE_LABEL);
         if (Objects.isNull(rate)) {
+            linkLabel.setForeground(JBColor.RED);
             tipLabel = createTipLabelStyle(true);
             tipLabel.setText("提示：您还未设置交易费率，请先设置交易费率在进行买入");
         } else {
@@ -97,8 +99,6 @@ public abstract class AbstractHoldingsTabView implements HoldingsTabView {
         }
         JPanel rowPanel = FormPanelUtil.createRowPanel(tipLabel);
         rowPanel.add(Box.createHorizontalStrut(5));
-        HyperlinkLabel linkLabel = new HyperlinkLabel(FuTradeConstants.LINK_RATE_LABEL);
-        linkLabel.setForeground(JBColor.RED);
         linkLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
         linkLabel.setToolTipText(FuTradeConstants.LINK_RATE_LABEL);
         linkLabel.addHyperlinkListener(e -> {

@@ -43,11 +43,7 @@ public class HoldingsTaxTabView extends AbstractHoldingsTabView {
 
     @Override
     public ValidationInfo doValidate() {
-        try {
-            validNumber("补缴税额", amountField);
-        } catch (ValidException e) {
-            return e.getValidationInfo();
-        }
+        validNumber("补缴税额", amountField);
         return null;
     }
 
