@@ -10,6 +10,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 
@@ -82,6 +83,15 @@ public class PinyinUtil {
                 MAX_FIXED_WORD_LENGTH = word.length();
             }
         }
+    }
+
+
+    public static String getFirstLetterRandom(String str){
+        Set<String> set = getFirstLetter(str);
+        if(CollectionUtils.isEmpty(set)){
+            return str;
+        }
+        return set.iterator().next();
     }
 
     /**

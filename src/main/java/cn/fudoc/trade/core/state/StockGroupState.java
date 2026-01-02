@@ -1,6 +1,7 @@
 package cn.fudoc.trade.core.state;
 
-import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
+import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @State(
@@ -24,26 +26,27 @@ import java.util.*;
 public class StockGroupState implements PersistentStateComponent<StockGroupState> {
 
 
-    private Map<String, StockTabEnum> stockTabEnumMap = new LinkedHashMap<>();
+    private Map<String, GroupTypeEnum> stockTabEnumMap = new LinkedHashMap<>();
 
-    public void add(String group, StockTabEnum stockTabEnum) {
-        if (StringUtils.isBlank(group) || Objects.isNull(stockTabEnum)) {
+
+    /**
+     * 股票分组集合
+     */
+    private List<StockGroupInfo> groupInfoList = new ArrayList<>();
+
+
+    public void add(StockGroupInfo stockGroupInfo) {
+        if (StringUtils.isBlank(stockGroupInfo.getGroupName()) || StringUtils.isBlank(stockGroupInfo.getHideGroupName()) || Objects.isNull(stockGroupInfo.getGroupType())) {
             return;
         }
-        stockTabEnumMap.put(group, stockTabEnum);
+        groupInfoList.add(stockGroupInfo);
     }
 
     /**
      * 持仓分组集合
      */
     public Set<String> holdingsGroups() {
-        Set<String> groups = new HashSet<>();
-        stockTabEnumMap.forEach((key, value) -> {
-            if (StockTabEnum.STOCK_HOLD.equals(value)) {
-                groups.add(key);
-            }
-        });
-        return groups;
+        return groupInfoList.stream().filter(f -> GroupTypeEnum.STOCK_HOLD.equals(f.getGroupType())).map(StockGroupInfo::getGroupName).collect(Collectors.toSet());
     }
 
 

@@ -1,6 +1,5 @@
 package cn.fudoc.trade.core.common.enumtype;
 
-import com.intellij.icons.AllIcons;
 import icons.FuIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,15 +8,15 @@ import javax.swing.*;
 
 @Getter
 @AllArgsConstructor
-public enum StockTabEnum {
+public enum GroupTypeEnum {
     /**
-     * 股票信息
+     * 自选股票分组
      */
-    STOCK_INFO("股票分组", FuIcons.FU_STOCK_INFO_GROUP),
+    STOCK_INFO("自选股票分组", FuIcons.FU_STOCK_INFO_GROUP),
     /**
-     * 持仓信息
+     * 持仓股票分组
      */
-    STOCK_HOLD("持仓分组",FuIcons.FU_STOCK_HOLD_GROUP),
+    STOCK_HOLD("持仓股票分组",FuIcons.FU_STOCK_HOLD_GROUP),
     ;
 
 

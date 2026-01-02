@@ -6,12 +6,10 @@ import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.action.PinToolBarAction;
 import cn.fudoc.trade.core.common.FuTradeConstants;
-import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
-import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.util.ToolBarUtils;
-import cn.fudoc.trade.view.holdings.HoldingsStockDialog;
 import cn.fudoc.trade.view.render.FuStockSearchListCellRenderer;
 import cn.fudoc.trade.view.table.StockTableView;
 import com.google.common.collect.Sets;
@@ -20,7 +18,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
@@ -36,7 +33,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.im.InputContext;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -259,7 +255,7 @@ public class FuStockSearchPopupView {
                 return;
             }
             //issue #11 MAC弹框问题修复
-            if (StockTabEnum.STOCK_HOLD.equals(this.stockTableView.getTabEnum())) {
+            if (GroupTypeEnum.STOCK_HOLD.equals(this.stockTableView.getTabEnum())) {
                 HoldingsStockState.getInstance().add(this.stockTableView.getTabName(), stock.getStockCode(), "0", 0);
             }
             this.stockTableView.addStock(realStockInfos.getFirst());

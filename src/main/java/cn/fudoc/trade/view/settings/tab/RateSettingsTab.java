@@ -38,7 +38,7 @@ public class RateSettingsTab implements SettingTab {
         Set<String> groups;
         if (StringUtils.isBlank(holdingsGroup)) {
             groups = StockGroupState.getInstance().holdingsGroups();
-            groups.add(FuTradeConstants.MY_POSITIONS_GROUP);
+            groups.add(FuTradeConstants.MY_HOLD_GROUP);
         } else {
             groups = Sets.newHashSet(holdingsGroup);
         }
@@ -138,7 +138,7 @@ public class RateSettingsTab implements SettingTab {
     private void initData(FuStockSettingState instance) {
         String selectedItem = (String) holdingsGroupField.getSelectedItem();
         if (StringUtils.isBlank(selectedItem)) {
-            selectedItem = FuTradeConstants.MY_POSITIONS_GROUP;
+            selectedItem = FuTradeConstants.MY_HOLD_GROUP;
         }
         TradeRateInfo rate = instance.getRate(selectedItem);
         if (Objects.isNull(rate)) {

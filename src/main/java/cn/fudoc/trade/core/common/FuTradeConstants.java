@@ -5,12 +5,19 @@ public interface FuTradeConstants {
     String FU_TRADE = "FU TRADE";
     String FU_TRADE_NOTIFICATION_GROUP = "cn.fudoc.trade.notification.group";
 
+    String FU_HIDE_MODE = "fu-hide-mode";
 
-    String MY_SELECTED_GROUP = "我的自选";
-    String MY_POSITIONS_GROUP = "我的持仓";
+    String MY_SELECT_GROUP = "我的自选";
+    String MY_SELECT_HIDE_GROUP = "My Selected";
+    String MY_HOLD_GROUP = "我的持仓";
+    String MY_HOLD_HIDE_GROUP = "My Holdings";
     String LINK_RATE_LABEL = "点我设置交易费率";
 
+
     String ADD_STOCK = FuBundle.message("add.stock.title");
+    String GROUP_NAME_NOT_NULL = FuBundle.message("stock.group.notNull");
+    String HIDE_GROUP_NAME_NOT_NULL = FuBundle.message("stock.hide.group.notNull");
+    String GROUP_TYPE_NOT_NULL = FuBundle.message("stock.group.type.notNull");
 
     String STOCK_VALID_FORMAT_ERROR = "stock.valid.formatError";
 

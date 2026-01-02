@@ -4,19 +4,19 @@ import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.core.helper.TableHelper;
 import cn.fudoc.trade.core.helper.TableListener;
+import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
@@ -26,6 +26,7 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
      * 当前tab 股票集合
      */
     protected final Set<String> stockCodeSet = new HashSet<>();
+    protected final StockGroupInfo stockGroupInfo;
 
     protected final JBTable stockTable;
     protected final DefaultTableModel tableModel;
@@ -37,6 +38,8 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
     protected final TableHelper tableHelper;
 
     protected TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
+
+    protected abstract boolean isHide();
 
     /**
      * 表格展示的标题
@@ -63,8 +66,16 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
 
     }
 
+    /**
+     * 中文分组名称 持久化的分组名称
+     */
+    protected String groupName() {
+        return stockGroupInfo.getGroupName();
+    }
 
-    public AbstractStockTableView() {
+
+    public AbstractStockTableView(StockGroupInfo stockGroupInfo) {
+        this.stockGroupInfo = stockGroupInfo;
         this.tableModel = new DefaultTableModel(getColumnNames(), 0) {
             // 设置单元格不可编辑
             @Override
@@ -75,6 +86,12 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
         stockTable = new JBTable(tableModel);
         tipLabel = new JLabel();
         tableHelper = new TableHelper(this.stockTable, this.tableModel, this);
+    }
+
+
+    @Override
+    public StockGroupInfo stockGroupInfo() {
+        return stockGroupInfo;
     }
 
 
@@ -97,7 +114,8 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
         if (StringUtils.isBlank(lastUpdateTime)) {
             lastUpdateTime = "----------";
         }
-        tipLabel.setText("最后更新时间：" + lastUpdateTime + (StringUtils.isBlank(tag) ? "" : "   [ " + tag + " ]"));
+        String text = isHide() ? "Last Update Time: " : "最后更新时间：";
+        tipLabel.setText(text + lastUpdateTime + (StringUtils.isBlank(tag) ? "" : "   [ " + tag + " ]"));
     }
 
     /**
@@ -133,7 +151,6 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
     }
 
 
-
     @Override
     public void addStock(RealStockInfo realStockInfo) {
         String stockCode = realStockInfo.getStockCode();
@@ -166,7 +183,6 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
     }
 
 
-
     @Override
     public void removeRow(int modelRow) {
         //持久化移除
@@ -177,4 +193,50 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
         stockCodeSet.remove(code);
         tableDataChanged();
     }
+
+
+    protected @NotNull TableRowSorter<DefaultTableModel> getDefaultTableModelTableRowSorter() {
+        TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
+        tableRowSorter.setComparator(2, Comparator.comparing(FuNumberUtil::toBigDecimal));
+        tableRowSorter.setComparator(3, Comparator.comparing(FuNumberUtil::toBigDecimal));
+        tableRowSorter.setComparator(4, Comparator.comparing(FuNumberUtil::toBigDecimal));
+        return tableRowSorter;
+    }
+
+    protected @NotNull TableRowSorter<DefaultTableModel> getHoldingsTableRowSorter() {
+        TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
+        tableRowSorter.setComparator(1, (o1, o2) -> {
+            String value1 = convertValue(o1, 1);
+            String value2 = convertValue(o2, 1);
+            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
+        });
+        tableRowSorter.setComparator(2, (o1, o2) -> {
+            String value1 = convertValue(o1, 0);
+            String value2 = convertValue(o2, 0);
+            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
+        });
+        tableRowSorter.setComparator(3, (o1, o2) -> {
+            String value1 = convertValue(o1, 0);
+            String value2 = convertValue(o2, 0);
+            return FuNumberUtil.toInteger(value1).compareTo(FuNumberUtil.toInteger(value2));
+        });
+        tableRowSorter.setComparator(5, (o1, o2) -> {
+            String value1 = convertValue(o1, 0);
+            String value2 = convertValue(o2, 0);
+            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
+        });
+        return tableRowSorter;
+    }
+
+
+    protected String convertValue(Object value, int index) {
+        if (Objects.isNull(value)) {
+            return "";
+        }
+        if (value instanceof String[] content && content.length > index) {
+            return content[index];
+        }
+        return "";
+    }
+
 }

@@ -1,8 +1,12 @@
 package cn.fudoc.trade.core.startup;
 
 import cn.fudoc.trade.api.ZTApiService;
+import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
+import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.state.index.StockIndex;
+import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
+import cn.fudoc.trade.util.PinyinUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -11,6 +15,7 @@ import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,6 +43,14 @@ public class FuStockStartupActivity implements ProjectActivity {
                 instance.setHK(new StockIndex(ztApiService.marketHK(), true));
                 instance.setUpdateTime(System.currentTimeMillis());
             }
+
+            //处理历史数据问题
+            StockGroupState stockGroupState = StockGroupState.getInstance();
+            Map<String, GroupTypeEnum> stockTabEnumMap = stockGroupState.getStockTabEnumMap();
+            if (stockTabEnumMap.isEmpty()) {
+                return;
+            }
+            stockTabEnumMap.forEach((key, value) -> stockGroupState.add(new StockGroupInfo(key, PinyinUtil.getFirstLetterRandom(key), value)));
         });
     }
 }

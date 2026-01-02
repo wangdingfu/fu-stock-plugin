@@ -24,10 +24,6 @@ import java.util.*;
 public class StockGroupPersistentState implements PersistentStateComponent<StockGroupPersistentState> {
 
     /**
-     * 是否每隔3秒刷新股票
-     */
-    private boolean autoRefresh;
-    /**
      * key：分组 value：股票代码
      */
     private Map<String, Set<String>> stockMap = new HashMap<>();

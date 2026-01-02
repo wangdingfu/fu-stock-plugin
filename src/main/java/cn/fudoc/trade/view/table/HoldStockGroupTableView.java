@@ -1,32 +1,23 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
-import cn.fudoc.trade.core.common.FuNotification;
-import cn.fudoc.trade.core.common.FuTradeConstants;
-import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
+import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
-import cn.fudoc.trade.util.ProjectUtils;
 import cn.fudoc.trade.view.TodayProfitView;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
-import cn.fudoc.trade.view.holdings.HoldingsStockDialog;
 import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.fudoc.trade.view.render.MultiLineTableCellRenderer;
 import com.google.common.collect.Lists;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ui.Splitter;
 import icons.FuIcons;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -35,9 +26,8 @@ import java.util.List;
 /**
  * 持仓 tab
  */
-public class HoldStockGroupTableView extends AbstractStockTableView {
+public class HoldStockGroupTableView extends AbstractHoldingsTable {
 
-    private final String tabName;
     private static final String[] columnNames = {"代码", "名称 / 市值", "持仓盈亏", "持仓 / 可用", "现价 / 成本", "今日收益",};
     private final HoldingsStockState state;
 
@@ -45,8 +35,8 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     private final TodayProfitView todayProfitView = new TodayProfitView();
 
 
-    public HoldStockGroupTableView(String tabName) {
-        this.tabName = tabName;
+    public HoldStockGroupTableView(StockGroupInfo stockGroupInfo) {
+        super(stockGroupInfo);
         addListener();
         int rowHeight = stockTable.getRowHeight();
         stockTable.setRowHeight(rowHeight * 2 + 10);
@@ -60,33 +50,8 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
         // 从视图中移除，模型仍保留
         stockTable.getColumnModel().removeColumn(idColumn);
         this.state = HoldingsStockState.getInstance();
-        init(this.state.getStockCodes(tabName));
+        init(this.state.getStockCodes(groupName()));
         stockTable.setRowSorter(getDefaultTableModelTableRowSorter());
-    }
-
-    private @NotNull TableRowSorter<DefaultTableModel> getDefaultTableModelTableRowSorter() {
-        TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
-        tableRowSorter.setComparator(1, (o1, o2) -> {
-            String value1 = convertValue(o1, 1);
-            String value2 = convertValue(o2, 1);
-            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
-        });
-        tableRowSorter.setComparator(2, (o1, o2) -> {
-            String value1 = convertValue(o1, 0);
-            String value2 = convertValue(o2, 0);
-            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
-        });
-        tableRowSorter.setComparator(3, (o1, o2) -> {
-            String value1 = convertValue(o1, 0);
-            String value2 = convertValue(o2, 0);
-            return FuNumberUtil.toInteger(value1).compareTo(FuNumberUtil.toInteger(value2));
-        });
-        tableRowSorter.setComparator(5, (o1, o2) -> {
-            String value1 = convertValue(o1, 0);
-            String value2 = convertValue(o2, 0);
-            return FuNumberUtil.toBigDecimal(value1).compareTo(FuNumberUtil.toBigDecimal(value2));
-        });
-        return tableRowSorter;
     }
 
 
@@ -134,13 +99,13 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
     }
 
     @Override
-    public String getTabName() {
-        return tabName;
+    protected boolean isHide() {
+        return false;
     }
 
     @Override
-    public StockTabEnum getTabEnum() {
-        return StockTabEnum.STOCK_HOLD;
+    public GroupTypeEnum getTabEnum() {
+        return GroupTypeEnum.STOCK_HOLD;
     }
 
 
@@ -151,13 +116,13 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
 
     @Override
     protected void removeStockFromState(String stockCode) {
-        state.remove(tabName, stockCode);
+        state.remove(groupName(), stockCode);
     }
 
     @Override
     protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
         Vector<Object> vector = new Vector<>();
-        HoldingsInfo holdingsInfo = state.getHoldingsInfo(tabName, realStockInfo.getStockCode());
+        HoldingsInfo holdingsInfo = state.getHoldingsInfo(groupName(), realStockInfo.getStockCode());
         BigDecimal cost = BigDecimal.ZERO,
                 companyValue = BigDecimal.ZERO,
                 PL = BigDecimal.ZERO,
@@ -225,70 +190,5 @@ public class HoldStockGroupTableView extends AbstractStockTableView {
             dataList.add(holdStockDataDto);
         });
         return dataList;
-    }
-
-
-    private String convertValue(Object value, int index) {
-        if (Objects.isNull(value)) {
-            return "";
-        }
-        if (value instanceof String[] content && content.length > index) {
-            return content[index];
-        }
-        return "";
-    }
-
-
-    private void addListener() {
-        super.stockTable.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                //双击进入设置持仓信息页面
-                if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-                    openDialog(FuTradeConstants.TabName.HOLDINGS_COST_TAB);
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
-        super.tableHelper.addMenu(FuTradeConstants.TabName.HOLDINGS_BUY_TAB, e -> openDialog(FuTradeConstants.TabName.HOLDINGS_BUY_TAB));
-        super.tableHelper.addMenu(FuTradeConstants.TabName.HOLDINGS_SELL_TAB, e -> openDialog(FuTradeConstants.TabName.HOLDINGS_SELL_TAB));
-        super.tableHelper.addMenu(FuTradeConstants.TabName.HOLDINGS_LOG_TAB, e -> openDialog(FuTradeConstants.TabName.HOLDINGS_LOG_TAB));
-    }
-
-
-    private void openDialog(String openTab) {
-        int selectedRow = stockTable.getSelectedRow();
-        if(selectedRow == -1){
-            FuNotification.notifyWarning("请先选中行在右键");
-            return;
-        }
-        int modelRow = stockTable.convertRowIndexToModel(selectedRow);
-        Object valueAt = tableModel.getValueAt(modelRow, 0);
-        Object valueAt1 = tableModel.getValueAt(modelRow, 1);
-        String code = Objects.isNull(valueAt) ? "" : valueAt.toString();
-        String name = (valueAt1 instanceof String[] values && values.length > 0) ? values[0] : "";
-        HoldingsStockDialog holdingsStockDialog = new HoldingsStockDialog(ProjectUtils.getCurrProject(), tabName, code, name, openTab);
-        if (holdingsStockDialog.showAndGet()) {
-            reloadAllStock();
-        }
     }
 }

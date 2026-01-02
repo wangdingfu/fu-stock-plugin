@@ -1,19 +1,21 @@
 package cn.fudoc.trade.core.action;
 
+import cn.fudoc.trade.core.common.FuTradeConstants;
+
 public abstract class DefaultHideShowCallback implements HideShowCallback {
     @Override
     public String getKey() {
-        return "fu-trade";
+        return FuTradeConstants.FU_HIDE_MODE;
     }
 
     @Override
     public String getShowText() {
-        return "摸鱼模式";
+        return "正常模式";
     }
 
     @Override
     public String getHideText() {
-        return "工作模式";
+        return "隐蔽模式";
     }
 
 }

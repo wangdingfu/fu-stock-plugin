@@ -43,14 +43,6 @@ public class FuStockSettingState implements PersistentStateComponent<FuStockSett
         return rateInfoMap.get(group);
     }
 
-    public TradeRateInfo getRateAndCreate(String group) {
-        TradeRateInfo rate = getRate(group);
-        if (Objects.isNull(rate)) {
-            rate = createDefaultTradeRateInfo();
-            rateInfoMap.put(group, rate);
-        }
-        return rate;
-    }
 
     public TradeRateInfo createDefaultTradeRateInfo() {
         TradeRateInfo rate = new TradeRateInfo();

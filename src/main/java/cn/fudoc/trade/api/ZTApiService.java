@@ -11,7 +11,7 @@ import java.util.List;
 public interface ZTApiService {
 
     /**
-     * A股所有股票集合
+     * A 股所有股票集合
      */
     List<StockInfo> marketA();
 

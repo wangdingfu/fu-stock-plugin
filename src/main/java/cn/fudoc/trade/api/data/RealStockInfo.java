@@ -34,4 +34,8 @@ public class RealStockInfo {
      * 成交额
      */
     private String volume;
+    /**
+     * 成交额 单位
+     */
+    private String volumeUnit;
 }

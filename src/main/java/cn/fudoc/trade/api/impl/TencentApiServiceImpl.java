@@ -2,12 +2,14 @@ package cn.fudoc.trade.api.impl;
 
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.util.FuNumberUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -66,21 +68,23 @@ public class TencentApiServiceImpl implements TencentApiService {
             bean.setCurrentPrice(values[3]);
             bean.setYesterdayPrice(values[4]);
             bean.setIncreaseRate(values[32]);
-            bean.setVolume(formatVolume(values[37]));
+            String[] volume = formatVolume(values[37]);
+            bean.setVolume(volume[0]);
+            bean.setVolumeUnit(volume[1]);
             realStockInfoList.add(bean);
         }
         return realStockInfoList;
     }
 
 
-    private static String formatVolume(String volume) {
+    private static String[] formatVolume(String volume) {
         if(StringUtils.isEmpty(volume) || !NumberUtil.isNumber(volume)){
-            return "---";
+            return new String[]{"---",""};
         }
         BigDecimal bigDecimal = new BigDecimal(volume);
         if(bigDecimal.compareTo(Y) < 0){
-            return volume+" 万";
+            return new String[]{volume,"万"};
         }
-        return NumberUtil.div(bigDecimal,Y,2) + " 亿";
+        return new String[]{FuNumberUtil.format(NumberUtil.div(bigDecimal,Y,2)),"亿"};
     }
 }

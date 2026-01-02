@@ -1,18 +1,21 @@
 package cn.fudoc.trade.toolwindow;
 
+import cn.fudoc.trade.core.action.DefaultHideShowCallback;
+import cn.fudoc.trade.core.action.HideShowAction;
 import cn.fudoc.trade.core.common.FuBundle;
 import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
-import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
+import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.common.enumtype.UpdateTipTagEnum;
 import cn.fudoc.trade.core.state.FuCommonState;
 import cn.fudoc.trade.core.state.StockGroupState;
+import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.core.timer.ScheduledTaskManager;
 import cn.fudoc.trade.util.ToolBarUtils;
 import cn.fudoc.trade.view.FuIndexView;
+import cn.fudoc.trade.view.FuStockSearchPopupView;
 import cn.fudoc.trade.view.FuStockTabView;
 import cn.fudoc.trade.view.GroupAddDialog;
-import cn.fudoc.trade.view.FuStockSearchPopupView;
 import cn.fudoc.trade.view.settings.FuStockSettingDialog;
 import cn.fudoc.trade.view.table.StockTableView;
 import cn.hutool.core.date.DateUtil;
@@ -22,9 +25,6 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.ui.BrowserHyperlinkListener;
-import com.intellij.util.ui.HTMLEditorKitBuilder;
-import com.intellij.util.ui.UIUtil;
 import icons.FuIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +43,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     private static final String STOCK_AUTO_LOAD_TITLE = FuBundle.message("stock.auto.load.title");
     private static final String STOCK_AUTO_LOAD_TIME_TITLE = FuBundle.message("stock.auto.load.time.tip");
 
+    private static final StockGroupInfo MY_SELECT = new StockGroupInfo(FuTradeConstants.MY_SELECT_GROUP, FuTradeConstants.MY_SELECT_HIDE_GROUP, GroupTypeEnum.STOCK_INFO);
+    private static final StockGroupInfo MY_HOLD = new StockGroupInfo(FuTradeConstants.MY_HOLD_GROUP, FuTradeConstants.MY_HOLD_HIDE_GROUP, GroupTypeEnum.STOCK_HOLD);
 
     /**
      * 指数栏视图
@@ -53,10 +55,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      */
     private final FuStockTabView stockView;
 
-    /**
-     * 消息栏视图
-     */
-//    private final JEditorPane messagePane;
 
     /**
      * 任务调度管理 主要保证每隔固定时间刷新股票实时信息
@@ -87,7 +85,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 第二部分：指数栏，主要展示上证指数，创业板指数信息
      * 第三部分：股票栏，主要展示自选股票实时信息以及自定义分组管理股票
      * 第四部分：收益栏，主要展示我今日的收益信息
-     * 第五部分：消息栏，主要展示一些炒股组训，炒股纪律等文案
      *
      * @param project 当前项目
      */
@@ -104,32 +101,25 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         this.stockView = new FuStockTabView(project);
         contentPanel.add(this.stockView.getComponent(), BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
-
-//        //5、消息栏
-//        this.messagePane = initPanel();
-//        rootPanel.add(ScrollPaneFactory.createScrollPane(this.messagePane), BorderLayout.SOUTH);
-
+        //初始化自动刷新
+        isAutoLoad.set(fuCommonState.is(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH));
         //设置当前面板到窗口
         setContent(rootPanel);
-        //随机展示炒股心灵鸡汤文案
-        showTips();
-        //初始化持仓
+        //初始化股票分组
         initGroup();
+        //默认选中我的自选
+        stockView.selected(MY_SELECT);
     }
 
-
+    /**
+     * 初始化股票分组
+     */
     private void initGroup() {
-        stockView.add(FuTradeConstants.MY_SELECTED_GROUP, StockTabEnum.STOCK_INFO);
-        stockView.add(FuTradeConstants.MY_POSITIONS_GROUP, StockTabEnum.STOCK_HOLD);
+        stockView.add(MY_SELECT);
+        stockView.add(MY_HOLD);
 
         //加载持久化的分组
-        stockGroupState.getStockTabEnumMap().forEach(stockView::add);
-
-        //是否自动刷新
-        isAutoLoad.set(fuCommonState.is(FuTradeConstants.CommonStateKey.STOCK_AUTO_REFRESH));
-
-        //默认选中我的自选
-        stockView.selectMySelected(FuTradeConstants.MY_SELECTED_GROUP);
+        stockGroupState.getGroupInfoList().forEach(stockView::add);
     }
 
 
@@ -155,14 +145,6 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
 
 
     /**
-     * 随机展示消息
-     */
-    private void showTips() {
-//        this.messagePane.setText("");
-    }
-
-
-    /**
      * 状态栏面板初始化
      */
     private JPanel initToolBarUI(Project project) {
@@ -183,8 +165,9 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 GroupAddDialog groupAddDialog = new GroupAddDialog(project);
                 if (groupAddDialog.showAndGet()) {
-                    stockView.add(groupAddDialog.getGroupName(), groupAddDialog.getStockTabEnum());
-                    stockGroupState.add(groupAddDialog.getGroupName(), groupAddDialog.getStockTabEnum());
+                    StockGroupInfo stockGroupInfo = groupAddDialog.getStockGroupInfo();
+                    stockView.add(stockGroupInfo);
+                    stockGroupState.add(stockGroupInfo);
                 }
             }
         });
@@ -265,13 +248,24 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 updateTag(UpdateTipTagEnum.MANUAL_REFRESH.getTag());
             }
         });
-        //摸鱼模式 TODO 下一版本开发
-//        actionGroup.add(new HideShowAction(new DefaultHideShowCallback() {
-//            @Override
-//            public void callback(boolean isShow) {
-//                System.out.println(isShow);
-//            }
-//        }));
+        //隐蔽模式
+        actionGroup.add(new HideShowAction(new DefaultHideShowCallback() {
+            @Override
+            public void callback(boolean isShow) {
+                StockTableView selected = stockView.getSelected();
+                StockGroupInfo stockGroupInfo = null;
+                if (Objects.nonNull(selected)) {
+                    stockGroupInfo = selected.stockGroupInfo();
+                }
+                stockView.setHide(!isShow);
+                stockView.removeAllTab();
+                initGroup();
+                //选中切换前的 tab
+                if (Objects.nonNull(stockGroupInfo)) {
+                    stockView.selected(stockGroupInfo);
+                }
+            }
+        }));
 
         //基础信息设置
         actionGroup.addAction(new DumbAwareAction("设置", "", AllIcons.General.Settings) {
@@ -348,16 +342,4 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         //TODO 节假日判断
         return !DateUtil.isWeekend(date);
     }
-
-
-    private JEditorPane initPanel() {
-        JEditorPane messagePanel = new JEditorPane();
-        messagePanel.setContentType("text/html");
-        messagePanel.setEditable(false);
-        messagePanel.setEditorKit(HTMLEditorKitBuilder.simple());
-        messagePanel.addHyperlinkListener(BrowserHyperlinkListener.INSTANCE);
-        UIUtil.doNotScrollToCaret(messagePanel);
-        return messagePanel;
-    }
-
 }
