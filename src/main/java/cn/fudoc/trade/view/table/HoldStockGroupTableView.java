@@ -6,6 +6,7 @@ import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
+import cn.fudoc.trade.util.StockUtils;
 import cn.fudoc.trade.view.TodayProfitView;
 import cn.fudoc.trade.view.dto.HoldStockDataDto;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
@@ -154,7 +155,7 @@ public class HoldStockGroupTableView extends AbstractHoldingsTable {
         }
 
         //股票代码
-        vector.add(realStockInfo.getStockCode());
+        vector.add(StockUtils.formatStockCode(realStockInfo.getStockCode()));
         //名称/市值
         vector.add(new String[]{realStockInfo.getStockName(), FuNumberUtil.format(companyValue)});
         //持仓盈亏

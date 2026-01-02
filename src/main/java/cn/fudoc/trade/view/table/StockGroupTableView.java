@@ -4,6 +4,7 @@ import cn.fudoc.trade.api.data.RealStockInfo;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
+import cn.fudoc.trade.util.StockUtils;
 import cn.fudoc.trade.view.render.StockColorTableCellRenderer;
 import com.google.common.collect.Lists;
 
@@ -57,11 +58,11 @@ public class StockGroupTableView extends AbstractStockTableView {
     @Override
     protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
         Vector<Object> vector = new Vector<>();
-        vector.add(realStockInfo.getStockCode());
+        vector.add(StockUtils.formatStockCode(realStockInfo.getStockCode()));
         vector.add(realStockInfo.getStockName());
         vector.add(realStockInfo.getCurrentPrice());
         vector.add(realStockInfo.getIncreaseRate() + "%");
-        vector.add(realStockInfo.getVolume());
+        vector.add(realStockInfo.getVolume() + " " + realStockInfo.getVolumeUnit());
         return vector;
     }
 }

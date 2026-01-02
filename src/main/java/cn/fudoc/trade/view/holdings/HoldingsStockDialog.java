@@ -54,9 +54,6 @@ public class HoldingsStockDialog extends DialogWrapper {
      */
     private HoldingsInfo holdingsInfo;
 
-    public HoldingsStockDialog(Project project, String group, String stockCode, String stockName) {
-        this(project, group, stockCode, stockName, "成本信息");
-    }
 
     public HoldingsStockDialog(Project project, String group, String stockCode, String stockName, String selectTab) {
         super(project, true);

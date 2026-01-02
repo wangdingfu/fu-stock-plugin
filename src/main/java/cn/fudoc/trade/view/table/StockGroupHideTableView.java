@@ -17,7 +17,7 @@ import java.util.*;
 public class StockGroupHideTableView extends AbstractStockTableView {
 
 
-    private static final String[] stockTableColumn = {"Code", "Name", "Price", "Change(%)", "Total"};
+    private static final String[] stockTableColumn = {"Name", "Price", "Change(%)", "Total"};
     private final StockGroupPersistentState state;
 
     public StockGroupHideTableView(StockGroupInfo stockGroupInfo) {
@@ -59,7 +59,6 @@ public class StockGroupHideTableView extends AbstractStockTableView {
     @Override
     protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
         Vector<Object> vector = new Vector<>();
-        vector.add(StockUtils.formatStockCode(realStockInfo.getStockCode()));
         vector.add(PinyinUtil.getFirstLetterRandom(realStockInfo.getStockName()));
         vector.add(realStockInfo.getCurrentPrice());
         vector.add(realStockInfo.getIncreaseRate() + "%");

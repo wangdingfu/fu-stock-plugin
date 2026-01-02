@@ -10,6 +10,7 @@ import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.dto.StockInfoDTO;
 import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.hutool.core.util.NumberUtil;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBTextField;
 
@@ -115,7 +116,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         String countStr = countField.getText().trim();
         String costStr = costField.getText().trim();
         Integer count = NumberUtil.isInteger(countStr) ? Integer.parseInt(countStr) : 0;
-        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(costStr, count, holdingsInfo.getTradeList());
+        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(costStr, count, Objects.isNull(this.holdingsInfo) ? Lists.newArrayList() : holdingsInfo.getTradeList());
         actualCountLabel.setText("实际数量: " + calculate.getTotal());
         actualCostLabel.setText("实际成本: " + FuNumberUtil.formatCost(calculate.getCurrentCost()));
     }

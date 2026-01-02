@@ -27,7 +27,7 @@ import java.util.Vector;
 public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
 
 
-    private static final String[] columnNames = {"Code", "Name", "Price", "Today Profit", "Total Profit"};
+    private static final String[] columnNames = {"Name", "Price", "Today Profit", "Total Profit"};
     private final HoldingsStockState state;
 
     public HoldStockGroupHideTableView(StockGroupInfo stockGroupInfo) {
@@ -108,9 +108,6 @@ public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
             BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
             todayProfit = CalculateCostHelper.calculateProfit(currentPrice, yesterdayPrice, holdingsInfo);
         }
-
-        //股票代码
-        vector.add(StockUtils.formatStockCode(realStockInfo.getStockCode()));
         //名称
         vector.add(PinyinUtil.getFirstLetterRandom(realStockInfo.getStockName()));
         //现价
