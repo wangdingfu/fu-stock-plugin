@@ -7,28 +7,30 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 public class StockColorTableCellRenderer extends DefaultTableCellRenderer {
-    public StockColorTableCellRenderer(Integer left) {
-        if (Objects.nonNull(left)) {
-            setBorder(BorderFactory.createEmptyBorder(0, left, 0, 0));
-        }
-        setAlignmentX(Component.CENTER_ALIGNMENT);
-        setAlignmentY(Component.CENTER_ALIGNMENT);
+    private final List<Integer> colorColumnList;
+    public StockColorTableCellRenderer(List<Integer> colorColumnList) {
+        this.colorColumnList = colorColumnList;
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        if (Objects.nonNull(value)) {
+        if (this.colorColumnList.contains(column) && Objects.nonNull(value)) {
             BigDecimal bigDecimal = FuNumberUtil.toBigDecimal(value);
             value = FuNumberUtil.formatRate(bigDecimal,true);
             JBColor textColor = getTextColor(bigDecimal);
             if (Objects.nonNull(textColor)) {
                 setForeground(textColor);
             }
+        }else {
+            setForeground(table.getForeground());
         }
-        return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        component.setFont(component.getFont().deriveFont(12.0f));
+        return component;
     }
 
 

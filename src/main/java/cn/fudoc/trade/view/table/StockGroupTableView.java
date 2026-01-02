@@ -5,11 +5,13 @@ import cn.fudoc.trade.core.common.enumtype.StockTabEnum;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.view.render.StockColorTableCellRenderer;
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -19,14 +21,13 @@ public class StockGroupTableView extends AbstractStockTableView {
 
     private final String tabName;
     private static final String[] stockTableColumn = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
-    private static final String[] colorColumnNames = {"涨跌幅(%)"};
+    private static final String[] stockTableEnColumn = {"Code", "Name", "Price", "Change(%)", "Total"};
+    private static final List<Integer> colorColumns = Lists.newArrayList(3);
     private final StockGroupPersistentState state;
 
     public StockGroupTableView(String tabName) {
         this.tabName = tabName;
-        for (String columnName : colorColumnNames) {
-            stockTable.getColumn(columnName).setCellRenderer(new StockColorTableCellRenderer(null));
-        }
+        stockTable.setDefaultRenderer(Object.class, new StockColorTableCellRenderer(colorColumns));
         this.state = StockGroupPersistentState.getInstance();
         init(this.state.getStockCodes(tabName));
         stockTable.setRowSorter(getDefaultTableModelTableRowSorter());
@@ -54,7 +55,7 @@ public class StockGroupTableView extends AbstractStockTableView {
 
     @Override
     protected String[] getColumnNames() {
-        return stockTableColumn;
+        return stockTableEnColumn;
     }
 
     @Override
