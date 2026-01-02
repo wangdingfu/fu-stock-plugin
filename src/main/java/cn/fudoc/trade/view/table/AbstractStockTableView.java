@@ -14,7 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.*;
@@ -83,7 +85,11 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
                 return false;
             }
         };
+        DefaultTableCellRenderer headerCenterRenderer = new DefaultTableCellRenderer();
+        headerCenterRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         stockTable = new JBTable(tableModel);
+        JTableHeader tableHeader = stockTable.getTableHeader();
+        tableHeader.setDefaultRenderer(headerCenterRenderer);
         tipLabel = new JLabel();
         tableHelper = new TableHelper(this.stockTable, this.tableModel, this);
     }
@@ -195,11 +201,9 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
     }
 
 
-    protected @NotNull TableRowSorter<DefaultTableModel> getDefaultTableModelTableRowSorter() {
+    protected @NotNull TableRowSorter<DefaultTableModel> getSorter(List<Integer> sortList) {
         TableRowSorter<DefaultTableModel> tableRowSorter = new TableRowSorter<>(tableModel);
-        tableRowSorter.setComparator(2, Comparator.comparing(FuNumberUtil::toBigDecimal));
-        tableRowSorter.setComparator(3, Comparator.comparing(FuNumberUtil::toBigDecimal));
-        tableRowSorter.setComparator(4, Comparator.comparing(FuNumberUtil::toBigDecimal));
+        sortList.forEach(f->tableRowSorter.setComparator(f, Comparator.comparing(FuNumberUtil::toBigDecimal)));
         return tableRowSorter;
     }
 

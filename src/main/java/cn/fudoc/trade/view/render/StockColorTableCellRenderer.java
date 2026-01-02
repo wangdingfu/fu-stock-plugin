@@ -29,6 +29,12 @@ public class StockColorTableCellRenderer extends DefaultTableCellRenderer {
             setForeground(table.getForeground());
         }
         Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        // 4. 设置水平居中 + 垂直居中（核心代码）
+        if (component instanceof JLabel label) {
+            label.setHorizontalAlignment(SwingConstants.CENTER); // 水平居中
+            label.setVerticalAlignment(SwingConstants.CENTER);   // 垂直居中
+        }
+
         component.setFont(component.getFont().deriveFont(12.0f));
         return component;
     }

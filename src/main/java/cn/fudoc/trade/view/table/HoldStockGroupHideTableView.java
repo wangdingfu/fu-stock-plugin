@@ -7,7 +7,6 @@ import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.util.PinyinUtil;
-import cn.fudoc.trade.util.StockUtils;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
 import cn.fudoc.trade.view.render.StockColorTableCellRenderer;
@@ -15,6 +14,7 @@ import com.google.common.collect.Lists;
 import icons.FuIcons;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -27,7 +27,7 @@ import java.util.Vector;
 public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
 
 
-    private static final String[] columnNames = {"Name", "Price", "Today Profit", "Total Profit"};
+    private static final String[] columnNames = {"Code", "Name", "Price", "Today Profit", "Total Profit"};
     private final HoldingsStockState state;
 
     public HoldStockGroupHideTableView(StockGroupInfo stockGroupInfo) {
@@ -35,8 +35,11 @@ public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
         addListener();
         this.state = HoldingsStockState.getInstance();
         init(this.state.getStockCodes(groupName()));
-        stockTable.setRowSorter(getDefaultTableModelTableRowSorter());
+        stockTable.setRowSorter(getSorter(Lists.newArrayList(1, 2, 3)));
         stockTable.setDefaultRenderer(Object.class, new StockColorTableCellRenderer(Lists.newArrayList()));
+        TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
+        // 从视图中移除，模型仍保留
+        stockTable.getColumnModel().removeColumn(idColumn);
 
     }
 
@@ -108,8 +111,9 @@ public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
             BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
             todayProfit = CalculateCostHelper.calculateProfit(currentPrice, yesterdayPrice, holdingsInfo);
         }
+        vector.add(realStockInfo.getStockCode());
         //名称
-        vector.add(PinyinUtil.getFirstLetterRandom(realStockInfo.getStockName()));
+        vector.add(PinyinUtil.getFirstLetterRandom(realStockInfo.getStockName()).toUpperCase());
         //现价
         vector.add(realStockInfo.getCurrentPrice());
         String todayProfitPrefix = todayProfit.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";

@@ -34,7 +34,8 @@ public class FuStockTabView {
     private boolean isHide;
     private boolean isSwitch;
 
-    public FuStockTabView(Project project) {
+    public FuStockTabView(Project project,boolean isHide) {
+        this.isHide = isHide;
         this.tabs = JBTabsFactory.createTabs(project);
         registerListener();
     }

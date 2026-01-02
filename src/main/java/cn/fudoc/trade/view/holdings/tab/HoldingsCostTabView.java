@@ -52,13 +52,13 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     @Override
     protected void initData(HoldingsInfo holdingsInfo) {
         if (Objects.isNull(holdingsInfo)) {
-            return;
+            costField.setText("");
+            countField.setText("");
+        }else {
+            costField.setText(FuNumberUtil.formatCost(holdingsInfo.getCost()));
+            Integer count = holdingsInfo.getCount();
+            countField.setText(Objects.isNull(count) ? "" : count.toString());
         }
-
-        costField.setText(FuNumberUtil.formatCost(holdingsInfo.getCost()));
-        Integer count = holdingsInfo.getCount();
-        countField.setText(Objects.isNull(count) ? "" : count.toString());
-
         tip1Label.setText("提示1：维护的成本价和持仓数量将被视为上一交易日结束后的持仓成本和数量");
         tip2Label.setText("提示2：实际成本和数量会根据当前维护的成本和今日交易实时计算得出");
     }

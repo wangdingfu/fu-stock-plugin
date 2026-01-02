@@ -5,7 +5,7 @@ import cn.fudoc.trade.core.common.FuTradeConstants;
 public abstract class DefaultHideShowCallback implements HideShowCallback {
     @Override
     public String getKey() {
-        return FuTradeConstants.FU_HIDE_MODE;
+        return FuTradeConstants.CommonStateKey.FU_HIDE_MODE;
     }
 
     @Override

@@ -5,7 +5,7 @@ public interface FuTradeConstants {
     String FU_TRADE = "FU TRADE";
     String FU_TRADE_NOTIFICATION_GROUP = "cn.fudoc.trade.notification.group";
 
-    String FU_HIDE_MODE = "fu-hide-mode";
+
 
     String MY_SELECT_GROUP = "我的自选";
     String MY_SELECT_HIDE_GROUP = "My Selected";
@@ -22,6 +22,7 @@ public interface FuTradeConstants {
     String STOCK_VALID_FORMAT_ERROR = "stock.valid.formatError";
 
     interface CommonStateKey{
+        String FU_HIDE_MODE = "fu-hide-mode";
         String STOCK_AUTO_REFRESH = "fu-stock-auto-refresh";
     }
 

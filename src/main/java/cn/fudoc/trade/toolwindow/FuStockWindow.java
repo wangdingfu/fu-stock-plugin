@@ -98,7 +98,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         this.indexView = new FuIndexView();
         contentPanel.add(this.indexView, BorderLayout.NORTH);
         //3、股票面板
-        this.stockView = new FuStockTabView(project);
+        this.stockView = new FuStockTabView(project, !fuCommonState.is(FuTradeConstants.CommonStateKey.FU_HIDE_MODE));
         contentPanel.add(this.stockView.getComponent(), BorderLayout.CENTER);
         rootPanel.add(contentPanel, BorderLayout.CENTER);
         //初始化自动刷新

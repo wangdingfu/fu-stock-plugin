@@ -42,7 +42,7 @@ public class HideShowAction extends AnAction {
         Presentation presentation = e.getPresentation();
         // 更新图标和描述
         boolean isVisible = !instance.is(hideShowCallback.getKey());
-        presentation.setIcon(isVisible ? AllIcons.General.InspectionsEye : FuIcons.FU_UNSHARE);
+        presentation.setIcon(isVisible ? AllIcons.General.Show : FuIcons.FU_UNSHARE);
         presentation.setText(isVisible ? hideShowCallback.getShowText() : hideShowCallback.getHideText());
     }
 
@@ -51,7 +51,7 @@ public class HideShowAction extends AnAction {
         Presentation presentation = e.getPresentation();
         // 更新图标和描述
         boolean isVisible = instance.is(hideShowCallback.getKey());
-        presentation.setIcon(isVisible ? AllIcons.General.InspectionsEye : FuIcons.FU_UNSHARE);
+        presentation.setIcon(isVisible ? AllIcons.General.Show : FuIcons.FU_UNSHARE);
         presentation.setText(isVisible ? hideShowCallback.getShowText() : hideShowCallback.getHideText());
         instance.set(hideShowCallback.getKey(), !isVisible);
 
