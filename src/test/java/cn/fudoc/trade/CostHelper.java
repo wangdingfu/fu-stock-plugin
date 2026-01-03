@@ -2,7 +2,7 @@ package cn.fudoc.trade;
 
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
-import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
+import cn.fudoc.trade.view.helper.CalculateCostHelper;
 import cn.hutool.json.JSONUtil;
 
 public class CostHelper {

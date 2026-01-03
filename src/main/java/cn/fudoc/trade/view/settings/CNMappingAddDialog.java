@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view;
+package cn.fudoc.trade.view.settings;
 
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
@@ -7,7 +7,7 @@ import cn.fudoc.trade.core.listener.DocumentCallback;
 import cn.fudoc.trade.core.listener.TextFieldDocumentListener;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
-import cn.fudoc.trade.view.helper.HideTextHelper;
+import cn.fudoc.trade.util.PinyinUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -25,17 +25,17 @@ import java.util.Objects;
 /**
  * 添加股票分组弹框
  */
-public class GroupAddDialog extends DialogWrapper implements DocumentCallback {
+public class CNMappingAddDialog extends DialogWrapper implements DocumentCallback {
     // 输入组件
-    private final JBTextField groupNameField = new JBTextField();
-    private final JBTextField hideGroupNameField = new JBTextField();
-    private final ComboBox<GroupTypeEnum> groupTypeComboBox = new ComboBox<>(GroupTypeEnum.values());
+    private final JBTextField cnField = new JBTextField();
+    private final JBTextField enField = new JBTextField();
+    private final ComboBox<CNMappingGroupEnum> typeComboBox = new ComboBox<>(CNMappingGroupEnum.values());
 
     // 构造器：接收父窗口（null 则以 IDE 为父窗口）
-    public GroupAddDialog(@Nullable Project project) {
+    public CNMappingAddDialog(@Nullable Project project) {
         super(project, true);
         // 弹框标题
-        setTitle("新增股票分组");
+        setTitle("新增中文映射");
         // 初始化 DialogWrapper（必须调用）
         init();
         // 初始化组件数据
@@ -46,7 +46,7 @@ public class GroupAddDialog extends DialogWrapper implements DocumentCallback {
 
     private void initComponents() {
         // 设置默认选中第一项（股票分组）
-        groupTypeComboBox.setSelectedIndex(0);
+        typeComboBox.setSelectedIndex(0);
     }
 
     // 构建弹框内容面板（核心布局）
@@ -56,35 +56,36 @@ public class GroupAddDialog extends DialogWrapper implements DocumentCallback {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(JBUI.Borders.empty(20, 30));
-        FormPanelUtil.addRow(mainPanel, "分组名称：", groupNameField);
-        FormPanelUtil.addRow(mainPanel, "隐蔽名称：", hideGroupNameField);
-        FormPanelUtil.addRow(mainPanel, "分组类型：", groupTypeComboBox);
+        FormPanelUtil.addRow(mainPanel, "中文名称：", cnField);
+        FormPanelUtil.addRow(mainPanel, "隐蔽名称：", enField);
+        FormPanelUtil.addRow(mainPanel, "分组类型：", typeComboBox);
         return mainPanel;
     }
 
     // 输入校验（必填项检查）
     @Override
     protected ValidationInfo doValidate() {
-        if (StringUtils.isBlank(groupNameField.getText().trim())) {
-            return new ValidationInfo(FuTradeConstants.GROUP_NAME_NOT_NULL, groupNameField);
+        if (StringUtils.isBlank(cnField.getText().trim())) {
+            return new ValidationInfo(FuTradeConstants.LANGUAGE_CN_NOT_NULL, cnField);
         }
-        if (StringUtils.isBlank(hideGroupNameField.getText().trim())) {
-            return new ValidationInfo(FuTradeConstants.HIDE_GROUP_NAME_NOT_NULL, groupNameField);
+        if (StringUtils.isBlank(enField.getText().trim())) {
+            return new ValidationInfo(FuTradeConstants.HIDE_GROUP_NAME_NOT_NULL, enField);
         }
-        if (Objects.isNull(groupTypeComboBox.getSelectedItem())) {
-            return new ValidationInfo(FuTradeConstants.GROUP_TYPE_NOT_NULL, groupNameField);
+        if (Objects.isNull(typeComboBox.getSelectedItem())) {
+            return new ValidationInfo(FuTradeConstants.LANGUAGE_TYPE_NOT_NULL, typeComboBox);
         }
         // 校验通过：返回 null
         return super.doValidate();
     }
 
 
-    public StockGroupInfo getStockGroupInfo() {
-        return new StockGroupInfo(groupNameField.getText().trim(), hideGroupNameField.getText().trim(), (GroupTypeEnum) groupTypeComboBox.getSelectedItem());
+    public Object[] getData() {
+        return new Object[]{cnField.getText().trim(), enField.getText().trim(), typeComboBox.getSelectedItem()};
     }
 
-    private void addListener(){
-        groupNameField.getDocument().addDocumentListener(new TextFieldDocumentListener(1, this));
+
+    private void addListener() {
+        cnField.getDocument().addDocumentListener(new TextFieldDocumentListener(1, this));
     }
 
     // 启用“确认”和“取消”按钮（默认启用，可自定义按钮文本）
@@ -98,7 +99,7 @@ public class GroupAddDialog extends DialogWrapper implements DocumentCallback {
 
     @Override
     public void callback(Integer type, DocumentEvent event) {
-        String trim = groupNameField.getText().trim();
-        hideGroupNameField.setText(HideTextHelper.mapping(trim, CNMappingGroupEnum.STOCK_GROUP));
+        String trim = cnField.getText().trim();
+        enField.setText((trim.length() <= 2 ? PinyinUtil.getPinyin(trim, "") : PinyinUtil.getFirstLetterRandom(trim)).toUpperCase());
     }
 }

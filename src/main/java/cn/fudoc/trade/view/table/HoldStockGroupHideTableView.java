@@ -1,6 +1,7 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
@@ -8,7 +9,8 @@ import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.fudoc.trade.util.PinyinUtil;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
-import cn.fudoc.trade.view.holdings.helper.CalculateCostHelper;
+import cn.fudoc.trade.view.helper.CalculateCostHelper;
+import cn.fudoc.trade.view.helper.HideTextHelper;
 import cn.fudoc.trade.view.render.StockColorTableCellRenderer;
 import com.google.common.collect.Lists;
 import icons.FuIcons;
@@ -113,7 +115,7 @@ public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
         }
         vector.add(realStockInfo.getStockCode());
         //名称
-        vector.add(PinyinUtil.getFirstLetterRandom(realStockInfo.getStockName()).toUpperCase());
+        vector.add(HideTextHelper.mapping(realStockInfo.getStockName(), CNMappingGroupEnum.STOCK_NAME));
         //现价
         vector.add(realStockInfo.getCurrentPrice());
         String todayProfitPrefix = todayProfit.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";

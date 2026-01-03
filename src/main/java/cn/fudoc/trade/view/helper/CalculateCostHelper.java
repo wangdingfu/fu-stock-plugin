@@ -1,4 +1,4 @@
-package cn.fudoc.trade.view.holdings.helper;
+package cn.fudoc.trade.view.helper;
 
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeInfoLog;

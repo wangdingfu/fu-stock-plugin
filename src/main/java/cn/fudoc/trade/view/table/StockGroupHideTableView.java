@@ -1,10 +1,12 @@
 package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.StockGroupPersistentState;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.PinyinUtil;
+import cn.fudoc.trade.view.helper.HideTextHelper;
 import cn.fudoc.trade.view.render.StockColorTableCellRenderer;
 import com.google.common.collect.Lists;
 
@@ -17,14 +19,14 @@ import java.util.*;
 public class StockGroupHideTableView extends AbstractStockTableView {
 
 
-    private static final String[] stockTableColumn = {"Code","Name", "Price", "Change(%)", "Total"};
+    private static final String[] stockTableColumn = {"Code", "Name", "Price", "Change(%)", "Total"};
     private final StockGroupPersistentState state;
 
     public StockGroupHideTableView(StockGroupInfo stockGroupInfo) {
         super(stockGroupInfo);
         this.state = StockGroupPersistentState.getInstance();
         init(this.state.getStockCodes(groupName()));
-        stockTable.setRowSorter(getSorter(Lists.newArrayList(1,2,3)));
+        stockTable.setRowSorter(getSorter(Lists.newArrayList(1, 2, 3)));
         stockTable.setDefaultRenderer(Object.class, new StockColorTableCellRenderer(Lists.newArrayList()));
         TableColumn idColumn = stockTable.getColumnModel().getColumn(0);
         // 从视图中移除，模型仍保留
@@ -63,10 +65,10 @@ public class StockGroupHideTableView extends AbstractStockTableView {
     protected Vector<Object> toTableData(RealStockInfo realStockInfo) {
         Vector<Object> vector = new Vector<>();
         vector.add(realStockInfo.getStockCode());
-        vector.add(PinyinUtil.getFirstLetterRandom(realStockInfo.getStockName()).toUpperCase());
+        vector.add(HideTextHelper.mapping(realStockInfo.getStockName(), CNMappingGroupEnum.STOCK_NAME));
         vector.add(realStockInfo.getCurrentPrice());
         vector.add(realStockInfo.getIncreaseRate() + "%");
-        vector.add(realStockInfo.getVolume()+" " + PinyinUtil.getFirstLetterRandom(realStockInfo.getVolumeUnit()).toUpperCase());
+        vector.add(realStockInfo.getVolume() + " " + HideTextHelper.mappingUnit(realStockInfo.getVolumeUnit()));
         return vector;
     }
 }

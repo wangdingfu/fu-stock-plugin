@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view.settings;
 
+import cn.fudoc.trade.view.settings.tab.CNMappingSettingTab;
 import cn.fudoc.trade.view.settings.tab.RateSettingsTab;
 import cn.fudoc.trade.view.settings.tab.SettingTab;
 import com.intellij.openapi.project.Project;
@@ -24,10 +25,14 @@ public class FuStockSettingDialog extends DialogWrapper {
     /**
      * 交易费率维护页面
      */
-    private RateSettingsTab rateSettingsTab ;
+    private RateSettingsTab rateSettingsTab;
+    /**
+     * 中文映射页面
+     */
+    private CNMappingSettingTab cnMappingSettingTab;
 
     public FuStockSettingDialog(Project project) {
-        this(project,null);
+        this(project, null);
     }
 
     public FuStockSettingDialog(Project project, String holdingsGroup) {
@@ -43,21 +48,24 @@ public class FuStockSettingDialog extends DialogWrapper {
     @Override
     protected void doOKAction() {
         rateSettingsTab.submit();
-
+        cnMappingSettingTab.submit();
         super.doOKAction();
     }
 
     private void initTab(String holdingsGroup) {
         this.rateSettingsTab = new RateSettingsTab(holdingsGroup);
-
-        addTab(rateSettingsTab);
+        this.cnMappingSettingTab = new CNMappingSettingTab();
+        TabInfo tabInfo = addTab(rateSettingsTab);
+        addTab(cnMappingSettingTab);
+        tabs.select(tabInfo, true);
     }
 
 
-    private void addTab(SettingTab settingTab) {
+    private TabInfo addTab(SettingTab settingTab) {
         TabInfo tabInfo = new TabInfo(settingTab.createPanel());
         tabInfo.setText(settingTab.getTabName());
         this.tabs.addTab(tabInfo);
+        return tabInfo;
     }
 
 

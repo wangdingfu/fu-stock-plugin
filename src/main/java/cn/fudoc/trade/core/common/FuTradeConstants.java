@@ -18,6 +18,8 @@ public interface FuTradeConstants {
     String GROUP_NAME_NOT_NULL = FuBundle.message("stock.group.notNull");
     String HIDE_GROUP_NAME_NOT_NULL = FuBundle.message("stock.hide.group.notNull");
     String GROUP_TYPE_NOT_NULL = FuBundle.message("stock.group.type.notNull");
+    String LANGUAGE_CN_NOT_NULL = FuBundle.message("stock.language.cn.notNull");
+    String LANGUAGE_TYPE_NOT_NULL = FuBundle.message("stock.language.type.notNull");
 
     String STOCK_VALID_FORMAT_ERROR = "stock.valid.formatError";
 
