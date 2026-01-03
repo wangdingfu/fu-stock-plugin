@@ -2,9 +2,11 @@ package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
-import cn.fudoc.trade.core.state.StockGroupState;
+import cn.fudoc.trade.core.listener.DocumentCallback;
+import cn.fudoc.trade.core.listener.TextFieldDocumentListener;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.FormPanelUtil;
+import cn.fudoc.trade.util.PinyinUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -16,12 +18,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.util.Objects;
 
 /**
  * 添加股票分组弹框
  */
-public class GroupAddDialog extends DialogWrapper {
+public class GroupAddDialog extends DialogWrapper implements DocumentCallback {
     // 输入组件
     private final JBTextField groupNameField = new JBTextField();
     private final JBTextField hideGroupNameField = new JBTextField();
@@ -36,6 +39,8 @@ public class GroupAddDialog extends DialogWrapper {
         init();
         // 初始化组件数据
         initComponents();
+        //添加监听器
+        addListener();
     }
 
     private void initComponents() {
@@ -77,6 +82,10 @@ public class GroupAddDialog extends DialogWrapper {
         return new StockGroupInfo(groupNameField.getText().trim(), hideGroupNameField.getText().trim(), (GroupTypeEnum) groupTypeComboBox.getSelectedItem());
     }
 
+    private void addListener(){
+        groupNameField.getDocument().addDocumentListener(new TextFieldDocumentListener(1, this));
+    }
+
     // 启用“确认”和“取消”按钮（默认启用，可自定义按钮文本）
     @Override
     protected Action @NotNull [] createActions() {
@@ -84,5 +93,11 @@ public class GroupAddDialog extends DialogWrapper {
         getOKAction().putValue(Action.NAME, "确定");
         getCancelAction().putValue(Action.NAME, "取消");
         return new Action[]{getOKAction(), getCancelAction()};
+    }
+
+    @Override
+    public void callback(Integer type, DocumentEvent event) {
+        String trim = groupNameField.getText().trim();
+        hideGroupNameField.setText((trim.length() <=2 ? PinyinUtil.getPinyin(trim,"") : PinyinUtil.getFirstLetterRandom(trim)).toUpperCase());
     }
 }
