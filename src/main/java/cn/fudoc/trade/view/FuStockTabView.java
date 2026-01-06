@@ -154,27 +154,26 @@ public class FuStockTabView {
 
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                        String text = anActionEvent.getDataContext().toString();
+                        if (StringUtils.isBlank(text)) {
+                            return;
+                        }
+                        text = text.replace("component=", "");
+                        if (is(text, FuStockWindow.MY_SELECT)) {
+                            FuNotification.notifyWarning("不允许删除我的自选分组");
+                            return;
+                        }
+                        if (is(text, FuStockWindow.MY_HOLD)) {
+                            FuNotification.notifyWarning("不允许删除我的持仓分组");
+                            return;
+                        }
                         int result = Messages.showYesNoDialog(REMOVE_STOCK_GROUP_TITLE, "确认移除", Messages.getQuestionIcon());
                         if (result == Messages.YES) {
-                            String text = anActionEvent.getDataContext().toString();
-                            if (StringUtils.isBlank(text)) {
-                                return;
-                            }
-                            text = text.replace("component=", "");
-                            if (is(text, FuStockWindow.MY_SELECT)) {
-                                FuNotification.notifyWarning("不允许删除我的自选分组");
-                                return;
-                            }
-                            if (is(text, FuStockWindow.MY_HOLD)) {
-                                FuNotification.notifyWarning("不允许删除我的持仓分组");
-                                return;
-                            }
                             TabInfo tabInfo = getTabInfo(text);
                             if (Objects.nonNull(tabInfo)) {
                                 ActionCallback actionCallback = tabs.removeTab(tabInfo);
                             }
                         }
-
                     }
 
                     private boolean is(String text, StockGroupInfo stockGroupInfo) {
