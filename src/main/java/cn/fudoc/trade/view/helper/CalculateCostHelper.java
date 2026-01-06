@@ -180,16 +180,17 @@ public class CalculateCostHelper {
         //印花税 卖出时才计算
         if (type == 2) {
             BigDecimal stampDutyRate = FuNumberUtil.toBigDecimal(rate.getStampDutyRate());
-            handlingFee = handlingFee.add(totalAmount.multiply(stampDutyRate));
+            //印花税默认保留两位小数 四舍五入
+            handlingFee = handlingFee.add(totalAmount.multiply(stampDutyRate).setScale(2, RoundingMode.HALF_UP));
         }
 
         //过户费
         BigDecimal transferRate = FuNumberUtil.toBigDecimal(rate.getTransferRate());
-        handlingFee = handlingFee.add(totalAmount.multiply(transferRate));
+        handlingFee = handlingFee.add(totalAmount.multiply(transferRate).setScale(2, RoundingMode.HALF_UP));
 
         //其他费率
         BigDecimal otherRate = FuNumberUtil.toBigDecimal(rate.getOtherRate());
-        handlingFee = handlingFee.add(totalAmount.multiply(otherRate));
+        handlingFee = handlingFee.add(totalAmount.multiply(otherRate).setScale(2, RoundingMode.HALF_UP));
 
         //其他费用
         BigDecimal otherFee = FuNumberUtil.toBigDecimal(rate.getOtherFee());

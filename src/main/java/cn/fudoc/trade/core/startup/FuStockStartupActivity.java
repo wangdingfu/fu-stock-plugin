@@ -3,6 +3,7 @@ package cn.fudoc.trade.core.startup;
 import cn.fudoc.trade.api.ZTApiService;
 import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
+import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.state.index.StockIndex;
@@ -48,11 +49,15 @@ public class FuStockStartupActivity implements ProjectActivity {
 
             //处理历史数据问题
             StockGroupState stockGroupState = StockGroupState.getInstance();
+            HoldingsStockState holdingsState = HoldingsStockState.getInstance();
             Map<String, GroupTypeEnum> stockTabEnumMap = stockGroupState.getStockTabEnumMap();
             if (stockTabEnumMap.isEmpty()) {
                 return;
             }
-            stockTabEnumMap.forEach((key, value) -> stockGroupState.add(new StockGroupInfo(key, HideTextHelper.mapping(key, CNMappingGroupEnum.STOCK_GROUP), value)));
+            stockTabEnumMap.forEach((key, value) -> {
+                GroupTypeEnum groupTypeEnum = holdingsState.getHoldings().containsKey(key) ? GroupTypeEnum.STOCK_HOLD : GroupTypeEnum.STOCK_INFO;
+                stockGroupState.add(new StockGroupInfo(key, HideTextHelper.mapping(key, CNMappingGroupEnum.STOCK_GROUP), groupTypeEnum));
+            });
         });
     }
 }

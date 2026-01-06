@@ -5,11 +5,18 @@ import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.helper.CalculateCostHelper;
 import cn.hutool.json.JSONUtil;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class CostHelper {
 
+
+
     public static void main(String[] args) {
-        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(TLYS());
-        System.out.println(JSONUtil.toJsonPrettyStr(calculate));
+//        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(TLYS());
+//        System.out.println(JSONUtil.toJsonPrettyStr(calculate));
+
+        System.out.println(new BigDecimal("4.8375").setScale(2, RoundingMode.HALF_UP));
     }
 
     private static HoldingsInfo TLYS(){

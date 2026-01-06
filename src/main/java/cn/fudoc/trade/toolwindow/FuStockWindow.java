@@ -257,7 +257,7 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                 if (Objects.nonNull(selected)) {
                     stockGroupInfo = selected.stockGroupInfo();
                 }
-                stockView.setHide(!isShow);
+                stockView.setHide(isShow);
                 stockView.removeAllTab();
                 initGroup();
                 //选中切换前的 tab
