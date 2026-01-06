@@ -58,6 +58,7 @@ public class FuStockStartupActivity implements ProjectActivity {
                 GroupTypeEnum groupTypeEnum = holdingsState.getHoldings().containsKey(key) ? GroupTypeEnum.STOCK_HOLD : GroupTypeEnum.STOCK_INFO;
                 stockGroupState.add(new StockGroupInfo(key, HideTextHelper.mapping(key, CNMappingGroupEnum.STOCK_GROUP), groupTypeEnum));
             });
+            stockGroupState.setStockTabEnumMap(null);
         });
     }
 }

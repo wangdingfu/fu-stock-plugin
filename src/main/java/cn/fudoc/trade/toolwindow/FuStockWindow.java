@@ -43,8 +43,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
     private static final String STOCK_AUTO_LOAD_TITLE = FuBundle.message("stock.auto.load.title");
     private static final String STOCK_AUTO_LOAD_TIME_TITLE = FuBundle.message("stock.auto.load.time.tip");
 
-    private static final StockGroupInfo MY_SELECT = new StockGroupInfo(FuTradeConstants.MY_SELECT_GROUP, FuTradeConstants.MY_SELECT_HIDE_GROUP, GroupTypeEnum.STOCK_INFO);
-    private static final StockGroupInfo MY_HOLD = new StockGroupInfo(FuTradeConstants.MY_HOLD_GROUP, FuTradeConstants.MY_HOLD_HIDE_GROUP, GroupTypeEnum.STOCK_HOLD);
+    public static final StockGroupInfo MY_SELECT = new StockGroupInfo(FuTradeConstants.MY_SELECT_GROUP, FuTradeConstants.MY_SELECT_HIDE_GROUP, GroupTypeEnum.STOCK_INFO);
+    public static final StockGroupInfo MY_HOLD = new StockGroupInfo(FuTradeConstants.MY_HOLD_GROUP, FuTradeConstants.MY_HOLD_HIDE_GROUP, GroupTypeEnum.STOCK_HOLD);
 
     /**
      * 指数栏视图

@@ -2,10 +2,7 @@ package cn.fudoc.trade.core.state.pojo;
 
 
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -26,4 +23,14 @@ public class StockGroupInfo {
      * 分组类型
      */
     private GroupTypeEnum groupType;
+
+
+    @Override
+    public String toString() {
+        return "StockGroupInfo{" +
+                "groupName='" + groupName + '\'' +
+                ", hideGroupName='" + hideGroupName + '\'' +
+                ", groupType=" + groupType +
+                '}';
+    }
 }

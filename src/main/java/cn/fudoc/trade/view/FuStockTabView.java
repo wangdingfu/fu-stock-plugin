@@ -1,18 +1,28 @@
 package cn.fudoc.trade.view;
 
 import cn.fudoc.trade.core.common.FuBundle;
+import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
+import cn.fudoc.trade.toolwindow.FuStockWindow;
 import cn.fudoc.trade.view.table.*;
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.ActionCallback;
 import com.intellij.ui.tabs.JBTabs;
 import com.intellij.ui.tabs.JBTabsFactory;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
+import com.intellij.ui.tabs.impl.JBTabsImpl;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -34,10 +44,11 @@ public class FuStockTabView {
     private boolean isHide;
     private boolean isSwitch;
 
-    public FuStockTabView(Project project,boolean isHide) {
+    public FuStockTabView(Project project, boolean isHide) {
         this.isHide = isHide;
         this.tabs = JBTabsFactory.createTabs(project);
         registerListener();
+        addRemoveAction();
     }
 
 
@@ -78,12 +89,20 @@ public class FuStockTabView {
 
 
     public void selected(StockGroupInfo stockGroupInfo) {
+        TabInfo tabInfo = getTabInfo(getTabName(stockGroupInfo));
+        if (Objects.nonNull(tabInfo)) {
+            tabs.select(tabInfo, true);
+        }
+    }
+
+
+    private TabInfo getTabInfo(String tabName) {
         for (TabInfo tabsTab : tabs.getTabs()) {
-            if (tabsTab.getText().equals(getTabName(stockGroupInfo))) {
-                tabs.select(tabsTab, true);
-                return;
+            if (tabsTab.getText().equals(tabName)) {
+                return tabsTab;
             }
         }
+        return null;
     }
 
 
@@ -102,14 +121,10 @@ public class FuStockTabView {
 
             @Override
             public void tabRemoved(@NotNull TabInfo tabToRemove) {
-                if(isSwitch){
+                if (isSwitch) {
                     return;
                 }
-                int result = Messages.showYesNoDialog(REMOVE_STOCK_GROUP_TITLE, "确认移除", Messages.getQuestionIcon());
-                if (result == Messages.YES) {
-                    //持久化数据更新
-                    stockTabViewMap.remove(tabToRemove.getText());
-                }
+                stockTabViewMap.remove(tabToRemove.getText());
             }
         });
     }
@@ -118,13 +133,57 @@ public class FuStockTabView {
     private StockTableView createStockTabView(StockGroupInfo stockGroupInfo) {
         GroupTypeEnum groupType = stockGroupInfo.getGroupType();
         return switch (groupType) {
-            case STOCK_INFO -> this.isHide ? new StockGroupHideTableView(stockGroupInfo) :  new StockGroupTableView(stockGroupInfo);
-            case STOCK_HOLD -> this.isHide ? new HoldStockGroupHideTableView(stockGroupInfo) : new HoldStockGroupTableView(stockGroupInfo);
+            case STOCK_INFO ->
+                    this.isHide ? new StockGroupHideTableView(stockGroupInfo) : new StockGroupTableView(stockGroupInfo);
+            case STOCK_HOLD ->
+                    this.isHide ? new HoldStockGroupHideTableView(stockGroupInfo) : new HoldStockGroupTableView(stockGroupInfo);
         };
     }
 
-    private String getTabName(StockGroupInfo stockGroupInfo){
+    private String getTabName(StockGroupInfo stockGroupInfo) {
         return this.isHide ? stockGroupInfo.getHideGroupName() : stockGroupInfo.getGroupName();
     }
+
+
+    @SuppressWarnings("all")
+    private void addRemoveAction() {
+        if (this.tabs instanceof JBTabsImpl jbTabs) {
+            ActionGroup navigationActions = jbTabs.getNavigationActions();
+            if (navigationActions instanceof DefaultActionGroup defaultActionGroup) {
+                defaultActionGroup.add(new AnAction("删除 TAB", "", AllIcons.General.Delete) {
+
+                    @Override
+                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                        int result = Messages.showYesNoDialog(REMOVE_STOCK_GROUP_TITLE, "确认移除", Messages.getQuestionIcon());
+                        if (result == Messages.YES) {
+                            String text = anActionEvent.getDataContext().toString();
+                            if (StringUtils.isBlank(text)) {
+                                return;
+                            }
+                            text = text.replace("component=", "");
+                            if (is(text, FuStockWindow.MY_SELECT)) {
+                                FuNotification.notifyWarning("不允许删除我的自选分组");
+                                return;
+                            }
+                            if (is(text, FuStockWindow.MY_HOLD)) {
+                                FuNotification.notifyWarning("不允许删除我的持仓分组");
+                                return;
+                            }
+                            TabInfo tabInfo = getTabInfo(text);
+                            if (Objects.nonNull(tabInfo)) {
+                                ActionCallback actionCallback = tabs.removeTab(tabInfo);
+                            }
+                        }
+
+                    }
+
+                    private boolean is(String text, StockGroupInfo stockGroupInfo) {
+                        return stockGroupInfo.getGroupName().equals(text) || stockGroupInfo.getHideGroupName().equals(text);
+                    }
+                });
+            }
+        }
+    }
+
 
 }

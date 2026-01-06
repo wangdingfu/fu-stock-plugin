@@ -39,6 +39,9 @@ public class StockGroupState implements PersistentStateComponent<StockGroupState
         if (StringUtils.isBlank(stockGroupInfo.getGroupName()) || StringUtils.isBlank(stockGroupInfo.getHideGroupName()) || Objects.isNull(stockGroupInfo.getGroupType())) {
             return;
         }
+        if (groupInfoList.stream().anyMatch(a -> a.toString().equals(stockGroupInfo.toString()))) {
+            return;
+        }
         groupInfoList.add(stockGroupInfo);
     }
 
