@@ -41,21 +41,21 @@ public class HideShowAction extends AnAction {
         super.update(e);
         Presentation presentation = e.getPresentation();
         // 更新图标和描述
-        boolean isVisible = !instance.is(hideShowCallback.getKey());
-        presentation.setIcon(isVisible ? AllIcons.General.Show : FuIcons.FU_UNSHARE);
-        presentation.setText(isVisible ? hideShowCallback.getShowText() : hideShowCallback.getHideText());
+        boolean isShow = instance.is(hideShowCallback.getKey());
+        presentation.setIcon(isShow ? AllIcons.General.Show : FuIcons.FU_UNSHARE);
+        presentation.setText(isShow ? hideShowCallback.getShowText() : hideShowCallback.getHideText());
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Presentation presentation = e.getPresentation();
         // 更新图标和描述
-        boolean isVisible = instance.is(hideShowCallback.getKey());
-        presentation.setIcon(isVisible ? AllIcons.General.Show : FuIcons.FU_UNSHARE);
-        presentation.setText(isVisible ? hideShowCallback.getShowText() : hideShowCallback.getHideText());
-        instance.set(hideShowCallback.getKey(), !isVisible);
+        boolean isShow = instance.is(hideShowCallback.getKey());
+        presentation.setIcon(isShow ? AllIcons.General.Show : FuIcons.FU_UNSHARE);
+        presentation.setText(isShow ? hideShowCallback.getShowText() : hideShowCallback.getHideText());
+        instance.set(hideShowCallback.getKey(), !isShow);
 
-        hideShowCallback.callback(!isVisible);
+        hideShowCallback.callback(!isShow);
     }
 
 }

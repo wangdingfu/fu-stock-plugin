@@ -1,12 +1,14 @@
 package cn.fudoc.trade.core.startup;
 
 import cn.fudoc.trade.api.ZTApiService;
+import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.state.index.StockIndex;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.PinyinUtil;
+import cn.fudoc.trade.view.helper.HideTextHelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -50,7 +52,7 @@ public class FuStockStartupActivity implements ProjectActivity {
             if (stockTabEnumMap.isEmpty()) {
                 return;
             }
-            stockTabEnumMap.forEach((key, value) -> stockGroupState.add(new StockGroupInfo(key, PinyinUtil.getFirstLetterRandom(key), value)));
+            stockTabEnumMap.forEach((key, value) -> stockGroupState.add(new StockGroupInfo(key, HideTextHelper.mapping(key, CNMappingGroupEnum.STOCK_GROUP), value)));
         });
     }
 }
