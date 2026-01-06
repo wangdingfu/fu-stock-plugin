@@ -25,12 +25,4 @@ public class StockGroupInfo {
     private GroupTypeEnum groupType;
 
 
-    @Override
-    public String toString() {
-        return "StockGroupInfo{" +
-                "groupName='" + groupName + '\'' +
-                ", hideGroupName='" + hideGroupName + '\'' +
-                ", groupType=" + groupType +
-                '}';
-    }
 }
