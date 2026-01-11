@@ -156,7 +156,7 @@ public class RateSettingsTab implements SettingTab {
         String transferSHRate = rate.getTransferSHRate();
         String transferSZRate = rate.getTransferSZRate();
         transferSHRateField.setText(StringUtils.isBlank(transferSHRate) ? "0.00001" : transferSHRate);
-        transferSHRateField.setText(StringUtils.isBlank(transferSZRate) ? "0.00001" : transferSZRate);
+        transferSZRateField.setText(StringUtils.isBlank(transferSZRate) ? "0.00001" : transferSZRate);
         otherRateField.setText(rate.getOtherRate());
         otherFeeField.setText(rate.getOtherFee());
     }
