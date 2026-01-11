@@ -18,8 +18,7 @@ import java.util.*;
  */
 public class StockGroupHideTableView extends AbstractStockTableView {
 
-
-    private static final String[] stockTableColumn = {"Code", "Name", "Price", "Change(%)", "Total"};
+    private static final String[] stockTableColumn = {"股票代码", "股票名称", "当前价格", "涨跌幅(%)", "成交额"};
     private final StockGroupPersistentState state;
 
     public StockGroupHideTableView(StockGroupInfo stockGroupInfo) {
@@ -47,7 +46,7 @@ public class StockGroupHideTableView extends AbstractStockTableView {
 
     @Override
     protected String[] getColumnNames() {
-        return stockTableColumn;
+        return HideTextHelper.mapingTable(stockTableColumn);
     }
 
     @Override

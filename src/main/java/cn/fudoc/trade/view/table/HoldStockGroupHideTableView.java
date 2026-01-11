@@ -29,7 +29,7 @@ import java.util.Vector;
 public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
 
 
-    private static final String[] columnNames = {"Code", "Name", "Price", "Today Profit", "Total Profit"};
+    private static final String[] columnNames = {"股票代码", "股票名称", "当前价格", "今日收益", "持仓收益"};
     private final HoldingsStockState state;
 
     public HoldStockGroupHideTableView(StockGroupInfo stockGroupInfo) {
@@ -83,7 +83,7 @@ public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
 
     @Override
     protected String[] getColumnNames() {
-        return columnNames;
+        return HideTextHelper.mapingTable(columnNames);
     }
 
     @Override

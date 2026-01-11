@@ -31,4 +31,9 @@ public class TableModel extends DefaultTableModel implements EditableModel {
     public boolean canExchangeRows(int i, int i1) {
         return true;
     }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return tableListener.isCellEditable(row,column);
+    }
 }

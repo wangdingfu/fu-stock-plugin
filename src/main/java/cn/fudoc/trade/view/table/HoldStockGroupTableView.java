@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class HoldStockGroupTableView extends AbstractHoldingsTable {
 
-    private static final String[] columnNames = {"代码", "名称 / 市值", "持仓盈亏", "持仓 / 可用", "现价 / 成本", "今日收益",};
+    private static final String[] columnNames = {"股票代码", "名称 / 市值", "持仓盈亏", "持仓 / 可用", "现价 / 成本", "今日收益",};
     private final HoldingsStockState state;
 
 

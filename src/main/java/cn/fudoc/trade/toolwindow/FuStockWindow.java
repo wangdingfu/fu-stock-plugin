@@ -5,6 +5,7 @@ import cn.fudoc.trade.core.action.HideShowAction;
 import cn.fudoc.trade.core.common.FuBundle;
 import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.FuTradeConstants;
+import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.common.enumtype.UpdateTipTagEnum;
 import cn.fudoc.trade.core.state.FuCommonState;
@@ -16,6 +17,7 @@ import cn.fudoc.trade.view.FuIndexView;
 import cn.fudoc.trade.view.FuStockSearchPopupView;
 import cn.fudoc.trade.view.FuStockTabView;
 import cn.fudoc.trade.view.GroupAddDialog;
+import cn.fudoc.trade.view.helper.HideTextHelper;
 import cn.fudoc.trade.view.settings.FuStockSettingDialog;
 import cn.fudoc.trade.view.table.StockTableView;
 import cn.hutool.core.date.DateUtil;
@@ -115,6 +117,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
      * 初始化股票分组
      */
     private void initGroup() {
+        MY_SELECT.setHideGroupName(HideTextHelper.mapping(MY_SELECT.getGroupName(), CNMappingGroupEnum.STOCK_GROUP));
+        MY_HOLD.setHideGroupName(HideTextHelper.mapping(MY_HOLD.getGroupName(), CNMappingGroupEnum.STOCK_GROUP));
         stockView.add(MY_SELECT);
         stockView.add(MY_HOLD);
 

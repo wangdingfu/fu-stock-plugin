@@ -94,7 +94,7 @@ public class RateSettingsTab implements SettingTab {
     @Override
     public ValidationInfo doValidate() {
         try {
-            validRateField("起收", minFeeField);
+            validRateField("每笔最低收取", minFeeField);
             validRateField("券商佣金费率", commissionRateField);
             validRateField("印花税费率", stampDutyRateField);
             validRateField("过户费费率(沪A)", transferSHRateField);
@@ -150,7 +150,7 @@ public class RateSettingsTab implements SettingTab {
             rate = instance.createDefaultTradeRateInfo();
         }
         String minFee = rate.getMinFee();
-        minFeeField.setText((StringUtils.isBlank(minFee) && rate.isMin5()) ? "0" : minFee);
+        minFeeField.setText((StringUtils.isBlank(minFee) && rate.isMin5()) ? "5" : (StringUtils.isBlank(minFee) ? "5" : minFee));
         commissionRateField.setText(rate.getCommissionRate());
         stampDutyRateField.setText(rate.getStampDutyRate());
         String transferSHRate = rate.getTransferSHRate();

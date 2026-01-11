@@ -1,6 +1,5 @@
 package cn.fudoc.trade.core.state;
 
-import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -14,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -84,7 +82,7 @@ public class FuStockSettingState implements PersistentStateComponent<FuStockSett
 
     public TradeRateInfo createDefaultTradeRateInfo() {
         TradeRateInfo rate = new TradeRateInfo();
-        rate.setMinFee("0.00005");
+        rate.setMinFee("5");
         rate.setCommissionRate("0");
         rate.setStampDutyRate("0.0005");
         rate.setTransferSHRate("0.00001");

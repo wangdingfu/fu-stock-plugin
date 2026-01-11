@@ -7,4 +7,8 @@ public interface TableListener {
     default Object[] addRow(){
         return new Object[]{};
     }
+
+    default boolean isCellEditable(int i, int i1){
+        return true;
+    }
 }

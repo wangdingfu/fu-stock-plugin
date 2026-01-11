@@ -23,7 +23,7 @@ import javax.swing.event.DocumentEvent;
 import java.util.Objects;
 
 /**
- * 添加股票分组弹框
+ * 新增名称映射弹框
  */
 public class CNMappingAddDialog extends DialogWrapper implements DocumentCallback {
     // 输入组件
