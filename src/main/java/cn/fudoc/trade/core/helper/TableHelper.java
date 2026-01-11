@@ -1,5 +1,6 @@
 package cn.fudoc.trade.core.helper;
 
+import cn.fudoc.trade.core.common.FuNotification;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 
@@ -44,6 +45,7 @@ public class TableHelper {
     private void deleteSelectedRow() {
         int[] selectedRows = stockTable.getSelectedRows();
         if (selectedRows == null || selectedRows.length == 0) {
+            FuNotification.notifyWarning("请先选中需要删除的记录");
             return;
         }
         for (int i = selectedRows.length - 1; i >= 0; i--) {
