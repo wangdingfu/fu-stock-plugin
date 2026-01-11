@@ -175,7 +175,7 @@ public class FuStockTabView {
     private void addPopupMenu(){
         DefaultActionGroup customGroup = new DefaultActionGroup();
         // 添加删除 Action
-        customGroup.add(new AnAction("删除 TAB", "", AllIcons.General.Delete) {
+        customGroup.add(new AnAction("删除分组", "", AllIcons.General.Delete) {
 
             @Override
             public void update(@NotNull AnActionEvent e) {
