@@ -61,7 +61,7 @@ public class HoldingsDividendTabView extends AbstractHoldingsTabView implements 
         TradeRateInfo rate = FuStockSettingState.getInstance().getRate(stockInfoDTO.group());
         Integer count = FuNumberUtil.toInteger(countField.getText().trim());
         BigDecimal price = FuNumberUtil.toBigDecimal(priceField.getText().trim());
-        BigDecimal handlingFee = CalculateCostHelper.calculateHandlingFee(2, rate, price, count);
+        BigDecimal handlingFee = CalculateCostHelper.calculateHandlingFee(2, rate, price, count, stockInfoDTO.jys());
         holdingsInfo.add(3, count, price.toString(), handlingFee.toString());
     }
 

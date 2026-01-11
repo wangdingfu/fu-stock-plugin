@@ -44,7 +44,7 @@ public class HoldingsSellTabView extends AbstractHoldingsTabView {
         TradeRateInfo rateInfo = getRateInfo();
         Integer count = FuNumberUtil.toInteger(countField.getText().trim());
         BigDecimal price = FuNumberUtil.toBigDecimal(priceField.getText().trim());
-        BigDecimal handlingFee = CalculateCostHelper.calculateHandlingFee(2, rateInfo, price, count);
+        BigDecimal handlingFee = CalculateCostHelper.calculateHandlingFee(2, rateInfo, price, count, stockInfoDTO.jys());
         holdingsInfo.add(2, count, price.toString(), handlingFee.toString());
     }
 

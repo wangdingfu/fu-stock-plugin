@@ -84,10 +84,11 @@ public class FuStockSettingState implements PersistentStateComponent<FuStockSett
 
     public TradeRateInfo createDefaultTradeRateInfo() {
         TradeRateInfo rate = new TradeRateInfo();
-        rate.setMin5(true);
-        rate.setCommissionRate("0.00025");
+        rate.setMinFee("0.00005");
+        rate.setCommissionRate("0");
         rate.setStampDutyRate("0.0005");
-        rate.setTransferRate("0");
+        rate.setTransferSHRate("0.00001");
+        rate.setTransferSZRate("0.00001");
         rate.setOtherRate("0");
         rate.setOtherFee("0");
         return rate;

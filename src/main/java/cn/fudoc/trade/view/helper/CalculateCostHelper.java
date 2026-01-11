@@ -1,5 +1,6 @@
 package cn.fudoc.trade.view.helper;
 
+import cn.fudoc.trade.core.common.enumtype.JYSEnum;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.core.state.pojo.TradeInfoLog;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
@@ -162,17 +163,18 @@ public class CalculateCostHelper {
      * @param tradeCount 交易数量
      * @return 本次交易收取的手续费
      */
-    public static BigDecimal calculateHandlingFee(Integer type, TradeRateInfo rate, BigDecimal tradePrice, Integer tradeCount) {
+    public static BigDecimal calculateHandlingFee(Integer type, TradeRateInfo rate, BigDecimal tradePrice, Integer tradeCount, JYSEnum jysEnum) {
         if (Objects.isNull(type) || Objects.isNull(rate) || (type != 1 && type != 2)) {
             return BigDecimal.ZERO;
         }
         BigDecimal totalAmount = multiply(tradePrice, tradeCount);
         BigDecimal handlingFee = BigDecimal.ZERO;
         BigDecimal commissionRate = FuNumberUtil.toBigDecimal(rate.getCommissionRate());
-        BigDecimal commissionFee = totalAmount.multiply(commissionRate);
-        if (rate.isMin5() && FuNumberUtil.DECIMAL_5.compareTo(commissionFee) >= 0) {
+        BigDecimal commissionFee = totalAmount.multiply(commissionRate).setScale(2,RoundingMode.HALF_UP);
+        BigDecimal minFee = FuNumberUtil.toBigDecimal(rate.getMinFee());
+        if (minFee.compareTo(commissionFee) > 0) {
             //最低收取5元
-            commissionFee = FuNumberUtil.DECIMAL_5;
+            commissionFee = minFee;
         }
         //券商佣金
         handlingFee = handlingFee.add(commissionFee);
@@ -185,7 +187,7 @@ public class CalculateCostHelper {
         }
 
         //过户费
-        BigDecimal transferRate = FuNumberUtil.toBigDecimal(rate.getTransferRate());
+        BigDecimal transferRate = FuNumberUtil.toBigDecimal(transferRate(rate,jysEnum));
         handlingFee = handlingFee.add(totalAmount.multiply(transferRate).setScale(2, RoundingMode.HALF_UP));
 
         //其他费率
@@ -198,6 +200,16 @@ public class CalculateCostHelper {
 
         //本次交易手续费
         return handlingFee;
+    }
+
+
+    private static String transferRate(TradeRateInfo rate,JYSEnum jysEnum){
+        if(JYSEnum.SH.equals(jysEnum)){
+            return rate.getTransferSHRate();
+        }else if(JYSEnum.SZ.equals(jysEnum)){
+            return rate.getTransferSZRate();
+        }
+        return "0";
     }
 
 

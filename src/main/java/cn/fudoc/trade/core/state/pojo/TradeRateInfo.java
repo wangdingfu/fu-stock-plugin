@@ -6,7 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TradeRateInfo {
-
+    /**
+     * 起收
+     */
+    private String minFee;
     /**
      * 佣金 券商收取 买入卖出均收取
      */
@@ -18,9 +21,13 @@ public class TradeRateInfo {
     private String stampDutyRate;
 
     /**
-     * 过户费
+     * 过户费（上海）
      */
-    private String transferRate;
+    private String transferSHRate;
+    /**
+     * 过户费（深圳）
+     */
+    private String transferSZRate;
 
     /**
      * 其他费率

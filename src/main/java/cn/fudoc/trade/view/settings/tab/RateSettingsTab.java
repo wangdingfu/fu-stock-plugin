@@ -26,10 +26,11 @@ import java.util.Set;
 public class RateSettingsTab implements SettingTab {
 
     private final ComboBox<String> holdingsGroupField;
-    private final OnOffButton onOffButton = new OnOffButton();
+    private final JBTextField minFeeField = new JBTextField();
     private final JBTextField commissionRateField = new JBTextField();
     private final JBTextField stampDutyRateField = new JBTextField();
-    private final JBTextField transferRateField = new JBTextField();
+    private final JBTextField transferSHRateField = new JBTextField();
+    private final JBTextField transferSZRateField = new JBTextField();
     private final JBTextField otherRateField = new JBTextField();
     private final JBTextField otherFeeField = new JBTextField();
 
@@ -67,8 +68,8 @@ public class RateSettingsTab implements SettingTab {
         mainPanel.setBorder(JBUI.Borders.empty(20, 30));
         FormPanelUtil.addRow(mainPanel, "应用的持仓分组", holdingsGroupField);
 
-        //0、是否每笔最低5元 默认开启
-        FormPanelUtil.addRow(mainPanel, "是否每笔最低5元", onOffButton, false);
+        //0、起收
+        FormPanelUtil.addRow(mainPanel, "起收", minFeeField);
 
 
         //1、券商佣金费率 默认0.0025
@@ -78,7 +79,8 @@ public class RateSettingsTab implements SettingTab {
         FormPanelUtil.addRow(mainPanel, "印花税费率", stampDutyRateField);
 
         //3、过户费费率 默认0
-        FormPanelUtil.addRow(mainPanel, "过户费费率", transferRateField);
+        FormPanelUtil.addRow(mainPanel, "过户费费率(沪A)", transferSHRateField);
+        FormPanelUtil.addRow(mainPanel, "过户费费率(深A)", transferSZRateField);
 
         //4、其他费率 默认0
         FormPanelUtil.addRow(mainPanel, "其他费率", otherRateField);
@@ -92,9 +94,11 @@ public class RateSettingsTab implements SettingTab {
     @Override
     public ValidationInfo doValidate() {
         try {
+            validRateField("起收", minFeeField);
             validRateField("券商佣金费率", commissionRateField);
             validRateField("印花税费率", stampDutyRateField);
-            validRateField("过户费费率", transferRateField);
+            validRateField("过户费费率(沪A)", transferSHRateField);
+            validRateField("过户费费率(深A)", transferSZRateField);
             validRateField("其他费率", otherRateField);
             validRateField("券商其他费用佣金费率", otherFeeField);
         } catch (ValidException e) {
@@ -126,10 +130,11 @@ public class RateSettingsTab implements SettingTab {
             rate = new TradeRateInfo();
             instance.addRate(selectedItem, rate);
         }
-        rate.setMin5(onOffButton.isSelected());
+        rate.setMinFee(minFeeField.getText().trim());
         rate.setCommissionRate(commissionRateField.getText().trim());
         rate.setStampDutyRate(stampDutyRateField.getText().trim());
-        rate.setTransferRate(transferRateField.getText().trim());
+        rate.setTransferSHRate(transferSHRateField.getText().trim());
+        rate.setTransferSZRate(transferSZRateField.getText().trim());
         rate.setOtherRate(otherRateField.getText().trim());
         rate.setOtherFee(otherFeeField.getText().trim());
     }
@@ -144,10 +149,14 @@ public class RateSettingsTab implements SettingTab {
         if (Objects.isNull(rate)) {
             rate = instance.createDefaultTradeRateInfo();
         }
-        onOffButton.setSelected(rate.isMin5());
+        String minFee = rate.getMinFee();
+        minFeeField.setText((StringUtils.isBlank(minFee) && rate.isMin5()) ? "0" : minFee);
         commissionRateField.setText(rate.getCommissionRate());
         stampDutyRateField.setText(rate.getStampDutyRate());
-        transferRateField.setText(rate.getTransferRate());
+        String transferSHRate = rate.getTransferSHRate();
+        String transferSZRate = rate.getTransferSZRate();
+        transferSHRateField.setText(StringUtils.isBlank(transferSHRate) ? "0.00001" : transferSHRate);
+        transferSHRateField.setText(StringUtils.isBlank(transferSZRate) ? "0.00001" : transferSZRate);
         otherRateField.setText(rate.getOtherRate());
         otherFeeField.setText(rate.getOtherFee());
     }

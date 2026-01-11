@@ -83,7 +83,7 @@ public class HoldingsTradeLogTabView extends AbstractHoldingsTabView implements 
 
     @Override
     public void removeRow(int modelRow) {
-        //无需处理
+        tableModel.removeRow(modelRow);
     }
 
 
