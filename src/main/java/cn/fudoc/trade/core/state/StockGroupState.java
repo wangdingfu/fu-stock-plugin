@@ -34,6 +34,13 @@ public class StockGroupState implements PersistentStateComponent<StockGroupState
      */
     private List<StockGroupInfo> groupInfoList = new ArrayList<>();
 
+    public void remove(StockGroupInfo stockGroupInfo) {
+        if (Objects.isNull(stockGroupInfo)) {
+            return;
+        }
+        groupInfoList.removeIf(f -> f.getGroupName().equals(stockGroupInfo.getGroupName()));
+    }
+
 
     public void add(StockGroupInfo stockGroupInfo) {
         if (StringUtils.isBlank(stockGroupInfo.getGroupName()) || StringUtils.isBlank(stockGroupInfo.getHideGroupName()) || Objects.isNull(stockGroupInfo.getGroupType())) {

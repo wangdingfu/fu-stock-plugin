@@ -3,6 +3,7 @@ package cn.fudoc.trade.view;
 import cn.fudoc.trade.core.common.FuBundle;
 import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
+import cn.fudoc.trade.core.state.StockGroupState;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.toolwindow.FuStockWindow;
 import cn.fudoc.trade.view.table.*;
@@ -149,7 +150,11 @@ public class FuStockTabView {
                 if (isSwitch) {
                     return;
                 }
-                stockTabViewMap.remove(tabToRemove.getText());
+                StockGroupState instance = StockGroupState.getInstance();
+                StockTableView remove = stockTabViewMap.remove(tabToRemove.getText());
+                if(Objects.nonNull(remove)){
+                    instance.remove(remove.stockGroupInfo());
+                }
             }
         });
     }
