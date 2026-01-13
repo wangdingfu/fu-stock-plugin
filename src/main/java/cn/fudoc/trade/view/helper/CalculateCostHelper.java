@@ -12,52 +12,61 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 计算持仓成本
  */
 public class CalculateCostHelper {
 
+
     /**
-     * 计算持仓成本
+     * 计算当前实时持仓成本
      *
-     * @param holdingsInfo 当前持仓信息
-     * @return 计算出来的当前持仓信息
      */
-    public static HoldingsTodayInfo calculate(HoldingsInfo holdingsInfo) {
+    public static HoldingsTodayInfo calculate(BigDecimal currentPrice, BigDecimal yesterdayPrice, HoldingsInfo holdingsInfo) {
         //计算持仓成本前 刷新当天持仓信息
-        refreshTodayHoldingsInfo(holdingsInfo);
-        //计算当前最新成本
-        return calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), holdingsInfo.getTradeList(), true);
+        refreshTodayHoldingsInfo(currentPrice, yesterdayPrice, holdingsInfo);
+        return calculate(currentPrice, yesterdayPrice, holdingsInfo.getCost(), holdingsInfo.getCount(), holdingsInfo.getTradeList(), true);
     }
 
     /**
      * 计算当前实时持仓成本
      *
      */
-    public static HoldingsTodayInfo calculate(String cost, Integer count, List<TradeInfoLog> tradeList) {
-        return calculate(cost, count, tradeList, true);
+    public static HoldingsTodayInfo calculate(String cost, Integer count, HoldingsInfo holdingsInfo) {
+        return calculate(BigDecimal.ZERO, BigDecimal.ZERO, cost, count, Objects.isNull(holdingsInfo) ? Lists.newArrayList() : holdingsInfo.getTradeList(), true);
     }
 
     /**
-     * 计算持仓成本
+     * 计算今日收益
      *
-     * @param cost      今日以前初始成本
-     * @param count     今日以前初始持仓数量
-     * @param tradeList 今日交易记录
-     * @return 今日实时持仓成本
+     * @param currentPrice   当前价
+     * @param yesterdayPrice 昨日收盘价
+     * @param cost           昨日收盘成本价
+     * @param count          昨日收盘持仓数量
+     * @param tradeList      交易记录
+     * @param isToday        是否只计算今日交易记录
+     * @return 今日收益
      */
-    public static HoldingsTodayInfo calculate(String cost, Integer count, List<TradeInfoLog> tradeList, boolean isToday) {
+    public static HoldingsTodayInfo calculate(BigDecimal currentPrice, BigDecimal yesterdayPrice, String cost, Integer count, List<TradeInfoLog> tradeList, boolean isToday) {
+        //历史持仓数量*（当前价-昨日收盘价）+ 今日买入数量*（当前价-买入价） + 今日卖出数量 * （当前价-昨日收盘价）
+        BigDecimal diffPrice = currentPrice.subtract(yesterdayPrice);
+        //当前持仓成本
         BigDecimal currentCost = FuNumberUtil.toBigDecimal(cost);
+        //当前持仓数量
         Integer currentCount = count;
-        BigDecimal currentProfit = BigDecimal.ZERO;
+        //上一交易日的持仓数量（可卖数量）
+        Integer lastDayCount = count;
         if (tradeList == null || tradeList.isEmpty()) {
-            return new HoldingsTodayInfo(currentCost, currentCount, currentCount);
+            return new HoldingsTodayInfo(currentCost, currentCount, currentCount, multiply(diffPrice, count));
         }
-        //idea持久化序列后的list集合类型不是ArrayList 无法排序
-        tradeList = Lists.newArrayList(tradeList);
-        tradeList.sort(Comparator.comparing(TradeInfoLog::getTime));
+        //截止到上一交易日的总收益
+        BigDecimal lastDayProfit = multiply(yesterdayPrice.subtract(currentCost), count);
+        BigDecimal todayProfit = BigDecimal.ZERO;
         long todayBeginDay = DateUtil.beginOfDay(new Date()).getTime();
         for (TradeInfoLog tradeInfoLog : tradeList) {
             Integer type = tradeInfoLog.getType();
@@ -69,40 +78,49 @@ public class CalculateCostHelper {
                 //不是当日交易记录 不考虑
                 continue;
             }
+            //这笔交易当前产生的利润
+            BigDecimal tradeProfit = BigDecimal.ZERO;
+            //发生这比交易后的总市值 如果清仓 则总市值为总利润
+            BigDecimal totalAmount = currentCount == 0 ? lastDayProfit.add(todayProfit) : multiply(currentCost, currentCount);
             BigDecimal tradePrice = FuNumberUtil.toBigDecimal(tradeInfoLog.getPrice());
             //手续费
             BigDecimal handlingFee = FuNumberUtil.toBigDecimal(tradeInfoLog.getHandlingFee());
             Integer tradeCount = tradeInfoLog.getCount();
-            BigDecimal totalAmount;
             if (type == 1) {
-                //买入动作 计算当前成本
-                totalAmount = multiply(currentCost, currentCount).add(multiply(tradePrice, tradeCount).add(currentProfit).add(handlingFee));
+                //买入动作 发生这笔交易后 总市值 = 发生交易前的成本价*持仓数量 + 本次交易价格*交易数量+手续费（为什么要加手续费而不是减？===> ）
+                totalAmount = totalAmount.add(multiply(tradePrice, tradeCount).add(handlingFee));
                 currentCount += tradeCount;
+                //本次交易的收益
+                tradeProfit = multiply(currentPrice.subtract(tradePrice), tradeCount).subtract(handlingFee);
             } else if (type == 2) {
-                //卖出动作 计算当前成本
-                totalAmount = multiply(currentCost, currentCount).subtract(multiply(tradePrice, tradeCount).subtract(handlingFee));
+                //卖出动作 发生这笔交易后 总市值 = 发生交易前的成本价*持仓数量 - 本次交易价格*交易数量 - 手续费（为什么要减手续费而不是加？===> ）
+                totalAmount = totalAmount.subtract(multiply(tradePrice, tradeCount).subtract(handlingFee));
+                //当前持仓数量（实际持仓数量）
                 currentCount -= tradeCount;
-                count -= tradeCount;
+                //卖出的是上一交易日持仓的数量 所以需要减掉上一交易日持仓数量
+                lastDayCount -= tradeCount;
+                //卖出上一交易日股票的收益
+                tradeProfit = multiply(tradePrice.subtract(yesterdayPrice), tradeCount).subtract(handlingFee);
             } else if (type == 3) {
                 //分红
-                totalAmount = multiply(currentCost, currentCount).subtract(multiply(tradePrice, tradeCount));
+                totalAmount = totalAmount.subtract(multiply(tradePrice, tradeCount));
             } else if (type == 4) {
                 //股息红利税补缴
-                totalAmount = multiply(currentCost, currentCount).add(handlingFee);
+                totalAmount = totalAmount.add(handlingFee);
             } else {
                 //其他情况暂不考虑
                 continue;
             }
-            if (currentCount == 0) {
-                currentProfit = totalAmount;
-                currentCost = BigDecimal.ZERO;
-                continue;
-            } else {
-                currentProfit = BigDecimal.ZERO;
-            }
-            currentCost = totalAmount.divide(new BigDecimal(currentCount), 24, RoundingMode.CEILING);
+            //当前成本 = 当前总市值 / 当前持仓数量
+            currentCost = currentCount == 0 ? FuNumberUtil.toBigDecimal(cost) : totalAmount.divide(new BigDecimal(currentCount), 24, RoundingMode.CEILING);
+            //今日收益累加上本次交易收益
+            todayProfit = todayProfit.add(tradeProfit);
         }
-        return new HoldingsTodayInfo(currentCost, currentCount, count);
+        if (lastDayCount > 0) {
+            //上一交易日还未卖出的持仓收益
+            todayProfit = todayProfit.add(multiply(diffPrice, lastDayCount));
+        }
+        return new HoldingsTodayInfo(currentCost, currentCount, lastDayCount, todayProfit);
     }
 
 
@@ -221,7 +239,7 @@ public class CalculateCostHelper {
     /**
      * 刷新当天持仓信息 每天第一次加载时刷新
      */
-    public static void refreshTodayHoldingsInfo(HoldingsInfo holdingsInfo) {
+    public static void refreshTodayHoldingsInfo(BigDecimal currentPrice, BigDecimal yesterdayPrice, HoldingsInfo holdingsInfo) {
         List<TradeInfoLog> tradeList = holdingsInfo.getTradeList();
         if (CollectionUtils.isEmpty(tradeList)) {
             //没有交易记录 无需处理
@@ -237,7 +255,7 @@ public class CalculateCostHelper {
         //当天之前的交易信息
         List<TradeInfoLog> beforeTradeList = tradeList.stream().filter(f -> f.getTime() < todayBeginDay).toList();
         //计算上一交易日的持仓成本 并将上一交易日的持仓成本设置到当前持仓成本信息中
-        HoldingsTodayInfo holdingsTodayInfo = calculate(holdingsInfo.getCost(), holdingsInfo.getCount(), beforeTradeList, false);
+        HoldingsTodayInfo holdingsTodayInfo = calculate(currentPrice, yesterdayPrice, holdingsInfo.getCost(), holdingsInfo.getCount(), holdingsInfo.getTradeList(), false);
         holdingsInfo.setCost(holdingsTodayInfo.getCurrentCost().toString());
         holdingsInfo.setCount(holdingsTodayInfo.getTotal());
 

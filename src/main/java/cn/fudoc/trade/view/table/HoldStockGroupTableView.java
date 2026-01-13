@@ -131,14 +131,15 @@ public class HoldStockGroupTableView extends AbstractHoldingsTable {
                 increaseRate = BigDecimal.ZERO;
         int count = 0, total = 0;
         if (Objects.nonNull(holdingsInfo)) {
-            HoldingsTodayInfo holdingsTodayInfo = CalculateCostHelper.calculate(holdingsInfo);
+            BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
+            BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
+            HoldingsTodayInfo holdingsTodayInfo = CalculateCostHelper.calculate(currentPrice, yesterdayPrice, holdingsInfo);
             //持仓成本价
             cost = holdingsTodayInfo.getCurrentCost();
             //持仓数量
             total = holdingsTodayInfo.getTotal();
             //可用数量
             count = holdingsTodayInfo.getCount();
-            BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
             BigDecimal totalDecimal = new BigDecimal(total);
             //市值=持仓*当前价
             companyValue = totalDecimal.multiply(currentPrice).setScale(4, RoundingMode.CEILING);
@@ -149,8 +150,7 @@ public class HoldStockGroupTableView extends AbstractHoldingsTable {
 
             //今日收益计算
             increaseRate = new BigDecimal(realStockInfo.getIncreaseRate());
-            BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
-            todayProfit = CalculateCostHelper.calculateProfit(currentPrice, yesterdayPrice, holdingsInfo);
+            todayProfit = holdingsTodayInfo.getTodayProfit();
         }
 
         //股票代码

@@ -101,16 +101,16 @@ public class HoldStockGroupHideTableView extends AbstractHoldingsTable {
                 todayProfit = BigDecimal.ZERO;
         int total;
         if (Objects.nonNull(holdingsInfo)) {
-            HoldingsTodayInfo holdingsTodayInfo = CalculateCostHelper.calculate(holdingsInfo);
+            BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
+            BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
+            HoldingsTodayInfo holdingsTodayInfo = CalculateCostHelper.calculate(currentPrice, yesterdayPrice, holdingsInfo);
             //持仓成本价
             cost = holdingsTodayInfo.getCurrentCost();
             //持仓数量
             total = holdingsTodayInfo.getTotal();
-            BigDecimal currentPrice = new BigDecimal(realStockInfo.getCurrentPrice());
             BigDecimal totalDecimal = new BigDecimal(total);
             //盈亏=持仓*(当前价-成本价)
             PL = currentPrice.subtract(cost).multiply(totalDecimal).setScale(4, RoundingMode.CEILING);
-            BigDecimal yesterdayPrice = FuNumberUtil.toBigDecimal(realStockInfo.getYesterdayPrice());
             todayProfit = CalculateCostHelper.calculateProfit(currentPrice, yesterdayPrice, holdingsInfo);
         }
         vector.add(realStockInfo.getStockCode());

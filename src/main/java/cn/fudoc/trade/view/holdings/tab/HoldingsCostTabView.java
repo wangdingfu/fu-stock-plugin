@@ -54,7 +54,7 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
         if (Objects.isNull(holdingsInfo)) {
             costField.setText("");
             countField.setText("");
-        }else {
+        } else {
             costField.setText(FuNumberUtil.formatCost(holdingsInfo.getCost()));
             Integer count = holdingsInfo.getCount();
             countField.setText(Objects.isNull(count) ? "" : count.toString());
@@ -67,13 +67,13 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     @Override
     protected void createPanel(JPanel mainPanel) {
         // 成本价行
-        JPanel costPanel = FormPanelUtil.createRowPanel("持仓成本：", costField,true);
+        JPanel costPanel = FormPanelUtil.createRowPanel("持仓成本：", costField, true);
         costPanel.add(Box.createHorizontalStrut(5));
         costPanel.add(actualCostLabel);
         mainPanel.add(costPanel);
         mainPanel.add(Box.createVerticalStrut(15));
         // 持仓数量行
-        JPanel countPanel = FormPanelUtil.createRowPanel("持仓数量：", countField,true);
+        JPanel countPanel = FormPanelUtil.createRowPanel("持仓数量：", countField, true);
         countPanel.add(Box.createHorizontalStrut(5));
         countPanel.add(actualCountLabel);
         mainPanel.add(countPanel);
@@ -111,12 +111,11 @@ public class HoldingsCostTabView extends AbstractHoldingsTabView implements Docu
     }
 
 
-
     private void updateTipInfo() {
         String countStr = countField.getText().trim();
         String costStr = costField.getText().trim();
         Integer count = NumberUtil.isInteger(countStr) ? Integer.parseInt(countStr) : 0;
-        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(costStr, count, Objects.isNull(this.holdingsInfo) ? Lists.newArrayList() : holdingsInfo.getTradeList());
+        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(costStr, count, holdingsInfo);
         actualCountLabel.setText("实际数量: " + calculate.getTotal());
         actualCostLabel.setText("实际成本: " + FuNumberUtil.formatCost(calculate.getCurrentCost()));
     }

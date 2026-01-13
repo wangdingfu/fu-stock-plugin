@@ -23,4 +23,15 @@ public class HoldingsTodayInfo {
      * 当日可用仓位
      */
     private Integer count;
+
+    /**
+     * 今日收益
+     */
+    private BigDecimal todayProfit;
+
+    public HoldingsTodayInfo(BigDecimal currentCost,Integer total,Integer count){
+        this.currentCost = currentCost;
+        this.total = total;
+        this.count = count;
+    }
 }
