@@ -29,9 +29,9 @@ public class HoldingsTodayInfo {
      */
     private BigDecimal todayProfit;
 
-    public HoldingsTodayInfo(BigDecimal currentCost,Integer total,Integer count){
-        this.currentCost = currentCost;
-        this.total = total;
-        this.count = count;
-    }
+    /**
+     * 持仓收益
+     */
+    private BigDecimal totalProfit;
+
 }

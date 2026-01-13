@@ -62,7 +62,8 @@ public class CalculateCostHelper {
         //上一交易日的持仓数量（可卖数量）
         Integer lastDayCount = count;
         if (tradeList == null || tradeList.isEmpty()) {
-            return new HoldingsTodayInfo(currentCost, currentCount, currentCount, multiply(diffPrice, count));
+            BigDecimal profit = multiply(diffPrice, count);
+            return new HoldingsTodayInfo(currentCost, currentCount, currentCount, profit, profit);
         }
         //截止到上一交易日的总收益
         BigDecimal lastDayProfit = multiply(yesterdayPrice.subtract(currentCost), count);
@@ -120,7 +121,7 @@ public class CalculateCostHelper {
             //上一交易日还未卖出的持仓收益
             todayProfit = todayProfit.add(multiply(diffPrice, lastDayCount));
         }
-        return new HoldingsTodayInfo(currentCost, currentCount, lastDayCount, todayProfit);
+        return new HoldingsTodayInfo(currentCost, currentCount, lastDayCount, todayProfit, lastDayProfit.add(todayProfit));
     }
 
 
@@ -255,7 +256,7 @@ public class CalculateCostHelper {
         //当天之前的交易信息
         List<TradeInfoLog> beforeTradeList = tradeList.stream().filter(f -> f.getTime() < todayBeginDay).toList();
         //计算上一交易日的持仓成本 并将上一交易日的持仓成本设置到当前持仓成本信息中
-        HoldingsTodayInfo holdingsTodayInfo = calculate(currentPrice, yesterdayPrice, holdingsInfo.getCost(), holdingsInfo.getCount(), holdingsInfo.getTradeList(), false);
+        HoldingsTodayInfo holdingsTodayInfo = calculate(currentPrice, yesterdayPrice, holdingsInfo.getCost(), holdingsInfo.getCount(), beforeTradeList, false);
         holdingsInfo.setCost(holdingsTodayInfo.getCurrentCost().toString());
         holdingsInfo.setCount(holdingsTodayInfo.getTotal());
 

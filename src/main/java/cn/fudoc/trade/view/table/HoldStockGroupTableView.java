@@ -144,7 +144,7 @@ public class HoldStockGroupTableView extends AbstractHoldingsTable {
             //市值=持仓*当前价
             companyValue = totalDecimal.multiply(currentPrice).setScale(4, RoundingMode.CEILING);
             //盈亏=持仓*(当前价-成本价)
-            PL = currentPrice.subtract(cost).multiply(totalDecimal).setScale(4, RoundingMode.CEILING);
+            PL = holdingsTodayInfo.getTotalProfit();
             //盈亏比=(成本价-当前价)/成本价
             PLRate = cost.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : currentPrice.subtract(cost).divide(cost, 4, RoundingMode.CEILING);
 
