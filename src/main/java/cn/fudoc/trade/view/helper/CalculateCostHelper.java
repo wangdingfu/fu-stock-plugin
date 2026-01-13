@@ -117,11 +117,12 @@ public class CalculateCostHelper {
     public static BigDecimal calculateProfit(BigDecimal currentPrice, BigDecimal yesterdayPrice, HoldingsInfo holdingsInfo) {
         //历史持仓数量*（当前价-昨日收盘价）+ 今日买入数量*（当前价-买入价） + 今日卖出数量 * （当前价-昨日收盘价）
         BigDecimal diffPrice = currentPrice.subtract(yesterdayPrice);
-        BigDecimal todayProfit = multiply(diffPrice, holdingsInfo.getCount());
         List<TradeInfoLog> tradeList = holdingsInfo.getTradeList();
         if (tradeList == null || tradeList.isEmpty()) {
-            return todayProfit;
+            return multiply(diffPrice, holdingsInfo.getCount());
         }
+        BigDecimal todayProfit = BigDecimal.ZERO;
+        Integer remainingCount = holdingsInfo.getCount();
         long todayBeginDay = DateUtil.beginOfDay(new Date()).getTime();
         for (TradeInfoLog tradeInfoLog : tradeList) {
             Integer type = tradeInfoLog.getType();
@@ -143,12 +144,16 @@ public class CalculateCostHelper {
                 tradeProfit = multiply(currentPrice.subtract(tradePrice), tradeCount).subtract(handlingFee);
             } else if (type == 2) {
                 //卖出动作 计算当前成本
-                tradeProfit = multiply(currentPrice.subtract(yesterdayPrice), tradeCount).subtract(handlingFee);
+                remainingCount -= tradeCount;
+                tradeProfit = multiply(tradePrice.subtract(yesterdayPrice), tradeCount).subtract(handlingFee);
             } else {
                 //其他情况暂不考虑
                 continue;
             }
             todayProfit = todayProfit.add(tradeProfit);
+        }
+        if (remainingCount > 0) {
+            todayProfit = todayProfit.add(multiply(diffPrice, remainingCount));
         }
         return todayProfit;
     }
@@ -170,7 +175,7 @@ public class CalculateCostHelper {
         BigDecimal totalAmount = multiply(tradePrice, tradeCount);
         BigDecimal handlingFee = BigDecimal.ZERO;
         BigDecimal commissionRate = FuNumberUtil.toBigDecimal(rate.getCommissionRate());
-        BigDecimal commissionFee = totalAmount.multiply(commissionRate).setScale(2,RoundingMode.HALF_UP);
+        BigDecimal commissionFee = totalAmount.multiply(commissionRate).setScale(2, RoundingMode.HALF_UP);
         BigDecimal minFee = FuNumberUtil.toBigDecimal(rate.getMinFee());
         if (minFee.compareTo(commissionFee) > 0) {
             //最低收取5元
@@ -187,7 +192,7 @@ public class CalculateCostHelper {
         }
 
         //过户费
-        BigDecimal transferRate = FuNumberUtil.toBigDecimal(transferRate(rate,jysEnum));
+        BigDecimal transferRate = FuNumberUtil.toBigDecimal(transferRate(rate, jysEnum));
         handlingFee = handlingFee.add(totalAmount.multiply(transferRate).setScale(2, RoundingMode.HALF_UP));
 
         //其他费率
@@ -203,10 +208,10 @@ public class CalculateCostHelper {
     }
 
 
-    private static String transferRate(TradeRateInfo rate,JYSEnum jysEnum){
-        if(JYSEnum.SH.equals(jysEnum)){
+    private static String transferRate(TradeRateInfo rate, JYSEnum jysEnum) {
+        if (JYSEnum.SH.equals(jysEnum)) {
             return rate.getTransferSHRate();
-        }else if(JYSEnum.SZ.equals(jysEnum)){
+        } else if (JYSEnum.SZ.equals(jysEnum)) {
             return rate.getTransferSZRate();
         }
         return "0";
