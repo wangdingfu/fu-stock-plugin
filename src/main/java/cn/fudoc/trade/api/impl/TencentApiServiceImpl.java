@@ -2,6 +2,7 @@ package cn.fudoc.trade.api.impl;
 
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpUtil;
@@ -13,6 +14,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -23,6 +25,16 @@ public class TencentApiServiceImpl implements TencentApiService {
     private static final BigDecimal Y = new BigDecimal("10000");
     private static final String BASE_URL = "http://qt.gtimg.cn/q=";
 
+
+    @Override
+    public void ping() {
+        String url = BASE_URL + "sz000001";
+        try {
+            HttpUtil.get(url);
+        } catch (Exception e) {
+            FuNotification.notifyWarning("无法获取股票信息，可能您当前环境无法访问api：" + url);
+        }
+    }
 
     @Override
     public List<RealStockInfo> stockList(Set<String> codeSet) {
@@ -78,13 +90,13 @@ public class TencentApiServiceImpl implements TencentApiService {
 
 
     private static String[] formatVolume(String volume) {
-        if(StringUtils.isEmpty(volume) || !NumberUtil.isNumber(volume)){
-            return new String[]{"---",""};
+        if (StringUtils.isEmpty(volume) || !NumberUtil.isNumber(volume)) {
+            return new String[]{"---", ""};
         }
         BigDecimal bigDecimal = new BigDecimal(volume);
-        if(bigDecimal.compareTo(Y) < 0){
-            return new String[]{volume,"万"};
+        if (bigDecimal.compareTo(Y) < 0) {
+            return new String[]{volume, "万"};
         }
-        return new String[]{FuNumberUtil.format(NumberUtil.div(bigDecimal,Y,2)),"亿"};
+        return new String[]{FuNumberUtil.format(NumberUtil.div(bigDecimal, Y, 2)), "亿"};
     }
 }

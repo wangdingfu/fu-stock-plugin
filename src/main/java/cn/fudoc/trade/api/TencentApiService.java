@@ -12,6 +12,11 @@ import java.util.Set;
 public interface TencentApiService {
 
     /**
+     * 验证是否能访问腾讯金融域名
+     */
+    void ping();
+
+    /**
      * 股票实时数据列表（包含A股、港股股票实时数据）
      *
      * @param codeSet 股票代码
