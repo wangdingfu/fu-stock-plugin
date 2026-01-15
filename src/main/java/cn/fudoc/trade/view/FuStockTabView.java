@@ -86,30 +86,6 @@ public class FuStockTabView {
         TabInfo tabInfo = new TabInfo(stockTableView.getComponent());
         tabInfo.setText(tabName);
         tabInfo.setIcon(groupType.getIcon());
-        tabInfo.setDragOutDelegate(new TabInfo.DragOutDelegate() {
-            @Override
-            public void dragOutStarted(@NotNull MouseEvent mouseEvent, @NotNull TabInfo tabInfo) {
-                System.out.println("dragOutStarted");
-            }
-
-            @Override
-            public void processDragOut(@NotNull MouseEvent mouseEvent, @NotNull TabInfo tabInfo) {
-                System.out.println("processDragOut");
-
-            }
-
-            @Override
-            public void dragOutFinished(@NotNull MouseEvent mouseEvent, @NotNull TabInfo tabInfo) {
-                System.out.println("dragOutFinished");
-
-            }
-
-            @Override
-            public void dragOutCancelled(@NotNull TabInfo tabInfo) {
-                System.out.println("dragOutCancelled");
-
-            }
-        });
         this.tabs.addTab(tabInfo);
     }
 

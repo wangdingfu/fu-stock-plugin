@@ -36,6 +36,10 @@
 #### 添加股票
 ![img.png](img/add-stock.png)
 
+#### 今日交易
+![img.png](img/sell.png)
+
+![img.png](img/logList.png)
 
 未来计划
 ---
