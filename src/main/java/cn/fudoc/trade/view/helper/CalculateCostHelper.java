@@ -61,12 +61,12 @@ public class CalculateCostHelper {
         Integer currentCount = count;
         //上一交易日的持仓数量（可卖数量）
         Integer lastDayCount = count;
-        if (tradeList == null || tradeList.isEmpty()) {
-            BigDecimal profit = multiply(diffPrice, count);
-            return new HoldingsTodayInfo(currentCost, currentCount, currentCount, profit, profit);
-        }
         //截止到上一交易日的总收益
         BigDecimal lastDayProfit = multiply(yesterdayPrice.subtract(currentCost), count);
+        if (tradeList == null || tradeList.isEmpty()) {
+            BigDecimal todayProfit = multiply(diffPrice, count);
+            return new HoldingsTodayInfo(currentCost, currentCount, currentCount, todayProfit, lastDayProfit.add(todayProfit));
+        }
         BigDecimal todayProfit = BigDecimal.ZERO;
         long todayBeginDay = DateUtil.beginOfDay(new Date()).getTime();
         for (TradeInfoLog tradeInfoLog : tradeList) {
