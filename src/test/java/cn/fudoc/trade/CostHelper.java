@@ -3,6 +3,7 @@ package cn.fudoc.trade;
 import cn.fudoc.trade.core.state.pojo.HoldingsInfo;
 import cn.fudoc.trade.view.dto.HoldingsTodayInfo;
 import cn.fudoc.trade.view.helper.CalculateCostHelper;
+import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 
 import java.math.BigDecimal;
@@ -15,8 +16,11 @@ public class CostHelper {
     public static void main(String[] args) {
 //        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(TLYS());
 //        System.out.println(JSONUtil.toJsonPrettyStr(calculate));
-
-        System.out.println(new BigDecimal("4.8375").setScale(2, RoundingMode.HALF_UP));
+        String s1 = HttpUtil.get("http://qt.gtimg.cn/q=sz000001");
+        String s = HttpUtil.get("http://stock.fudoc.cn/q=sz000001");
+        System.out.println(s);
+        System.out.println(s1);
+//        System.out.println(new BigDecimal("4.8375").setScale(2, RoundingMode.HALF_UP));
     }
 
     private static HoldingsInfo TLYS(){
