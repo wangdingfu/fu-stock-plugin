@@ -17,7 +17,6 @@ public class CostHelper {
 //        HoldingsTodayInfo calculate = CalculateCostHelper.calculate(TLYS());
 //        System.out.println(JSONUtil.toJsonPrettyStr(calculate));
         String s1 = HttpUtil.get("http://qt.gtimg.cn/q=sz000001");
-
         System.out.println(s1);
 //        System.out.println(new BigDecimal("4.8375").setScale(2, RoundingMode.HALF_UP));
     }
@@ -52,6 +51,7 @@ public class CostHelper {
         HoldingsInfo holdingsInfo = new HoldingsInfo();
         holdingsInfo.add(1,3000,"8.82","5.27");
         holdingsInfo.add(2,1500,"10.02","12.67");
+        holdingsInfo.add(2,1000,"11.176","10.69");
         holdingsInfo.add(2,1000,"11.176","10.69");
         return holdingsInfo;
     }
