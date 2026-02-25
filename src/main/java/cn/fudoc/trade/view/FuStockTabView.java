@@ -53,7 +53,6 @@ public class FuStockTabView {
     public JComponent getComponent() {
         JPanel rootPanel = new JPanel(new BorderLayout());
         rootPanel.add(tabs.getComponent());
-        rootPanel.setFont(JBUI.Fonts.label(11));
         return rootPanel;
     }
 

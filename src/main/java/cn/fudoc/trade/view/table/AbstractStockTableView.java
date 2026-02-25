@@ -2,8 +2,10 @@ package cn.fudoc.trade.view.table;
 
 import cn.fudoc.trade.api.TencentApiService;
 import cn.fudoc.trade.api.data.RealStockInfo;
+import cn.fudoc.trade.core.common.enumtype.FuPosition;
 import cn.fudoc.trade.core.helper.TableHelper;
 import cn.fudoc.trade.core.helper.TableListener;
+import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.FuNumberUtil;
 import cn.hutool.core.date.DateUtil;
@@ -91,6 +93,7 @@ public abstract class AbstractStockTableView implements StockTableView, TableLis
         JTableHeader tableHeader = stockTable.getTableHeader();
         tableHeader.setDefaultRenderer(headerCenterRenderer);
         tipLabel = new JLabel();
+        stockTable.setFont(stockTable.getFont().deriveFont(FuStockSettingState.getInstance().getFontSize(FuPosition.TABLE_TITLE)));
         tableHelper = new TableHelper(this.stockTable, this.tableModel, this);
     }
 

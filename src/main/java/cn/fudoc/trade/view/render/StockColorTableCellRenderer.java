@@ -1,5 +1,7 @@
 package cn.fudoc.trade.view.render;
 
+import cn.fudoc.trade.core.common.enumtype.FuPosition;
+import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.fudoc.trade.util.FuNumberUtil;
 import com.intellij.ui.JBColor;
 
@@ -12,8 +14,10 @@ import java.util.Objects;
 
 public class StockColorTableCellRenderer extends DefaultTableCellRenderer {
     private final List<Integer> colorColumnList;
+    private final Float fontSize;
     public StockColorTableCellRenderer(List<Integer> colorColumnList) {
         this.colorColumnList = colorColumnList;
+        this.fontSize = FuStockSettingState.getInstance().getFontSize(FuPosition.TABLE_CONTENT);
     }
 
     @Override
@@ -34,8 +38,7 @@ public class StockColorTableCellRenderer extends DefaultTableCellRenderer {
             label.setHorizontalAlignment(SwingConstants.CENTER); // 水平居中
             label.setVerticalAlignment(SwingConstants.CENTER);   // 垂直居中
         }
-
-        component.setFont(component.getFont().deriveFont(12.0f));
+        component.setFont(component.getFont().deriveFont(fontSize));
         return component;
     }
 

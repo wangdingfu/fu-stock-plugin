@@ -1,5 +1,6 @@
 package cn.fudoc.trade.core.state;
 
+import cn.fudoc.trade.core.common.enumtype.FuPosition;
 import cn.fudoc.trade.core.state.pojo.TradeRateInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -40,6 +41,18 @@ public class FuStockSettingState implements PersistentStateComponent<FuStockSett
      * value： key：中文。value：英文/自定义隐蔽标识
      */
     private Map<String, Map<String, String>> cnMappingMap = new HashMap<>();
+
+    /**
+     * 表格字体
+     */
+    private Map<String, Float> fontSizeMap = new HashMap<>();
+
+
+    public float getFontSize(FuPosition fuPosition){
+        Float fontSize = fontSizeMap.get(fuPosition.getCode());
+        return Objects.isNull(fontSize) ? fuPosition.getDefaultSize() : fontSize;
+    }
+
 
     public void clearCnMapping() {
         cnMappingMap.clear();

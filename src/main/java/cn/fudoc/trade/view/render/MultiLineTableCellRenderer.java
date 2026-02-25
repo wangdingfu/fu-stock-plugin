@@ -1,5 +1,7 @@
 package cn.fudoc.trade.view.render;
 
+import cn.fudoc.trade.core.common.enumtype.FuPosition;
+import cn.fudoc.trade.core.state.FuStockSettingState;
 import cn.hutool.core.util.NumberUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -46,6 +48,9 @@ public class MultiLineTableCellRenderer extends JPanel implements TableCellRende
         topLabel.setVerticalAlignment(SwingConstants.CENTER);
         bottomLabel.setHorizontalAlignment(SwingConstants.CENTER);
         bottomLabel.setVerticalAlignment(SwingConstants.CENTER);
+        FuStockSettingState instance = FuStockSettingState.getInstance();
+        topLabel.setFont(topLabel.getFont().deriveFont(instance.getFontSize(FuPosition.TABLE_CONTENT)));
+        bottomLabel.setFont(bottomLabel.getFont().deriveFont(instance.getFontSize(FuPosition.TABLE_CONTENT_SMALL)));
 
         // 面板自身背景透明（避免遮挡表格样式） 保留不透明，用于显示选中背景
         setOpaque(true);
@@ -83,8 +88,6 @@ public class MultiLineTableCellRenderer extends JPanel implements TableCellRende
 
         // 加粗列配置
         if (boldColumnList.contains(column)) {
-            Font defaultFont = bottomLabel.getFont();
-            bottomLabel.setFont(defaultFont.deriveFont(11.0f));
             bottomLabel.setForeground(JBColor.GRAY);
         }
 
