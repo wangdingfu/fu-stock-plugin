@@ -47,8 +47,11 @@ public class FuStockSettingState implements PersistentStateComponent<FuStockSett
      */
     private Map<String, Float> fontSizeMap = new HashMap<>();
 
+    public void addFont(FuPosition fuPosition,float fontSize){
+        fontSizeMap.put(fuPosition.getCode(), fontSize);
+    }
 
-    public float getFontSize(FuPosition fuPosition){
+    public Float getFontSize(FuPosition fuPosition){
         Float fontSize = fontSizeMap.get(fuPosition.getCode());
         return Objects.isNull(fontSize) ? fuPosition.getDefaultSize() : fontSize;
     }
