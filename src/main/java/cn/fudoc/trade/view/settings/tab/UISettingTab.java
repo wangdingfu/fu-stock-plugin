@@ -40,7 +40,7 @@ public class UISettingTab implements SettingTab {
         FormPanelUtil.addRow(mainPanel, "表格标题字体", titleFontField);
         FormPanelUtil.addRow(mainPanel, "表格单元格字体", tableFontField);
         FormPanelUtil.addRow(mainPanel, "表格副文本字体", tableTipFontField);
-        return null;
+        return mainPanel;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class UISettingTab implements SettingTab {
 
 
     private float convertFont(FuPosition fuPosition, String text) {
-        if (StringUtils.isBlank(text) || !NumberUtil.isDouble(text)) {
+        if (StringUtils.isBlank(text) || !(NumberUtil.isDouble(text) || NumberUtil.isInteger(text))) {
             return fuPosition.getDefaultSize();
         }
         return NumberUtil.parseFloat(text);

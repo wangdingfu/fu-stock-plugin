@@ -3,6 +3,7 @@ package cn.fudoc.trade.view.settings;
 import cn.fudoc.trade.view.settings.tab.CNMappingSettingTab;
 import cn.fudoc.trade.view.settings.tab.RateSettingsTab;
 import cn.fudoc.trade.view.settings.tab.SettingTab;
+import cn.fudoc.trade.view.settings.tab.UISettingTab;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -30,6 +31,10 @@ public class FuStockSettingDialog extends DialogWrapper {
      * 中文映射页面
      */
     private CNMappingSettingTab cnMappingSettingTab;
+    /**
+     * 外观设置tab
+     */
+    private UISettingTab uiSettingTab;
 
     public FuStockSettingDialog(Project project) {
         this(project, null);
@@ -49,14 +54,17 @@ public class FuStockSettingDialog extends DialogWrapper {
     protected void doOKAction() {
         rateSettingsTab.submit();
         cnMappingSettingTab.submit();
+        uiSettingTab.submit();
         super.doOKAction();
     }
 
     private void initTab(String holdingsGroup) {
         this.rateSettingsTab = new RateSettingsTab(holdingsGroup);
         this.cnMappingSettingTab = new CNMappingSettingTab();
+        this.uiSettingTab = new UISettingTab();
         TabInfo tabInfo = addTab(rateSettingsTab);
         addTab(cnMappingSettingTab);
+        addTab(uiSettingTab);
         tabs.select(tabInfo, true);
     }
 
@@ -71,7 +79,9 @@ public class FuStockSettingDialog extends DialogWrapper {
 
     @Override
     protected @Nullable ValidationInfo doValidate() {
-        return rateSettingsTab.doValidate();
+        rateSettingsTab.doValidate();
+        uiSettingTab.doValidate();
+        return null;
     }
 
     @Override

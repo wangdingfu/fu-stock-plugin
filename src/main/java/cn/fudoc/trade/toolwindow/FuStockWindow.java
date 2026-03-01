@@ -256,18 +256,8 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
         actionGroup.add(new HideShowAction(new DefaultHideShowCallback() {
             @Override
             public void callback(boolean isShow) {
-                StockTableView selected = stockView.getSelected();
-                StockGroupInfo stockGroupInfo = null;
-                if (Objects.nonNull(selected)) {
-                    stockGroupInfo = selected.stockGroupInfo();
-                }
                 stockView.setHide(isShow);
-                stockView.removeAllTab();
-                initGroup();
-                //选中切换前的 tab
-                if (Objects.nonNull(stockGroupInfo)) {
-                    stockView.selected(stockGroupInfo);
-                }
+                reload();
             }
         }));
 
@@ -281,12 +271,27 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 FuStockSettingDialog fuStockSettingDialog = new FuStockSettingDialog(e.getProject());
-                fuStockSettingDialog.showAndGet();
+                if (fuStockSettingDialog.showAndGet()) {
+                    reload();
+                }
             }
         });
         return actionGroup;
     }
 
+    private void reload() {
+        StockTableView selected = stockView.getSelected();
+        StockGroupInfo stockGroupInfo = null;
+        if (Objects.nonNull(selected)) {
+            stockGroupInfo = selected.stockGroupInfo();
+        }
+        stockView.removeAllTab();
+        initGroup();
+        //选中切换前的 tab
+        if (Objects.nonNull(stockGroupInfo)) {
+            stockView.selected(stockGroupInfo);
+        }
+    }
 
     /**
      * 启动实时刷新任务
