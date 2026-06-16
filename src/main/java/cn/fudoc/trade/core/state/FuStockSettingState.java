@@ -47,7 +47,14 @@ public class FuStockSettingState implements PersistentStateComponent<FuStockSett
      */
     private Map<String, Float> fontSizeMap = new HashMap<>();
 
-    public void addFont(FuPosition fuPosition,float fontSize){
+    /**
+     * 智兔数服金融Token
+     */
+    private String token;
+
+
+
+    public void addFont(FuPosition fuPosition, float fontSize){
         fontSizeMap.put(fuPosition.getCode(), fontSize);
     }
 

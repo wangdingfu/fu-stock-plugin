@@ -18,8 +18,7 @@ public class UISettingTab implements SettingTab {
     private final JBTextField tableFontField = new JBTextField();
     private final JBTextField tableTipFontField = new JBTextField();
 
-    public UISettingTab() {
-        FuStockSettingState instance = FuStockSettingState.getInstance();
+    public UISettingTab(FuStockSettingState instance) {
         titleFontField.setText(instance.getFontSize(FuPosition.TABLE_TITLE) + "");
         tableFontField.setText(instance.getFontSize(FuPosition.TABLE_CONTENT) + "");
         tableTipFontField.setText(instance.getFontSize(FuPosition.TABLE_CONTENT_SMALL) + "");

@@ -1,9 +1,7 @@
 package cn.fudoc.trade.view.settings;
 
-import cn.fudoc.trade.view.settings.tab.CNMappingSettingTab;
-import cn.fudoc.trade.view.settings.tab.RateSettingsTab;
-import cn.fudoc.trade.view.settings.tab.SettingTab;
-import cn.fudoc.trade.view.settings.tab.UISettingTab;
+import cn.fudoc.trade.core.state.FuStockSettingState;
+import cn.fudoc.trade.view.settings.tab.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -35,6 +33,10 @@ public class FuStockSettingDialog extends DialogWrapper {
      * 外观设置tab
      */
     private UISettingTab uiSettingTab;
+    /**
+     * Token设置tab
+     */
+    private TokenSettingsTab tokenSettingsTab;
 
     public FuStockSettingDialog(Project project) {
         this(project, null);
@@ -55,16 +57,21 @@ public class FuStockSettingDialog extends DialogWrapper {
         rateSettingsTab.submit();
         cnMappingSettingTab.submit();
         uiSettingTab.submit();
+        tokenSettingsTab.submit();
         super.doOKAction();
     }
 
     private void initTab(String holdingsGroup) {
-        this.rateSettingsTab = new RateSettingsTab(holdingsGroup);
+        FuStockSettingState instance = FuStockSettingState.getInstance();
+
+        this.rateSettingsTab = new RateSettingsTab(holdingsGroup,instance);
         this.cnMappingSettingTab = new CNMappingSettingTab();
-        this.uiSettingTab = new UISettingTab();
+        this.uiSettingTab = new UISettingTab(instance);
+        this.tokenSettingsTab = new TokenSettingsTab(instance);
         TabInfo tabInfo = addTab(rateSettingsTab);
         addTab(cnMappingSettingTab);
         addTab(uiSettingTab);
+        addTab(tokenSettingsTab);
         tabs.select(tabInfo, true);
     }
 

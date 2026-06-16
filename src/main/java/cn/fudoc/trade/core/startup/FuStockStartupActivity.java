@@ -10,6 +10,8 @@ import cn.fudoc.trade.core.state.index.StockIndex;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.util.PinyinUtil;
 import cn.fudoc.trade.view.helper.HideTextHelper;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.RandomUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -39,7 +41,8 @@ public class FuStockStartupActivity implements ProjectActivity {
         return CompletableFuture.runAsync(() -> {
             MarketAllStockPersistentState instance = MarketAllStockPersistentState.getInstance();
             Long updateTime = instance.getUpdateTime();
-            if (Objects.isNull(updateTime) || (updateTime + ONE_DAY) < System.currentTimeMillis()) {
+            Integer randomedInt = RandomUtil.randomInt(1, 10);
+            if (Objects.isNull(updateTime) || (updateTime + randomedInt * ONE_DAY) < System.currentTimeMillis()) {
                 //触发更新
                 ZTApiService ztApiService = ApplicationManager.getApplication().getService(ZTApiService.class);
                 instance.setA(new StockIndex(ztApiService.marketA(), false));

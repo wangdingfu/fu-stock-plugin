@@ -7,6 +7,7 @@ import cn.fudoc.trade.core.common.FuNotification;
 import cn.fudoc.trade.core.action.PinToolBarAction;
 import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
+import cn.fudoc.trade.core.exception.FuStockException;
 import cn.fudoc.trade.core.state.HoldingsStockState;
 import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.util.ToolBarUtils;
@@ -57,10 +58,10 @@ public class FuStockSearchPopupView {
 
     private final TencentApiService tencentApiService = ApplicationManager.getApplication().getService(TencentApiService.class);
 
-    public FuStockSearchPopupView(StockTableView stockTableView) {
+    public FuStockSearchPopupView(StockTableView stockTableView,MarketAllStockPersistentState state) {
         this.stockTableView = stockTableView;
         this.searchField = createSearchField();
-        this.dataSource = MarketAllStockPersistentState.getInstance();
+        this.dataSource = state;
         //初始化结果列表
         this.resultModel = new DefaultListModel<>();
         this.jbList = new JBList<>(this.resultModel);
@@ -235,14 +236,17 @@ public class FuStockSearchPopupView {
      */
     private void doSearch(String keyword) {
         this.resultModel.clear();
-        List<StockInfo> stockInfoList = this.dataSource.match(keyword);
-        if (CollectionUtils.isNotEmpty(stockInfoList)) {
-            for (StockInfo stockInfo : stockInfoList) {
-                stockInfo.setAdd(this.stockTableView.isContainsStock(stockInfo.getStockCode()));
-                this.resultModel.addElement(stockInfo);
+        try {
+            List<StockInfo> stockInfoList = this.dataSource.match(keyword);
+            if (CollectionUtils.isNotEmpty(stockInfoList)) {
+                for (StockInfo stockInfo : stockInfoList) {
+                    stockInfo.setAdd(this.stockTableView.isContainsStock(stockInfo.getStockCode()));
+                    this.resultModel.addElement(stockInfo);
+                }
             }
+        } catch (FuStockException fuStockException) {
+            FuNotification.notifyWarning(fuStockException.getErrorMsg());
         }
-
     }
 
     private void toggleStockAddStatus(StockInfo stock) {

@@ -3,7 +3,8 @@ package cn.fudoc.trade.api.impl;
 import cn.fudoc.trade.api.ZTApiService;
 import cn.fudoc.trade.api.data.StockInfo;
 import cn.fudoc.trade.api.dto.ZTStockDTO;
-import cn.fudoc.trade.api.helper.ZTTokenHelper;
+import cn.fudoc.trade.core.state.FuStockSettingState;
+import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
@@ -34,7 +35,13 @@ public class ZTApiServiceImpl implements ZTApiService {
 
     private List<StockInfo> getStockListByMarket(String marketUrl) {
         try {
-            String result = HttpUtil.get(marketUrl + ZTTokenHelper.getToken());
+            FuStockSettingState settingState = FuStockSettingState.getInstance();
+            String token = settingState.getToken();
+            if (StringUtils.isBlank(token)) {
+                MarketAllStockPersistentState instance = MarketAllStockPersistentState.getInstance();
+                token = instance.usedToken();
+            }
+            String result = HttpUtil.get(marketUrl + token);
             if (StringUtils.isEmpty(result) || !JSONUtil.isTypeJSONArray(result)) {
                 return Lists.newArrayList();
             }

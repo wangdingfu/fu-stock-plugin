@@ -12,7 +12,7 @@ public class FormPanelUtil {
         mainPanel.add(Box.createVerticalStrut(15));
     }
 
-    public static void addRow(JPanel mainPanel, String labelText, JComponent component,boolean setComponentSize) {
+    public static void addRow(JPanel mainPanel, String labelText, JComponent component, boolean setComponentSize) {
         JPanel rowPanel = createRowPanel(labelText, component, setComponentSize);
         rowPanel.add(Box.createHorizontalGlue());
         mainPanel.add(rowPanel);

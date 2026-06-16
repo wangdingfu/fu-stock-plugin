@@ -1,5 +1,6 @@
 package cn.fudoc.trade.toolwindow;
 
+import cn.fudoc.trade.api.ZTApiService;
 import cn.fudoc.trade.core.action.DefaultHideShowCallback;
 import cn.fudoc.trade.core.action.HideShowAction;
 import cn.fudoc.trade.core.common.FuBundle;
@@ -8,8 +9,11 @@ import cn.fudoc.trade.core.common.FuTradeConstants;
 import cn.fudoc.trade.core.common.enumtype.CNMappingGroupEnum;
 import cn.fudoc.trade.core.common.enumtype.GroupTypeEnum;
 import cn.fudoc.trade.core.common.enumtype.UpdateTipTagEnum;
+import cn.fudoc.trade.core.exception.FuStockException;
 import cn.fudoc.trade.core.state.FuCommonState;
+import cn.fudoc.trade.core.state.MarketAllStockPersistentState;
 import cn.fudoc.trade.core.state.StockGroupState;
+import cn.fudoc.trade.core.state.index.StockIndex;
 import cn.fudoc.trade.core.state.pojo.StockGroupInfo;
 import cn.fudoc.trade.core.timer.ScheduledTaskManager;
 import cn.fudoc.trade.util.ToolBarUtils;
@@ -24,6 +28,7 @@ import cn.hutool.core.date.DateUtil;
 import com.intellij.find.editorHeaderActions.Utils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
@@ -183,7 +188,12 @@ public class FuStockWindow extends SimpleToolWindowPanel implements DataProvider
                     return;
                 }
                 SwingUtilities.invokeLater(() -> {
-                    FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stockTableView);
+                    MarketAllStockPersistentState state = MarketAllStockPersistentState.getInstance();
+                    if (state.aDataIsEmpty()) {
+                        FuNotification.notifyWarning("Token次数使用完毕，请进入设置--》Token设置 中获取新Token");
+                        return;
+                    }
+                    FuStockSearchPopupView fuStockSearchPopupView = new FuStockSearchPopupView(stockTableView, state);
                     fuStockSearchPopupView.showPopup(project);
                 });
 

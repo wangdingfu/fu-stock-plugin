@@ -40,6 +40,11 @@ public class StockIndex {
         this.nameMap = new HashMap<>();
     }
 
+
+    public boolean isEmpty(){
+        return MapUtils.isEmpty(this.codeMap);
+    }
+
     public StockIndex(List<StockInfo> stockInfoList, boolean isHK) {
         this.isHK = isHK;
         if (CollectionUtils.isNotEmpty(stockInfoList)) {

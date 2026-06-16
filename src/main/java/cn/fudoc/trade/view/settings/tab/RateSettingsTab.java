@@ -35,7 +35,7 @@ public class RateSettingsTab implements SettingTab {
     private final JBTextField otherFeeField = new JBTextField();
 
 
-    public RateSettingsTab(String holdingsGroup) {
+    public RateSettingsTab(String holdingsGroup, FuStockSettingState instance) {
         Set<String> groups;
         if (StringUtils.isBlank(holdingsGroup)) {
             groups = StockGroupState.getInstance().holdingsGroups();
@@ -43,14 +43,8 @@ public class RateSettingsTab implements SettingTab {
         } else {
             groups = Sets.newHashSet(holdingsGroup);
         }
-        FuStockSettingState instance = FuStockSettingState.getInstance();
         holdingsGroupField = new ComboBox<>(groups.toArray(new String[]{}));
-        holdingsGroupField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                initData(instance);
-            }
-        });
+        holdingsGroupField.addActionListener(e -> initData(instance));
         initData(instance);
     }
 
